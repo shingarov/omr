@@ -23,6 +23,7 @@
 #define TR_ARM64_INSTOPCODE_INCL
 
 #include "codegen/OMRInstOpCode.hpp"
+#include "infra/Assert.hpp"
 
 namespace TR
 {
@@ -39,7 +40,11 @@ class InstOpCode: public OMR::InstOpCodeConnector
     * @brief Constructor
     * @param[in] m : mnemonic
     */
-   InstOpCode(TR::InstOpCode::Mnemonic m) : OMR::InstOpCodeConnector(m) {}
+   InstOpCode(TR::InstOpCode::Mnemonic m) : OMR::InstOpCodeConnector(m)
+      {
+      TR_ASSERT((uint32_t)m < (uint32_t)TR::InstOpCode::cbzw || (uint32_t)m >= (uint32_t)TR::InstOpCode::proc,
+               "Invalid RISC-V opcode (AArch64 opcode, perhaps?)");
+      }
    };
 
 }

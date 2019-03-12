@@ -26,6 +26,17 @@ const OMR::ARM64::InstOpCode::OpCodeBinaryEntry OMR::ARM64::InstOpCode::binaryEn
 //		BINARY			Opcode    	Opcode		comments
 /* UNALLOCATED */
 		0x00000000,	/* BAD       	bad	invalid operation */
+/*
+ * RISC-V instructions
+ */
+#define DECLARE_INSN(mnemonic, match, mask) match,
+#include <riscv-opc.h>
+#undef DECLARE_INSN
+/*
+ * AArch64 instructions. They are defined for AArch64 source-level compatibility
+ * only, they *must* die at some point
+ */
+#if 1
 /* Branch,exception generation and system Instruction */
 	/* Compare _ Branch (immediate) */
 		0x34000000,	/* CBZ       	cbzw	 */
@@ -464,4 +475,5 @@ const OMR::ARM64::InstOpCode::OpCodeBinaryEntry OMR::ARM64::InstOpCode::binaryEn
 		0x1E604800,	/* FMAX      	fmaxd	 */
 		0x1E205800,	/* FMIN      	fmins	 */
 		0x1E605800,	/* FMIN      	fmind	 */
+#endif
 };

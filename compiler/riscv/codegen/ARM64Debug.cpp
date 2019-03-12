@@ -80,6 +80,17 @@ static const char *ARM64ExtendCodeNames[] =
 static const char *opCodeToNameMap[] =
    {
    "bad",
+/*
+ * RISC-V instructions
+ */
+#define DECLARE_INSN(mnemonic, match, mask) #mnemonic,
+#include <riscv-opc.h>
+#undef DECLARE_INSN
+/*
+ * AArch64 instructions. They are defined for AArch64 source-level compatibility
+ * only, they *must* die at some point
+ */
+#if 1
    "cbzw",
    "cbnzw",
    "cbzx",
@@ -473,6 +484,7 @@ static const char *opCodeToNameMap[] =
    "fmaxd",
    "fmins",
    "fmind",
+#endif
    "proc",
    "fence",
    "return",

@@ -27,6 +27,17 @@
 //		Opcode                                                         BINARY    	OPCODE    	comments
 /* UNALLOCATED */
 		bad,                                                    	/* 0x00000000	BAD       	invalid operation */
+/*
+ * RISC-V instructions
+ */
+#define DECLARE_INSN(mnemonic, match, mask) _ ## mnemonic,
+#include <riscv-opc.h>
+#undef DECLARE_INSN
+/*
+ * AArch64 instructions. They are defined for AArch64 source-level compatibility
+ * only, they *must* die at some point
+ */
+#if 1
 /* Branch,exception generation and system Instruction */
 	/* Compare _ Branch (immediate) */
 		cbzw,                                                   	/* 0x34000000	CBZ       	 */
@@ -465,6 +476,7 @@
 		fmaxd,                                                  	/* 0x1E604800	FMAX      	 */
 		fmins,                                                  	/* 0x1E205800	FMIN      	 */
 		fmind,                                                  	/* 0x1E605800	FMIN      	 */
+#endif
 /* Internal OpCodes */
 		proc,  // Entry to the method
 		fence, // Fence
