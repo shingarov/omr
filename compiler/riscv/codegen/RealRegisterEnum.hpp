@@ -23,79 +23,39 @@
  * This file will be included within an enum.  Only comments and enumerator
  * definitions are permitted.
  */
-
       NoReg             = 0,
-      x0                = 1,
+
+#define DECLARE_GPR(regname, abiname, encoding) \
+      abiname           = NoReg + 1 + encoding, \
+      regname           = NoReg + 1 + encoding,
+#include <codegen/riscv-regs.h>
+#undef DECLARE_GPR
+
+#define DECLARE_FPR(regname, abiname, encoding) \
+      abiname           = x31 + 1 + encoding, \
+      regname           = x31 + 1 + encoding,
+#include <codegen/riscv-regs.h>
+#undef DECLARE_FPR
+
+      // Following are AArch64 names defined here temporarily
+      // source-level compativility with to-be-replaced AArch64
+      // code. Will be removed.
+#if 1
+      lr                = ra,
+      xzr               = zero,
+#define DECLARE_FPR(regname, abiname, encoding) \
+      v##encoding       = x31 + 1 + encoding,
+#include <codegen/riscv-regs.h>
+#undef DECLARE_FPR
+#endif
+
+
       FirstGPR          = x0,
-      x1                = 2,
-      x2                = 3,
-      x3                = 4,
-      x4                = 5,
-      x5                = 6,
-      x6                = 7,
-      x7                = 8,
-      x8                = 9,
-      x9                = 10,
-      x10               = 11,
-      x11               = 12,
-      x12               = 13,
-      x13               = 14,
-      x14               = 15,
-      x15               = 16,
-      x16               = 17,
-      x17               = 18,
-      x18               = 19,
-      x19               = 20,
-      x20               = 21,
-      x21               = 22,
-      x22               = 23,
-      x23               = 24,
-      x24               = 25,
-      x25               = 26,
-      x26               = 27,
-      x27               = 28,
-      x28               = 29,
-      x29               = 30,
-      x30               = 31,
-      lr                = x30,
-      LastGPR           = x30,
-      LastAssignableGPR = x29,
-      sp                = 32,
-      xzr               = 33,
-      v0                = 34,
-      FirstFPR          = v0,
-      v1                = 35,
-      v2                = 36,
-      v3                = 37,
-      v4                = 38,
-      v5                = 39,
-      v6                = 40,
-      v7                = 41,
-      v8                = 42,
-      v9                = 43,
-      v10               = 44,
-      v11               = 45,
-      v12               = 46,
-      v13               = 47,
-      v14               = 48,
-      v15               = 49,
-      v16               = 50,
-      v17               = 51,
-      v18               = 52,
-      v19               = 53,
-      v20               = 54,
-      v21               = 55,
-      v22               = 56,
-      v23               = 57,
-      v24               = 58,
-      v25               = 59,
-      v26               = 60,
-      v27               = 61,
-      v28               = 62,
-      v29               = 63,
-      v30               = 64,
-      v31               = 65,
-      LastFPR           = v31,
-      LastAssignableFPR = v31,
-      SpilledReg        = 66,
-      NumRegisters      = SpilledReg + 1
+      LastGPR           = x31,
+      LastAssignableGPR = x31,
+
+      FirstFPR          = f0,
+      LastFPR           = f31,
+      LastAssignableFPR = f31,
+      SpilledReg        = f31 + 1,
+      NumRegisters      = SpilledReg + 1,

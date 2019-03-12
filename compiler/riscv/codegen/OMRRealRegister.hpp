@@ -35,6 +35,8 @@
 
 #include "compiler/codegen/OMRRealRegister.hpp"
 #include "infra/Annotations.hpp"
+#include "infra/Assert.hpp"
+
 
 namespace TR { class CodeGenerator; }
 
@@ -78,12 +80,21 @@ class OMR_EXTENSIBLE RealRegister : public OMR::RealRegister
    } ARM64OperandPosition;
 
    /**
+    * @brief Return binary encoding of the register
+    * @return: register binary encoding
+    */
+   uint32_t binaryRegCode()
+      {
+      return (uint32_t)fullRegBinaryEncodings[_registerNumber];
+      }
+
+   /**
     * @brief Set the RealRegister in the Rd field of the specified instruction
     * @param[in] instruction : target instruction
     */
    void setRegisterFieldRD(uint32_t *instruction)
       {
-      *instruction |= fullRegBinaryEncodings[_registerNumber] << pos_RD;
+      TR_ASSERT(false, "Should not be called anymore!");
       }
 
    /**
@@ -92,7 +103,7 @@ class OMR_EXTENSIBLE RealRegister : public OMR::RealRegister
     */
    void setRegisterFieldRN(uint32_t *instruction)
       {
-      *instruction |= fullRegBinaryEncodings[_registerNumber] << pos_RN;
+      TR_ASSERT(false, "Should not be called anymore!");
       }
 
    /**
@@ -101,7 +112,7 @@ class OMR_EXTENSIBLE RealRegister : public OMR::RealRegister
     */
    void setRegisterFieldRM(uint32_t *instruction)
       {
-      *instruction |= fullRegBinaryEncodings[_registerNumber] << pos_RM;
+      TR_ASSERT(false, "Should not be called anymore!");
       }
 
    /**
@@ -110,7 +121,7 @@ class OMR_EXTENSIBLE RealRegister : public OMR::RealRegister
     */
    void setRegisterFieldRT(uint32_t *instruction)
       {
-      *instruction |= fullRegBinaryEncodings[_registerNumber] << pos_RT;
+      TR_ASSERT(false, "Should not be called anymore!");
       }
 
    /**
@@ -119,7 +130,7 @@ class OMR_EXTENSIBLE RealRegister : public OMR::RealRegister
     */
    void setRegisterFieldRT2(uint32_t *instruction)
       {
-      *instruction |= fullRegBinaryEncodings[_registerNumber] << pos_RT2;
+      TR_ASSERT(false, "Should not be called anymore!");
       }
 
    /**
@@ -128,7 +139,7 @@ class OMR_EXTENSIBLE RealRegister : public OMR::RealRegister
     */
    void setRegisterFieldRS(uint32_t *instruction)
       {
-      *instruction |= fullRegBinaryEncodings[_registerNumber] << pos_RS;
+      TR_ASSERT(false, "Should not be called anymore!");
       }
 
    /**
@@ -137,7 +148,7 @@ class OMR_EXTENSIBLE RealRegister : public OMR::RealRegister
     */
    void setRegisterFieldRA(uint32_t *instruction)
       {
-      *instruction |= fullRegBinaryEncodings[_registerNumber] << pos_RA;
+      TR_ASSERT(false, "Should not be called anymore!");
       }
 
    private:

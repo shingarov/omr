@@ -873,25 +873,16 @@ void OMR::ARM64::Machine::initializeRegisterFile()
                                                  TR::RealRegister::x29,
                                                  self()->cg());
 
-   /* x30 is used as LR on ARM64 */
-   _registerFile[TR::RealRegister::lr] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
+   _registerFile[TR::RealRegister::x30] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
                                                  0,
                                                  TR::RealRegister::Free,
-                                                 TR::RealRegister::lr,
+                                                 TR::RealRegister::x30,
                                                  self()->cg());
 
-   /* SP */
-   _registerFile[TR::RealRegister::sp] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
+   _registerFile[TR::RealRegister::x31] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
                                                  0,
                                                  TR::RealRegister::Free,
-                                                 TR::RealRegister::sp,
-                                                 self()->cg());
-
-   /* XZR */
-   _registerFile[TR::RealRegister::xzr] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::xzr,
+                                                 TR::RealRegister::x31,
                                                  self()->cg());
 
    _registerFile[TR::RealRegister::v0] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
