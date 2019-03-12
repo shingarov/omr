@@ -626,6 +626,11 @@ public:
    virtual const char * getOpCodeName(TR::InstOpCode *);
    const char * getName(TR::RealRegister *, TR_RegisterSizes size = TR_WordReg);
 #endif
+#if defined(TR_TARGET_RISCV)
+   virtual const char * getOpCodeName(TR::InstOpCode *);
+   const char * getName(TR::RealRegister *, TR_RegisterSizes size = TR_WordReg);
+#endif
+
 
 #if defined(AIXPPC)
    virtual void setupDebugger(void *);
@@ -1143,6 +1148,44 @@ public:
 #endif
    void print(TR::FILE *, TR::ARM64HelperCallSnippet *);
 
+#endif
+#ifdef TR_TARGET_RISCV
+   void printPrefix(TR::FILE *, TR::Instruction *);
+
+   void print(TR::FILE *, TR::ARM64ImmInstruction *);
+   void print(TR::FILE *, TR::ARM64ImmSymInstruction *);
+   void print(TR::FILE *, TR::ARM64LabelInstruction *);
+   void print(TR::FILE *, TR::ARM64ConditionalBranchInstruction *);
+   void print(TR::FILE *, TR::ARM64CompareBranchInstruction *);
+   void print(TR::FILE *, TR::ARM64RegBranchInstruction *);
+   void print(TR::FILE *, TR::ARM64AdminInstruction *);
+   void print(TR::FILE *, TR::ARM64Trg1Instruction *);
+   void print(TR::FILE *, TR::ARM64Trg1CondInstruction *);
+   void print(TR::FILE *, TR::ARM64Trg1ImmInstruction *);
+   void print(TR::FILE *, TR::ARM64Trg1Src1Instruction *);
+   void print(TR::FILE *, TR::ARM64Trg1Src1ImmInstruction *);
+   void print(TR::FILE *, TR::ARM64Trg1Src2Instruction *);
+   void print(TR::FILE *, TR::ARM64Trg1Src2ShiftedInstruction *);
+   void print(TR::FILE *, TR::ARM64Trg1Src2ExtendedInstruction *);
+   void print(TR::FILE *, TR::ARM64Trg1Src3Instruction *);
+   void print(TR::FILE *, TR::ARM64Trg1MemInstruction *);
+   void print(TR::FILE *, TR::ARM64MemInstruction *);
+   void print(TR::FILE *, TR::ARM64MemSrc1Instruction *);
+   void print(TR::FILE *, TR::ARM64Src1Instruction *);
+   void print(TR::FILE *, TR::ARM64Src2Instruction *);
+
+   void print(TR::FILE *, TR::RealRegister *, TR_RegisterSizes size = TR_WordReg);
+   void print(TR::FILE *, TR::RegisterDependency *);
+   void print(TR::FILE *, TR::RegisterDependencyConditions *);
+   void print(TR::FILE *, TR::MemoryReference *);
+   void print(TR::FILE *, TR::UnresolvedDataSnippet *);
+
+   void printARM64OOLSequences(TR::FILE *);
+   void printARM64GCRegisterMap(TR::FILE *, TR::GCRegisterMap *);
+   void printInstructionComment(TR::FILE *, int32_t, TR::Instruction *);
+   void printMemoryReferenceComment(TR::FILE *, TR::MemoryReference *);
+
+   const char *getARM64RegisterName(uint32_t, bool = true);
 #endif
 
    friend class TR_CFGChecker;
