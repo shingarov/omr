@@ -24,6 +24,7 @@ compiler_library(riscv
 	${CMAKE_CURRENT_LIST_DIR}/codegen/ARM64BinaryEncoding.cpp
 	${CMAKE_CURRENT_LIST_DIR}/codegen/ARM64Debug.cpp
 	${CMAKE_CURRENT_LIST_DIR}/codegen/ARM64Instruction.cpp
+	${CMAKE_CURRENT_LIST_DIR}/codegen/RVInstruction.cpp
 	${CMAKE_CURRENT_LIST_DIR}/codegen/ARM64OutOfLineCodeSection.cpp
 	${CMAKE_CURRENT_LIST_DIR}/codegen/ARM64SystemLinkage.cpp
 	${CMAKE_CURRENT_LIST_DIR}/codegen/BinaryEvaluator.cpp
