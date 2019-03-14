@@ -22,6 +22,7 @@
 #include "codegen/ARM64SystemLinkage.hpp"
 
 #include "codegen/ARM64Instruction.hpp"
+#include "codegen/RVInstruction.hpp"
 #include "codegen/GenerateInstructions.hpp"
 #include "codegen/MemoryReference.hpp"
 #include "env/StackMemoryRegion.hpp"
@@ -36,78 +37,119 @@ TR::ARM64SystemLinkage::ARM64SystemLinkage(TR::CodeGenerator *cg)
 
    _properties._properties = IntegersInRegisters|FloatsInRegisters|RightToLeft;
 
-   _properties._registerFlags[TR::RealRegister::NoReg] = 0;
-   _properties._registerFlags[TR::RealRegister::x0]    = IntegerReturn|IntegerArgument;
-   _properties._registerFlags[TR::RealRegister::x1]    = IntegerArgument;
-   _properties._registerFlags[TR::RealRegister::x2]    = IntegerArgument;
-   _properties._registerFlags[TR::RealRegister::x3]    = IntegerArgument;
-   _properties._registerFlags[TR::RealRegister::x4]    = IntegerArgument;
-   _properties._registerFlags[TR::RealRegister::x5]    = IntegerArgument;
-   _properties._registerFlags[TR::RealRegister::x6]    = IntegerArgument;
-   _properties._registerFlags[TR::RealRegister::x7]    = IntegerArgument;
+   _properties._registerFlags[TR::RealRegister::zero] = Preserved|ARM64_Reserved; // zero
+   _properties._registerFlags[TR::RealRegister::ra]   = Preserved|ARM64_Reserved; // return address
+   _properties._registerFlags[TR::RealRegister::sp]   = Preserved|ARM64_Reserved; // sp
+   _properties._registerFlags[TR::RealRegister::gp]   = Preserved|ARM64_Reserved; // gp
+   _properties._registerFlags[TR::RealRegister::tp]   = Preserved|ARM64_Reserved; // tp
 
-   for (i = TR::RealRegister::x8; i <= TR::RealRegister::x15; i++)
-      _properties._registerFlags[i] = 0; // x8 - x15
+   _properties._registerFlags[TR::RealRegister::t0]   = Preserved|ARM64_Reserved; // fp
+   _properties._registerFlags[TR::RealRegister::t1]   = 0;
+   _properties._registerFlags[TR::RealRegister::t2]   = 0;
 
-   _properties._registerFlags[TR::RealRegister::x16]   = ARM64_Reserved; // IP0
-   _properties._registerFlags[TR::RealRegister::x17]   = ARM64_Reserved; // IP1
+   _properties._registerFlags[TR::RealRegister::s0]   = Preserved;
+   _properties._registerFlags[TR::RealRegister::s1]   = Preserved;
 
-   for (i = TR::RealRegister::x18; i <= TR::RealRegister::x28; i++)
-      _properties._registerFlags[i] = Preserved; // x18 - x28 Preserved
+   _properties._registerFlags[TR::RealRegister::a0]   = IntegerArgument | IntegerReturn;
+   _properties._registerFlags[TR::RealRegister::a1]   = IntegerArgument | IntegerReturn;
+   _properties._registerFlags[TR::RealRegister::a2]   = IntegerArgument;
+   _properties._registerFlags[TR::RealRegister::a3]   = IntegerArgument;
+   _properties._registerFlags[TR::RealRegister::a4]   = IntegerArgument;
+   _properties._registerFlags[TR::RealRegister::a5]   = IntegerArgument;
+   _properties._registerFlags[TR::RealRegister::a6]   = IntegerArgument;
+   _properties._registerFlags[TR::RealRegister::a7]   = IntegerArgument;
 
-   _properties._registerFlags[TR::RealRegister::x29]   = ARM64_Reserved; // FP
-   _properties._registerFlags[TR::RealRegister::x30]   = ARM64_Reserved; // LR
-   _properties._registerFlags[TR::RealRegister::sp]    = ARM64_Reserved;
-   _properties._registerFlags[TR::RealRegister::xzr]   = ARM64_Reserved;
+   _properties._registerFlags[TR::RealRegister::s2]   = Preserved;
+   _properties._registerFlags[TR::RealRegister::s3]   = Preserved;
+   _properties._registerFlags[TR::RealRegister::s4]   = Preserved;
+   _properties._registerFlags[TR::RealRegister::s5]   = Preserved;
+   _properties._registerFlags[TR::RealRegister::s6]   = Preserved;
+   _properties._registerFlags[TR::RealRegister::s7]   = Preserved;
+   _properties._registerFlags[TR::RealRegister::s8]   = Preserved;
+   _properties._registerFlags[TR::RealRegister::s9]   = Preserved;
+   _properties._registerFlags[TR::RealRegister::s10]  = Preserved;
+   _properties._registerFlags[TR::RealRegister::s11]  = Preserved;
 
-   _properties._registerFlags[TR::RealRegister::v0]    = FloatArgument|FloatReturn;
-   _properties._registerFlags[TR::RealRegister::v1]    = FloatArgument;
-   _properties._registerFlags[TR::RealRegister::v2]    = FloatArgument;
-   _properties._registerFlags[TR::RealRegister::v3]    = FloatArgument;
-   _properties._registerFlags[TR::RealRegister::v4]    = FloatArgument;
-   _properties._registerFlags[TR::RealRegister::v5]    = FloatArgument;
-   _properties._registerFlags[TR::RealRegister::v6]    = FloatArgument;
-   _properties._registerFlags[TR::RealRegister::v7]    = FloatArgument;
+   _properties._registerFlags[TR::RealRegister::t3]   = 0;
+   _properties._registerFlags[TR::RealRegister::t4]   = 0;
+   _properties._registerFlags[TR::RealRegister::t5]   = 0;
+   _properties._registerFlags[TR::RealRegister::t6]   = 0;
 
-   for (i = TR::RealRegister::v8; i <= TR::RealRegister::v15; i++)
-      _properties._registerFlags[i] = Preserved; // v8 - v15 Preserved
-   for (i = TR::RealRegister::v16; i <= TR::RealRegister::LastFPR; i++)
-      _properties._registerFlags[i] = 0; // v16 - v31
+   _properties._registerFlags[TR::RealRegister::ft0]  = 0;
+   _properties._registerFlags[TR::RealRegister::ft1]  = 0;
+   _properties._registerFlags[TR::RealRegister::ft2]  = 0;
+   _properties._registerFlags[TR::RealRegister::ft3]  = 0;
+   _properties._registerFlags[TR::RealRegister::ft4]  = 0;
+   _properties._registerFlags[TR::RealRegister::ft5]  = 0;
+   _properties._registerFlags[TR::RealRegister::ft6]  = 0;
+   _properties._registerFlags[TR::RealRegister::ft7]  = 0;
+
+   _properties._registerFlags[TR::RealRegister::fs0]  = Preserved;
+   _properties._registerFlags[TR::RealRegister::fs1]  = Preserved;
+
+   _properties._registerFlags[TR::RealRegister::fa0]  = FloatArgument | FloatReturn;
+   _properties._registerFlags[TR::RealRegister::fa1]  = FloatArgument | FloatReturn;
+   _properties._registerFlags[TR::RealRegister::fa2]  = FloatArgument;
+   _properties._registerFlags[TR::RealRegister::fa3]  = FloatArgument;
+   _properties._registerFlags[TR::RealRegister::fa4]  = FloatArgument;
+   _properties._registerFlags[TR::RealRegister::fa5]  = FloatArgument;
+   _properties._registerFlags[TR::RealRegister::fa6]  = FloatArgument;
+   _properties._registerFlags[TR::RealRegister::fa7]  = FloatArgument;
+
+   _properties._registerFlags[TR::RealRegister::fs2]  = Preserved;
+   _properties._registerFlags[TR::RealRegister::fs3]  = Preserved;
+   _properties._registerFlags[TR::RealRegister::fs4]  = Preserved;
+   _properties._registerFlags[TR::RealRegister::fs5]  = Preserved;
+   _properties._registerFlags[TR::RealRegister::fs6]  = Preserved;
+   _properties._registerFlags[TR::RealRegister::fs7]  = Preserved;
+   _properties._registerFlags[TR::RealRegister::fs8]  = Preserved;
+   _properties._registerFlags[TR::RealRegister::fs9]  = Preserved;
+   _properties._registerFlags[TR::RealRegister::fs10] = Preserved;
+   _properties._registerFlags[TR::RealRegister::fs11] = Preserved;
+   _properties._registerFlags[TR::RealRegister::ft8]  = 0;
+   _properties._registerFlags[TR::RealRegister::ft9]  = 0;
+   _properties._registerFlags[TR::RealRegister::ft10] = 0;
+   _properties._registerFlags[TR::RealRegister::ft11] = 0;
+
 
    _properties._numIntegerArgumentRegisters  = 8;
    _properties._firstIntegerArgumentRegister = 0;
+
+   _properties._argumentRegisters[0]  = TR::RealRegister::a0;
+   _properties._argumentRegisters[1]  = TR::RealRegister::a1;
+   _properties._argumentRegisters[2]  = TR::RealRegister::a2;
+   _properties._argumentRegisters[3]  = TR::RealRegister::a3;
+   _properties._argumentRegisters[4]  = TR::RealRegister::a4;
+   _properties._argumentRegisters[5]  = TR::RealRegister::a5;
+   _properties._argumentRegisters[6]  = TR::RealRegister::a6;
+   _properties._argumentRegisters[7]  = TR::RealRegister::a7;
+
+   _properties._firstIntegerReturnRegister = 0;
+   _properties._returnRegisters[0]  = TR::RealRegister::a0;
+   _properties._returnRegisters[1]  = TR::RealRegister::a1;
+
    _properties._numFloatArgumentRegisters    = 8;
    _properties._firstFloatArgumentRegister   = 8;
 
-   _properties._argumentRegisters[0]  = TR::RealRegister::x0;
-   _properties._argumentRegisters[1]  = TR::RealRegister::x1;
-   _properties._argumentRegisters[2]  = TR::RealRegister::x2;
-   _properties._argumentRegisters[3]  = TR::RealRegister::x3;
-   _properties._argumentRegisters[4]  = TR::RealRegister::x4;
-   _properties._argumentRegisters[5]  = TR::RealRegister::x5;
-   _properties._argumentRegisters[6]  = TR::RealRegister::x6;
-   _properties._argumentRegisters[7]  = TR::RealRegister::x7;
-   _properties._argumentRegisters[8]  = TR::RealRegister::v0;
-   _properties._argumentRegisters[9]  = TR::RealRegister::v1;
-   _properties._argumentRegisters[10] = TR::RealRegister::v2;
-   _properties._argumentRegisters[11] = TR::RealRegister::v3;
-   _properties._argumentRegisters[12] = TR::RealRegister::v4;
-   _properties._argumentRegisters[13] = TR::RealRegister::v5;
-   _properties._argumentRegisters[14] = TR::RealRegister::v6;
-   _properties._argumentRegisters[15] = TR::RealRegister::v7;
+   _properties._argumentRegisters[8+0]  = TR::RealRegister::fa0;
+   _properties._argumentRegisters[8+1]  = TR::RealRegister::fa1;
+   _properties._argumentRegisters[8+2]  = TR::RealRegister::fa2;
+   _properties._argumentRegisters[8+3]  = TR::RealRegister::fa3;
+   _properties._argumentRegisters[8+4]  = TR::RealRegister::fa4;
+   _properties._argumentRegisters[8+5]  = TR::RealRegister::fa5;
+   _properties._argumentRegisters[8+6]  = TR::RealRegister::fa6;
+   _properties._argumentRegisters[8+7]  = TR::RealRegister::fa7;
 
-   _properties._firstIntegerReturnRegister = 0;
-   _properties._firstFloatReturnRegister   = 1;
+   _properties._firstFloatReturnRegister   = 2;
+   _properties._returnRegisters[2+0]  = TR::RealRegister::fa0;
+   _properties._returnRegisters[2+1]  = TR::RealRegister::fa1;
 
-   _properties._returnRegisters[0]  = TR::RealRegister::x0;
-   _properties._returnRegisters[1]  = TR::RealRegister::v0;
-
-   _properties._numAllocatableIntegerRegisters = 27;
+   _properties._numAllocatableIntegerRegisters = 7 + 11 + 6; // t0-t6 + s1-s11 + a2-a7
    _properties._numAllocatableFloatRegisters   = 32;
 
    _properties._methodMetaDataRegister      = TR::RealRegister::NoReg;
    _properties._stackPointerRegister        = TR::RealRegister::sp;
-   _properties._framePointerRegister        = TR::RealRegister::x29;
+   _properties._framePointerRegister        = TR::RealRegister::s0;
 
    _properties._numberOfDependencyGPRegisters = 32; // To be determined
    _properties._offsetToFirstParm             = 0; // To be determined
@@ -129,40 +171,36 @@ TR::ARM64SystemLinkage::initARM64RealRegisterLinkage()
    TR::RealRegister *reg;
    int icount;
 
-   reg = machine->getRealRegister(TR::RealRegister::RegNum::x16); // IP0
+   reg = machine->getRealRegister(TR::RealRegister::RegNum::zero);
    reg->setState(TR::RealRegister::Locked);
    reg->setAssignedRegister(reg);
 
-   reg = machine->getRealRegister(TR::RealRegister::RegNum::x17); // IP1
+   reg = machine->getRealRegister(TR::RealRegister::RegNum::ra);
    reg->setState(TR::RealRegister::Locked);
    reg->setAssignedRegister(reg);
 
-   reg = machine->getRealRegister(TR::RealRegister::RegNum::x29); // FP
+   reg = machine->getRealRegister(TR::RealRegister::RegNum::sp);
    reg->setState(TR::RealRegister::Locked);
    reg->setAssignedRegister(reg);
 
-   reg = machine->getRealRegister(TR::RealRegister::RegNum::x30); // LR
+   reg = machine->getRealRegister(TR::RealRegister::RegNum::gp);
    reg->setState(TR::RealRegister::Locked);
    reg->setAssignedRegister(reg);
 
-   reg = machine->getRealRegister(TR::RealRegister::RegNum::sp); // SP
+   reg = machine->getRealRegister(TR::RealRegister::RegNum::tp);
    reg->setState(TR::RealRegister::Locked);
    reg->setAssignedRegister(reg);
 
-   reg = machine->getRealRegister(TR::RealRegister::RegNum::xzr); // zero
+   reg = machine->getRealRegister(TR::RealRegister::RegNum::s0); // FP
    reg->setState(TR::RealRegister::Locked);
    reg->setAssignedRegister(reg);
 
-   // assign "maximum" weight to registers x0-x15
-   for (icount = TR::RealRegister::x0; icount <= TR::RealRegister::x15; icount++)
+   // assign "maximum" weight to argument registers
+   for (icount = TR::RealRegister::a0; icount <= TR::RealRegister::a7; icount++)
       machine->getRealRegister((TR::RealRegister::RegNum)icount)->setWeight(0xf000);
 
-   // assign "maximum" weight to registers x18-x28
-   for (icount = TR::RealRegister::x18; icount <= TR::RealRegister::x28; icount++)
-      machine->getRealRegister((TR::RealRegister::RegNum)icount)->setWeight(0xf000);
-
-   // assign "maximum" weight to registers v0-v31
-   for (icount = TR::RealRegister::v0; icount <= TR::RealRegister::v31; icount++)
+   // assign "maximum" weight to argument registers
+   for (icount = TR::RealRegister::fa0; icount <= TR::RealRegister::fa7; icount++)
       machine->getRealRegister((TR::RealRegister::RegNum)icount)->setWeight(0xf000);
    }
 
@@ -384,7 +422,7 @@ TR::ARM64SystemLinkage::createPrologue(TR::Instruction *cursor, List<TR::Paramet
    uint32_t frameSize = (uint32_t)codeGen->getFrameSizeInBytes();
    if (constantIsUnsignedImm12(frameSize))
       {
-      cursor = generateTrg1Src1ImmInstruction(codeGen, TR::InstOpCode::subimmx, firstNode, sp, sp, frameSize, cursor);
+      cursor = generateITYPE(TR::InstOpCode::_addi, firstNode, sp, sp, -frameSize, codeGen, cursor);
       }
    else
       {
@@ -482,6 +520,7 @@ TR::ARM64SystemLinkage::createEpilogue(TR::Instruction *cursor)
    TR::Node *lastNode = cursor->getNode();
    TR::ResolvedMethodSymbol *bodySymbol = comp()->getJittedMethodSymbol();
    TR::RealRegister *sp = machine->getRealRegister(properties.getStackPointerRegister());
+   TR::RealRegister *zero = machine->getRealRegister(TR::RealRegister::zero);
 
    // restore callee-saved registers
    uint32_t offset = bodySymbol->getLocalMappingCursor();
@@ -507,7 +546,7 @@ TR::ARM64SystemLinkage::createEpilogue(TR::Instruction *cursor)
       }
 
    // restore link register (x30)
-   TR::RealRegister *lr = machine->getRealRegister(TR::RealRegister::lr);
+   TR::RealRegister *lr = machine->getRealRegister(TR::RealRegister::ra);
    if (machine->getLinkRegisterKilled())
       {
       TR::MemoryReference *stackSlot = new (trHeapMemory()) TR::MemoryReference(sp, 0, codeGen);
@@ -518,7 +557,7 @@ TR::ARM64SystemLinkage::createEpilogue(TR::Instruction *cursor)
    uint32_t frameSize = codeGen->getFrameSizeInBytes();
    if (constantIsUnsignedImm12(frameSize))
       {
-      cursor = generateTrg1Src1ImmInstruction(codeGen, TR::InstOpCode::addimmx, lastNode, sp, sp, frameSize, cursor);
+      cursor = generateITYPE(TR::InstOpCode::_addi, lastNode, sp, sp, frameSize, codeGen, cursor);
       }
    else
       {
@@ -526,7 +565,7 @@ TR::ARM64SystemLinkage::createEpilogue(TR::Instruction *cursor)
       }
 
    // return
-   cursor = generateRegBranchInstruction(codeGen, TR::InstOpCode::ret, lastNode, lr, cursor);
+   cursor = generateITYPE(TR::InstOpCode::_jalr, lastNode, zero, lr, 0, codeGen, cursor);
    }
 
 
