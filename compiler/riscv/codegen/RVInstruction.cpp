@@ -158,8 +158,8 @@ uint8_t *TR::BtypeInstruction::generateBinaryEncoding()
 
 
    *iPtr = TR_RISCV_SBTYPE ((uint32_t)(getOpCode().getOpCodeBinaryEncoding()),
-                         toRealRegister(_src1)->binaryRegCode(),
-                         toRealRegister(_src2)->binaryRegCode(),
+                         toRealRegister(getSource1Register())->binaryRegCode(),
+                         toRealRegister(getSource2Register())->binaryRegCode(),
                          0 /* to fix up in the future */ );
 
    if (label->getCodeLocation() != NULL) {
@@ -175,6 +175,51 @@ uint8_t *TR::BtypeInstruction::generateBinaryEncoding()
    setBinaryEncoding(instructionStart);
    return cursor;
    }
+
+bool TR::BtypeInstruction::refsRegister(TR::Register *reg)
+   {
+   return (reg == getSource1Register() || reg == getSource2Register());
+   }
+
+bool TR::BtypeInstruction::usesRegister(TR::Register *reg)
+   {
+   return (reg == getSource1Register() || reg == getSource2Register());
+   }
+
+bool TR::BtypeInstruction::defsRegister(TR::Register *reg)
+   {
+   return false;
+   }
+
+bool TR::BtypeInstruction::defsRealRegister(TR::Register *reg)
+   {
+   return false;
+   }
+
+void TR::BtypeInstruction::assignRegisters(TR_RegisterKinds kindToBeAssigned)
+   {
+   TR::Machine *machine = cg()->machine();
+   TR::Register *source1Virtual = getSource1Register();
+   TR::Register *source2Virtual = getSource2Register();
+
+   if (getDependencyConditions())
+      getDependencyConditions()->assignPostConditionRegisters(this, kindToBeAssigned, cg());
+
+   source1Virtual->block();
+   TR::RealRegister *assignedSource2Register = machine->assignOneRegister(this, source2Virtual);
+   source1Virtual->unblock();
+
+   source2Virtual->block();
+   TR::RealRegister *assignedSource1Register = machine->assignOneRegister(this, source1Virtual);
+   source2Virtual->unblock();
+
+   if (getDependencyConditions())
+      getDependencyConditions()->assignPreConditionRegisters(this->getPrev(), kindToBeAssigned, cg());
+
+   setSource1Register(assignedSource1Register);
+   setSource2Register(assignedSource2Register);
+   }
+
 
 uint8_t *TR::UtypeInstruction::generateBinaryEncoding() {
    uint8_t        *instructionStart = cg()->getBinaryBufferCursor();

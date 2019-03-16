@@ -20,6 +20,7 @@
  *******************************************************************************/
 
 #include <stdlib.h>
+#include <riscv.h>
 
 #include "codegen/ARM64Instruction.hpp"
 #include "codegen/ARM64SystemLinkage.hpp"
@@ -394,22 +395,31 @@ TR_GlobalRegisterNumber OMR::ARM64::CodeGenerator::getLinkageGlobalRegisterNumbe
    return 0;
    }
 
-void OMR::ARM64::CodeGenerator::apply24BitLabelRelativeRelocation(int32_t *cursor, TR::LabelSymbol *label)
+void OMR::ARM64::CodeGenerator::apply16BitLabelRelativeRelocation(int32_t *cursor, TR::LabelSymbol *label)
    {
    // for "b.cond" instruction
    TR_ASSERT(label->getCodeLocation(), "Attempt to relocate to a NULL label address!");
 
    intptrj_t distance = (uintptrj_t)label->getCodeLocation() - (uintptrj_t)cursor;
-   *cursor |= ((distance >> 2) & 0x7ffff) << 5; // imm19
+
+   TR_ASSERT(VALID_SBTYPE_IMM(distance), "Invalid Branch offset out of range");
+   *cursor |= ENCODE_SBTYPE_IMM(distance);
+   }
+
+void OMR::ARM64::CodeGenerator::apply16BitLabelRelativeRelocation(int32_t *cursor, TR::LabelSymbol *label, int8_t d, bool isInstrOffset) 
+   {
+   apply16BitLabelRelativeRelocation(cursor, label);
+   }
+
+void OMR::ARM64::CodeGenerator::apply24BitLabelRelativeRelocation(int32_t *cursor, TR::LabelSymbol *label)
+   {
+   TR_ASSERT(false, "Unsupported relocation");
    }
 
 void OMR::ARM64::CodeGenerator::apply32BitLabelRelativeRelocation(int32_t *cursor, TR::LabelSymbol *label)
    {
    // for unconditional "b" instruction
-   TR_ASSERT(label->getCodeLocation(), "Attempt to relocate to a NULL label address!");
-
-   intptrj_t distance = (uintptrj_t)label->getCodeLocation() - (uintptrj_t)cursor;
-   *cursor |= ((distance >> 2) & 0x3ffffff); // imm26
+   TR_ASSERT(false, "Unsupported relocation");
    }
 
 int64_t OMR::ARM64::CodeGenerator::getLargestNegConstThatMustBeMaterialized()

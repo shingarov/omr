@@ -175,6 +175,22 @@ class OMR_EXTENSIBLE CodeGenerator : public OMR::CodeGenerator
    TR::RealRegister *setMethodMetaDataRegister(TR::RealRegister *r) { return (_methodMetaDataRegister = r); }
 
    /**
+    * @brief Applies 16-bit Label relative relocation (for conditional branch)
+    * @param[in] cursor : instruction cursor
+    * @param[in] label : label
+    */
+   void apply16BitLabelRelativeRelocation(int32_t *cursor, TR::LabelSymbol *label);
+
+   /**
+    * @brief Applies 16-bit Label relative relocation (for conditional branch)
+    * @param[in] cursor : instruction cursor
+    * @param[in] label : label
+    * @param[in] d : FIXME
+    * @param[in] isInstrOffset : FIXME
+    */
+   void apply16BitLabelRelativeRelocation(int32_t *cursor, TR::LabelSymbol *label, int8_t d, bool isInstrOffset);
+
+   /**
     * @brief Applies 24-bit Label relative relocation (for conditional branch)
     * @param[in] cursor : instruction cursor
     * @param[in] label : label

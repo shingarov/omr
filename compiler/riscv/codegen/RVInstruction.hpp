@@ -168,8 +168,8 @@ class BtypeInstruction : public ARM64LabelInstruction
    {
    protected:
 
-   TR::Register    *_src1;
-   TR::Register    *_src2;
+   TR::Register    *_source1Register;
+   TR::Register    *_source2Register;
 
    public:
      BtypeInstruction(
@@ -180,10 +180,10 @@ class BtypeInstruction : public ARM64LabelInstruction
        TR::Register             *src2,
        TR::CodeGenerator        *cg
        )
-     : ARM64LabelInstruction(op, n, sym, cg), _src1(src1), _src2(src2)
+     : ARM64LabelInstruction(op, n, sym, cg), _source1Register(src1), _source2Register(src2)
      {
-     useRegister(_src1);
-     useRegister(_src2);
+     useRegister(_source1Register);
+     useRegister(_source2Register);
      }
 
      BtypeInstruction(
@@ -195,11 +195,85 @@ class BtypeInstruction : public ARM64LabelInstruction
        TR::Instruction          *precedingInstruction,
        TR::CodeGenerator        *cg
        )
-     : ARM64LabelInstruction(op, n, sym, precedingInstruction, cg), _src1(src1), _src2(src2)
+     : ARM64LabelInstruction(op, n, sym, precedingInstruction, cg), _source1Register(src1), _source2Register(src2)
      {
-     useRegister(_src1);
-     useRegister(_src2);
+     useRegister(_source1Register);
+     useRegister(_source2Register);
      }
+
+   /**
+    * @brief Gets source register
+    * @return source register
+    */
+   TR::Register *getSource1Register() {return _source1Register;}
+   /**
+    * @brief Sets source register
+    * @param[in] tr : source register
+    * @return source register
+    */
+   TR::Register *setSource1Register(TR::Register *tr) {return (_source1Register = tr);}
+
+   /**
+    * @brief Gets source register 2
+    * @return source register 2
+    */
+   TR::Register *getSource2Register() {return _source2Register;}
+   /**
+    * @brief Sets source register 2
+    * @param[in] sr : source register 2
+    * @return source register 2
+    */
+   TR::Register *setSource2Register(TR::Register *sr) {return (_source2Register = sr);}
+
+   /**
+    * @brief Gets i-th source register
+    * @param[in] i : index
+    * @return i-th source register or NULL
+    */
+   virtual TR::Register *getSourceRegister(uint32_t i) {if      (i==0) return getSource1Register();
+                                                        else if (i==1) return _source2Register; return NULL;}
+
+   /**
+    * @brief Sets source register 2 in binary encoding
+    * @param[in] instruction : instruction cursor
+    */
+   void insertSource2Register(uint32_t *instruction)
+      {
+      TR::RealRegister *source2 = toRealRegister(_source2Register);
+      source2->setRegisterFieldRM(instruction);
+      }
+
+   /**
+    * @brief Answers whether this instruction references the given virtual register
+    * @param[in] reg : virtual register
+    * @return true when the instruction references the virtual register
+    */
+   virtual bool refsRegister(TR::Register *reg);
+   /**
+    * @brief Answers whether this instruction uses the given virtual register
+    * @param[in] reg : virtual register
+    * @return true when the instruction uses the virtual register
+    */
+   virtual bool usesRegister(TR::Register *reg);
+   /**
+    * @brief Answers whether this instruction defines the given virtual register
+    * @param[in] reg : virtual register
+    * @return true when the instruction defines the virtual register
+    */
+   virtual bool defsRegister(TR::Register *reg);
+   /**
+    * @brief Answers whether this instruction defines the given real register
+    * @param[in] reg : real register
+    * @return true when the instruction defines the real register
+    */
+   virtual bool defsRealRegister(TR::Register *reg);
+   /**
+    * @brief Assigns registers
+    * @param[in] kindToBeAssigned : register kind
+    */
+   virtual void assignRegisters(TR_RegisterKinds kindToBeAssigned);
+
+
 
    virtual uint8_t *generateBinaryEncoding();
    };
