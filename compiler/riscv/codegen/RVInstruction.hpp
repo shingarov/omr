@@ -29,6 +29,42 @@
 namespace TR
 {
 
+class RtypeInstruction : public ARM64Trg1Src2Instruction
+   {
+
+   uint32_t _imm;
+
+   public:
+
+   RtypeInstruction(TR::InstOpCode::Mnemonic op,
+         TR::Node          *n,
+         TR::Register      *treg,
+         TR::Register      *s1reg,
+         TR::Register      *s2reg,
+         TR::CodeGenerator *codeGen)
+
+      : ARM64Trg1Src2Instruction(op, n, treg, s1reg, s2reg, codeGen)
+      {
+      }
+
+   RtypeInstruction(TR::InstOpCode::Mnemonic op,
+         TR::Node          *n,
+         TR::Register      *treg,
+         TR::Register      *s1reg,
+         TR::Register      *s2reg,
+         TR::Instruction   *precedingInstruction,
+         TR::CodeGenerator *codeGen)
+      : ARM64Trg1Src2Instruction(op, n, treg, s1reg, s2reg, precedingInstruction, codeGen)
+      {
+      }
+
+
+   virtual uint8_t *generateBinaryEncoding();
+
+   };
+
+
+
 class ItypeInstruction : public ARM64Trg1Src1Instruction
    {
 
@@ -350,6 +386,15 @@ class JtypeInstruction : public ARM64ImmSymInstruction
    };
 
 } // namespace TR
+
+TR::Instruction *generateRTYPE( TR::InstOpCode::Mnemonic op,
+                                TR::Node          *n,
+                                TR::Register      *treg,
+                                TR::Register      *s1reg,
+                                TR::Register      *s2reg,
+                                TR::CodeGenerator *cg,
+                                TR::Instruction   *previous = NULL);
+
 
 TR::Instruction *generateITYPE( TR::InstOpCode::Mnemonic op,
                                 TR::Node          *n,

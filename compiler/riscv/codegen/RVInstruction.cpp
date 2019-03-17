@@ -63,6 +63,21 @@
 #define TR_RISCV_UJTYPE(insn, rd, target) \
   ((insn) | ((rd) << OP_SH_RD) | ENCODE_UJTYPE_IMM(target))
 
+uint8_t *TR::RtypeInstruction::generateBinaryEncoding() {
+   uint8_t        *instructionStart = cg()->getBinaryBufferCursor();
+   uint8_t        *cursor           = instructionStart;
+   uint32_t *iPtr = (uint32_t*)instructionStart;
+
+   *iPtr = TR_RISCV_RTYPE ((uint32_t)(getOpCode().getOpCodeBinaryEncoding()),
+                         toRealRegister(getTargetRegister())->binaryRegCode(),
+                         toRealRegister(getSource1Register())->binaryRegCode(),
+                         toRealRegister(getSource2Register())->binaryRegCode());
+
+   cursor += RISCV_INSTRUCTION_LENGTH;
+   setBinaryLength(RISCV_INSTRUCTION_LENGTH);
+   setBinaryEncoding(instructionStart);
+   return cursor;
+}
 
 uint8_t *TR::ItypeInstruction::generateBinaryEncoding() {
    uint8_t        *instructionStart = cg()->getBinaryBufferCursor();
@@ -271,6 +286,21 @@ uint8_t *TR::JtypeInstruction::generateBinaryEncoding() {
    return cursor;
 
 }
+
+TR::Instruction *generateRTYPE( TR::InstOpCode::Mnemonic op,
+                                TR::Node          *n,
+                                TR::Register      *treg,
+                                TR::Register      *s1reg,
+                                TR::Register      *s2reg,
+                                TR::CodeGenerator *cg,
+                                TR::Instruction   *previous)
+   {
+   if (previous)
+      return new (cg->trHeapMemory()) TR::RtypeInstruction(op, n, treg, s1reg, s2reg, previous, cg);
+   else
+      return new (cg->trHeapMemory()) TR::RtypeInstruction(op, n, treg, s1reg, s2reg, cg);
+   }
+
 
 TR::Instruction *generateITYPE( TR::InstOpCode::Mnemonic op,
                                 TR::Node          *n,
