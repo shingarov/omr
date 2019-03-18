@@ -23,6 +23,7 @@
 #include <stdint.h> // for uint16_t, int32_t, etc
 
 #include "codegen/ARM64Instruction.hpp"
+#include "codegen/RVInstruction.hpp"
 #include "codegen/BackingStore.hpp"
 #include "codegen/CodeGenerator.hpp"
 #include "codegen/GenerateInstructions.hpp"
@@ -488,15 +489,13 @@ static void registerCopy(TR::Instruction *precedingInstruction,
                          TR::CodeGenerator *cg)
    {
    TR::Node *node = precedingInstruction->getNode();
-   TR::RealRegister *zeroReg;
    switch (rk)
       {
       case TR_GPR:
-         zeroReg = cg->machine()->getRealRegister(TR::RealRegister::xzr);
-         generateTrg1Src2Instruction(cg, TR::InstOpCode::orrx, node, targetReg, zeroReg, sourceReg, precedingInstruction); /* mov (register) */
+         generateITYPE(TR::InstOpCode::_addi, node, targetReg, sourceReg, 0, cg, precedingInstruction);
          break;
       case TR_FPR:
-         generateTrg1Src1Instruction(cg, TR::InstOpCode::fmovd, node, targetReg, sourceReg, precedingInstruction);
+         TR_ASSERT(false, "Unsupported RegisterKind.");
          break;
       default:
          TR_ASSERT(false, "Unsupported RegisterKind.");
