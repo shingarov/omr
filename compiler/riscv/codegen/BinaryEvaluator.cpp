@@ -144,7 +144,7 @@ OMR::ARM64::TreeEvaluator::imulEvaluator(TR::Node *node, TR::CodeGenerator *cg)
       {
       TR::Register *src2Reg = cg->evaluate(secondChild);
       trgReg = cg->allocateRegister();
-      generateMulInstruction(cg, node, trgReg, src1Reg, src2Reg);
+      generateRTYPE(TR::InstOpCode::_mul, node, trgReg, src1Reg, src2Reg, cg);
       }
    firstChild->decReferenceCount();
    secondChild->decReferenceCount();
