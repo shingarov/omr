@@ -76,13 +76,13 @@ TR::Register *OMR::ARM64::TreeEvaluator::gotoEvaluator(TR::Node *node, TR::CodeG
       {
       TR::Node *child = node->getFirstChild();
       cg->evaluate(child);
-      generateLabelInstruction(cg, TR::InstOpCode::b, node, gotoLabel,
+      generateLabelInstruction(cg, TR::InstOpCode::_jal, node, gotoLabel,
             generateRegisterDependencyConditions(cg, child, 0));
       cg->decReferenceCount(child);
       }
    else
       {
-      generateLabelInstruction(cg, TR::InstOpCode::b, node, gotoLabel);
+      generateLabelInstruction(cg, TR::InstOpCode::_jal, node, gotoLabel);
       }
    return NULL;
    }

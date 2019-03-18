@@ -21,11 +21,16 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <riscv.h>
 
 #include "codegen/ARM64ConditionCode.hpp"
 #include "codegen/ARM64Instruction.hpp"
 #include "codegen/CodeGenerator.hpp"
 #include "codegen/Relocation.hpp"
+
+#define TR_RISCV_UJTYPE(insn, rd, target) \
+  ((insn) | ((rd) << OP_SH_RD) | ENCODE_UJTYPE_IMM(target))
+
 
 uint8_t *OMR::ARM64::Instruction::generateBinaryEncoding()
    {
@@ -99,20 +104,24 @@ uint8_t *TR::ARM64LabelInstruction::generateBinaryEncoding()
       }
    else
       {
-      TR_ASSERT(getOpCodeValue() == OMR::InstOpCode::b, "Unsupported opcode in LabelInstruction.");
+      TR_ASSERT(getOpCodeValue() == OMR::InstOpCode::_jal, "Unsupported opcode in LabelInstruction.");
 
       uintptr_t destination = (uintptr_t)label->getCodeLocation();
-      cursor = getOpCode().copyBinaryToBuffer(instructionStart);
+      intptr_t distance = 0;
       if (destination != 0)
          {
-         intptr_t distance = destination - (uintptr_t)cursor;
-         TR_ASSERT(-0x8000000 <= distance && distance < 0x8000000, "Branch destination is too far away.");
-         insertImmediateField(toARM64Cursor(cursor), distance);
+         distance = destination - (uintptr_t)cursor;
          }
       else
          {
          cg()->addRelocation(new (cg()->trHeapMemory()) TR::LabelRelative32BitRelocation(cursor, label));
          }
+
+      TR::RealRegister *zero = cg()->machine()->getRealRegister(TR::RealRegister::zero);
+      TR_ASSERT(VALID_UJTYPE_IMM(distance), "Branch destination is too far away.");
+         *((uint32_t*)cursor) = TR_RISCV_UJTYPE ((uint32_t)(getOpCode().getOpCodeBinaryEncoding()),
+                         toRealRegister(zero)->binaryRegCode(),
+                         distance);
       cursor += ARM64_INSTRUCTION_LENGTH;
       }
 

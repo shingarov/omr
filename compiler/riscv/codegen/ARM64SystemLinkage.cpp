@@ -18,7 +18,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
-
+#include <riscv.h>
 #include "codegen/ARM64SystemLinkage.hpp"
 
 #include "codegen/ARM64Instruction.hpp"
@@ -29,6 +29,35 @@
 #include "il/Node_inlines.hpp"
 #include "il/symbol/AutomaticSymbol.hpp"
 
+
+//getRegisterNumber
+
+#define FOR_EACH_REGISTER(machine, block)                                        \
+   for (int regNum = TR::RealRegister::x0; regNum <= TR::RealRegister::x31; regNum++) \
+      {                                                                          \
+      TR::RealRegister *reg                                                      \
+                   = machine->getRealRegister((TR::RealRegister::RegNum)regNum); \
+      { block; }                                                                 \
+      }                                                                          \
+   for (int regNum = TR::RealRegister::f0; regNum <= TR::RealRegister::f31; regNum++) \
+      {                                                                          \
+      TR::RealRegister *reg                                                      \
+                   = machine->getRealRegister((TR::RealRegister::RegNum)regNum); \
+      { block; }                                                                 \
+      }
+
+
+#define FOR_EACH_CALLEE_SAVED_REGISTER(machine, block)                           \
+   FOR_EACH_REGISTER(machine,                                                    \
+   if (_properties._registerFlags[(TR::RealRegister::RegNum)regNum] == Preserved)\
+      { block; }                                                                 \
+   )
+
+#define FOR_EACH_ASSIGNED_CALLEE_SAVED_REGISTER(machine, block)                  \
+   FOR_EACH_CALLEE_SAVED_REGISTER(machine,                                       \
+   if (reg->getHasBeenAssignedInMethod())                                        \
+      { block; }                                                                 \
+   )
 
 TR::ARM64SystemLinkage::ARM64SystemLinkage(TR::CodeGenerator *cg)
    : TR::Linkage(cg)
@@ -195,15 +224,13 @@ TR::ARM64SystemLinkage::initARM64RealRegisterLinkage()
    reg->setState(TR::RealRegister::Locked);
    reg->setAssignedRegister(reg);
 
-   // assign "maximum" weight to argument registers
-   for (icount = TR::RealRegister::a0; icount <= TR::RealRegister::a7; icount++)
-      machine->getRealRegister((TR::RealRegister::RegNum)icount)->setWeight(0xf000);
 
-   // assign "maximum" weight to argument registers
-   for (icount = TR::RealRegister::fa0; icount <= TR::RealRegister::fa7; icount++)
-      machine->getRealRegister((TR::RealRegister::RegNum)icount)->setWeight(0xf000);
+   FOR_EACH_REGISTER(machine, reg->setWeight(0xf000));
+
+   // prefer preserved registers over the rest since they're saved / restored
+   // in prologue/epilogue.
+   FOR_EACH_CALLEE_SAVED_REGISTER(machine, reg->setWeight(0x0001));
    }
-
 
 uint32_t
 TR::ARM64SystemLinkage::getRightToLeft()
@@ -271,23 +298,7 @@ TR::ARM64SystemLinkage::mapStack(TR::ResolvedMethodSymbol *method)
       }
    method->setLocalMappingCursor(stackIndex);
 
-   // allocate space for preserved registers (x19-x28, v8-v15)
-   for (int r = TR::RealRegister::x19; r <= TR::RealRegister::x28; r++)
-      {
-      TR::RealRegister *rr = machine->getRealRegister((TR::RealRegister::RegNum)r);
-      if (rr->getHasBeenAssignedInMethod())
-         {
-         stackIndex += 8;
-         }
-      }
-   for (int r = TR::RealRegister::v8; r <= TR::RealRegister::v15; r++)
-      {
-      TR::RealRegister *rr = machine->getRealRegister((TR::RealRegister::RegNum)r);
-      if (rr->getHasBeenAssignedInMethod())
-         {
-         stackIndex += 8;
-         }
-      }
+   FOR_EACH_ASSIGNED_CALLEE_SAVED_REGISTER(machine, stackIndex += 8);
 
    /*
     * Because the rest of the code generator currently expects **all** arguments
@@ -421,7 +432,7 @@ TR::ARM64SystemLinkage::createPrologue(TR::Instruction *cursor, List<TR::Paramet
 
    // allocate stack space
    uint32_t frameSize = (uint32_t)codeGen->getFrameSizeInBytes();
-   if (constantIsUnsignedImm12(frameSize))
+   if (VALID_ITYPE_IMM(frameSize))
       {
       cursor = generateITYPE(TR::InstOpCode::_addi, firstNode, sp, sp, -frameSize, codeGen, cursor);
       }
@@ -489,26 +500,10 @@ TR::ARM64SystemLinkage::createPrologue(TR::Instruction *cursor, List<TR::Paramet
 
    // save callee-saved registers
    uint32_t offset = bodySymbol->getLocalMappingCursor();
-   for (int r = TR::RealRegister::x19; r <= TR::RealRegister::x28; r++)
-      {
-      TR::RealRegister *rr = machine->getRealRegister((TR::RealRegister::RegNum)r);
-      if (rr->getHasBeenAssignedInMethod())
-         {
-         TR::MemoryReference *stackSlot = new (trHeapMemory()) TR::MemoryReference(sp, offset, codeGen);
-         cursor = generateMemSrc1Instruction(cg(), TR::InstOpCode::strimmx, firstNode, stackSlot, rr, cursor);
-         offset += 8;
-         }
-      }
-   for (int r = TR::RealRegister::v8; r <= TR::RealRegister::v15; r++)
-      {
-      TR::RealRegister *rr = machine->getRealRegister((TR::RealRegister::RegNum)r);
-      if (rr->getHasBeenAssignedInMethod())
-         {
-         TR::MemoryReference *stackSlot = new (trHeapMemory()) TR::MemoryReference(sp, offset, codeGen);
-         cursor = generateMemSrc1Instruction(cg(), TR::InstOpCode::vstrimmd, firstNode, stackSlot, rr, cursor);
-         offset += 8;
-         }
-      }
+   FOR_EACH_ASSIGNED_CALLEE_SAVED_REGISTER(machine,
+      TR::MemoryReference *stackSlot = new (trHeapMemory()) TR::MemoryReference(sp, offset, codeGen);
+      cursor = generateSTORE(TR::InstOpCode::_sd, firstNode, stackSlot, reg, cg(), cursor);
+      offset += 8;)
    }
 
 
@@ -525,33 +520,17 @@ TR::ARM64SystemLinkage::createEpilogue(TR::Instruction *cursor)
 
    // restore callee-saved registers
    uint32_t offset = bodySymbol->getLocalMappingCursor();
-   for (int r = TR::RealRegister::x19; r <= TR::RealRegister::x28; r++)
-      {
-      TR::RealRegister *rr = machine->getRealRegister((TR::RealRegister::RegNum)r);
-      if (rr->getHasBeenAssignedInMethod())
-         {
-         TR::MemoryReference *stackSlot = new (trHeapMemory()) TR::MemoryReference(sp, offset, codeGen);
-         cursor = generateTrg1MemInstruction(cg(), TR::InstOpCode::ldrimmx, lastNode, rr, stackSlot, cursor);
-         offset += 8;
-         }
-      }
-   for (int r = TR::RealRegister::v8; r <= TR::RealRegister::v15; r++)
-      {
-      TR::RealRegister *rr = machine->getRealRegister((TR::RealRegister::RegNum)r);
-      if (rr->getHasBeenAssignedInMethod())
-         {
-         TR::MemoryReference *stackSlot = new (trHeapMemory()) TR::MemoryReference(sp, offset, codeGen);
-         cursor = generateTrg1MemInstruction(cg(), TR::InstOpCode::vldrimmd, lastNode, rr, stackSlot, cursor);
-         offset += 8;
-         }
-      }
+   FOR_EACH_ASSIGNED_CALLEE_SAVED_REGISTER(machine,
+      TR::MemoryReference *stackSlot = new (trHeapMemory()) TR::MemoryReference(sp, offset, codeGen);
+      cursor = generateLOAD(TR::InstOpCode::_ld, lastNode, reg, stackSlot, cg(), cursor);
+      offset += 8;)
 
    // restore link register (x30)
-   TR::RealRegister *lr = machine->getRealRegister(TR::RealRegister::ra);
+   TR::RealRegister *ra = machine->getRealRegister(TR::RealRegister::ra);
    if (machine->getLinkRegisterKilled())
       {
       TR::MemoryReference *stackSlot = new (trHeapMemory()) TR::MemoryReference(sp, 0, codeGen);
-      cursor = generateTrg1MemInstruction(cg(), TR::InstOpCode::ldrimmx, lastNode, lr, stackSlot, cursor);
+      cursor = generateLOAD(TR::InstOpCode::_ld, lastNode, ra, stackSlot, cg(), cursor);
       }
 
    // remove space for preserved registers
@@ -566,7 +545,7 @@ TR::ARM64SystemLinkage::createEpilogue(TR::Instruction *cursor)
       }
 
    // return
-   cursor = generateITYPE(TR::InstOpCode::_jalr, lastNode, zero, lr, 0, codeGen, cursor);
+   cursor = generateITYPE(TR::InstOpCode::_jalr, lastNode, zero, ra, 0, codeGen, cursor);
    }
 
 
@@ -682,8 +661,8 @@ int32_t TR::ARM64SystemLinkage::buildArgs(TR::Node *callNode,
                   else
                      resultReg = cg()->allocateRegister();
 
-                  dependencies->addPreCondition(argRegister, TR::RealRegister::x0);
-                  dependencies->addPostCondition(resultReg, TR::RealRegister::x0);
+                  dependencies->addPreCondition(argRegister, TR::RealRegister::a0);
+                  dependencies->addPostCondition(resultReg, TR::RealRegister::a0);
                   }
                else
                   {
@@ -808,6 +787,7 @@ TR::Register *TR::ARM64SystemLinkage::buildDirectDispatch(TR::Node *callNode)
 
    const TR::ARM64LinkageProperties &pp = getProperties();
    TR::RealRegister *sp = cg()->machine()->getRealRegister(pp.getStackPointerRegister());
+   TR::RealRegister *ra = cg()->machine()->getRealRegister(TR::RealRegister::ra);
 
    TR::RegisterDependencyConditions *dependencies =
       new (trHeapMemory()) TR::RegisterDependencyConditions(
@@ -817,9 +797,9 @@ TR::Register *TR::ARM64SystemLinkage::buildDirectDispatch(TR::Node *callNode)
    int32_t totalSize = buildArgs(callNode, dependencies);
    if (totalSize > 0)
       {
-      if (constantIsUnsignedImm12(totalSize))
+      if (VALID_ITYPE_IMM(-totalSize))
          {
-         generateTrg1Src1ImmInstruction(cg(), TR::InstOpCode::subimmx, callNode, sp, sp, totalSize);
+         generateITYPE(TR::InstOpCode::_addi, callNode, sp, sp, -totalSize, cg());
          }
       else
          {
@@ -828,17 +808,17 @@ TR::Register *TR::ARM64SystemLinkage::buildDirectDispatch(TR::Node *callNode)
       }
 
    TR::MethodSymbol *callSymbol = callSymRef->getSymbol()->castToMethodSymbol();
-   generateImmSymInstruction(cg(), TR::InstOpCode::bl, callNode,
+   generateJTYPE(TR::InstOpCode::_jal, callNode, ra,
       (uintptr_t)callSymbol->getMethodAddress(),
-      dependencies, callSymRef ? callSymRef : callNode->getSymbolReference(), NULL);
+      dependencies, callSymRef ? callSymRef : callNode->getSymbolReference(), NULL, cg());
 
    cg()->machine()->setLinkRegisterKilled(true);
 
    if (totalSize > 0)
       {
-      if (constantIsUnsignedImm12(totalSize))
+      if (VALID_ITYPE_IMM(totalSize))
          {
-         generateTrg1Src1ImmInstruction(cg(), TR::InstOpCode::addimmx, callNode, sp, sp, totalSize);
+         generateITYPE(TR::InstOpCode::_addi, callNode, sp, sp, totalSize, cg());
          }
       else
          {

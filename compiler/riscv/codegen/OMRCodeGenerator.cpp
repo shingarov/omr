@@ -418,8 +418,13 @@ void OMR::ARM64::CodeGenerator::apply24BitLabelRelativeRelocation(int32_t *curso
 
 void OMR::ARM64::CodeGenerator::apply32BitLabelRelativeRelocation(int32_t *cursor, TR::LabelSymbol *label)
    {
-   // for unconditional "b" instruction
-   TR_ASSERT(false, "Unsupported relocation");
+   // for "b.cond" instruction
+   TR_ASSERT(label->getCodeLocation(), "Attempt to relocate to a NULL label address!");
+
+   intptrj_t distance = (uintptrj_t)label->getCodeLocation() - (uintptrj_t)cursor;
+
+   TR_ASSERT(VALID_UJTYPE_IMM(distance), "Invalid Branch offset out of range");
+   *cursor |= ENCODE_UJTYPE_IMM(distance);
    }
 
 int64_t OMR::ARM64::CodeGenerator::getLargestNegConstThatMustBeMaterialized()
