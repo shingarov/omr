@@ -19,6 +19,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
 
+#include "codegen/RVInstruction.hpp"
 #include "codegen/CodeGenerator.hpp"
 #include "codegen/GenerateInstructions.hpp"
 #include "codegen/TreeEvaluator.hpp"
@@ -131,10 +132,9 @@ static TR::Register *extendToIntOrLongHelper(TR::Node *node, TR::InstOpCode::Mne
    TR::Node *child  = node->getFirstChild();
    TR::Register *trgReg = cg->gprClobberEvaluate(child);
 
-   // signed extension: alias of SBFM
-   // unsigned extension: alias of UBFM
-   TR_ASSERT(imms < 32, "Extension size too big");
-   generateTrg1Src1ImmInstruction(cg, op, node, trgReg, trgReg, imms);
+
+   TR_ASSERT(imms == 31, "Not yet implementeed");
+   generateITYPE(op, node, trgReg, trgReg, 0, cg);
 
    node->setRegister(trgReg);
    child->decReferenceCount();
@@ -163,7 +163,7 @@ TR::Register *OMR::ARM64::TreeEvaluator::s2lEvaluator(TR::Node *node, TR::CodeGe
 
 TR::Register *OMR::ARM64::TreeEvaluator::i2lEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return extendToIntOrLongHelper(node, TR::InstOpCode::sbfmx, 31, cg);
+   return extendToIntOrLongHelper(node, TR::InstOpCode::_addiw, 31, cg);
    }
 
 TR::Register *OMR::ARM64::TreeEvaluator::bu2iEvaluator(TR::Node *node, TR::CodeGenerator *cg)
