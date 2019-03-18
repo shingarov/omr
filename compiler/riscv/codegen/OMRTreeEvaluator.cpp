@@ -427,7 +427,10 @@ OMR::ARM64::TreeEvaluator::directCallEvaluator(TR::Node *node, TR::CodeGenerator
    {
    TR::SymbolReference *symRef = node->getSymbolReference();
    TR::MethodSymbol *callee = symRef->getSymbol()->castToMethodSymbol();
-   TR::Linkage *linkage = cg->getLinkage(callee->getLinkageConvention());
+
+   // FIXME: How comes here we get private linkage?
+   // TR::Linkage *linkage = cg->getLinkage(callee->getLinkageConvention());
+   TR::Linkage *linkage = cg->getLinkage(TR_System);
 
    return linkage->buildDirectDispatch(node);
    }
