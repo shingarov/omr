@@ -5,7 +5,8 @@
 ```
 mkdir build
 cd build
-cmake -DOMR_COMPILER=ON -DOMR_TEST_COMPILER=ON \
+cmake .. \
+      -DOMR_COMPILER=ON -DOMR_TEST_COMPILER=ON \
       -DCMAKE_BUILD_TYPE=Debug \
       -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 make -j4
@@ -17,11 +18,11 @@ Notes:
  * *CMake* supports (requires?) out-of-tree builds, so build happen in `build` subdirectory. All artifacts are there.
  * You *must* return `cmake ...` when you add/remove/rename files (generally, when you change `CMakeLists.txt`).
  * `-DCMAKE_BUILD_TYPE=Debug` is necessary to produce debug symbols
- * `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON` is to produce a `compile_commands.json` used by Clang-based tools. Should not harm
+ * `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON` is to produce a `compile_commands.json` used by Clang-based tools. Should not harm.
 
  ## Running `compilertest`
 
- Unlike in "Santa CLara" port, the test program is `build/compilertest/compilertest` and uses Google Test (rather than sequence of `printf()`s line in "Santa Clara" port. A new testsuite called "MinimalTest" has been added (see `MinimalTest.hpp` and `MinimalTest.cpp`. This has been done in order to have better (and automatable!) way of ensuring that new changes have no regressions.
+ Unlike in "Santa Clara" port, the test program is `build/compilertest/compilertest` and uses Google Test (rather than sequence of `printf()` lines in "Santa Clara" port. A new testsuite called "MinimalTest" has been added (see `MinimalTest.hpp` and `MinimalTest.cpp`. This has been done in order to have better (and automatable!) way of ensuring that new changes have no regressions.
 
  To see what tests are in minimal testsuite run:
 
