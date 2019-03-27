@@ -692,389 +692,19 @@ void OMR::ARM64::Machine::initializeRegisterFile()
    _registerFile[TR::RealRegister::NoReg] = NULL;
    _registerFile[TR::RealRegister::SpilledReg] = NULL;
 
-   _registerFile[TR::RealRegister::x0] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x0,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x1] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x1,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x2] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x2,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x3] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x3,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x4] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x4,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x5] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x5,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x6] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x6,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x7] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x7,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x8] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x8,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x9] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x9,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x10] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x10,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x11] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x11,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x12] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x12,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x13] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x13,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x14] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x14,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x15] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x15,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x16] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x16,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x17] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x17,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x18] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x18,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x19] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x19,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x20] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x20,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x21] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x21,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x22] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x22,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x23] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x23,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x24] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x24,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x25] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x25,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x26] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x26,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x27] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x27,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x28] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x28,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x29] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x29,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x30] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x30,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::x31] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_GPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::x31,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v0] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v0,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v1] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v1,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v2] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v2,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v3] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v3,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v4] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v4,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v5] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v5,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v6] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v6,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v7] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v7,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v8] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v8,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v9] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v9,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v10] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v10,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v11] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v11,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v12] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v12,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v13] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v13,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v14] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v14,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v15] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v15,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v16] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v16,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v17] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v17,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v18] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v18,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v19] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v19,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v20] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v20,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v21] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v21,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v22] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v22,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v23] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v23,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v24] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v24,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v25] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v25,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v26] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v26,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v27] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v27,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v28] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v28,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v29] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v29,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v30] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v30,
-                                                 self()->cg());
-
-   _registerFile[TR::RealRegister::v31] = new (self()->cg()->trHeapMemory()) TR::RealRegister(TR_FPR,
-                                                 0,
-                                                 TR::RealRegister::Free,
-                                                 TR::RealRegister::v31,
-                                                 self()->cg());
+#define DECLARE_REG(regname, type)                                             \
+   _registerFile[TR::RealRegister:: regname] =                                 \
+         new (self()->cg()->trHeapMemory()) TR::RealRegister(type,             \
+                                                 0,                            \
+                                                 TR::RealRegister::Free,       \
+                                                 TR::RealRegister:: regname,   \
+                                                 self()->cg());
+#define DECLARE_GPR(regname, abiname, encoding) DECLARE_REG(regname, TR_GPR)
+#define DECLARE_FPR(regname, abiname, encoding) DECLARE_REG(regname, TR_FPR)
+#include <codegen/riscv-regs.h>
+#undef DECLARE_GPR
+#undef DECLARE_FPR
+#undef DECLARE_REG
    }
 
 void
@@ -1156,38 +786,38 @@ uint32_t OMR::ARM64::Machine::_globalRegisterNumberToRealRegisterMap[] =
    TR::RealRegister::x0,
 
    // FPRs
-   TR::RealRegister::v31,
-   TR::RealRegister::v30,
-   TR::RealRegister::v29,
-   TR::RealRegister::v28,
-   TR::RealRegister::v27,
-   TR::RealRegister::v26,
-   TR::RealRegister::v25,
-   TR::RealRegister::v24,
-   TR::RealRegister::v23,
-   TR::RealRegister::v22,
-   TR::RealRegister::v21,
-   TR::RealRegister::v20,
-   TR::RealRegister::v19,
-   TR::RealRegister::v18,
-   TR::RealRegister::v17,
-   TR::RealRegister::v16,
+   TR::RealRegister::f31,
+   TR::RealRegister::f30,
+   TR::RealRegister::f29,
+   TR::RealRegister::f28,
+   TR::RealRegister::f27,
+   TR::RealRegister::f26,
+   TR::RealRegister::f25,
+   TR::RealRegister::f24,
+   TR::RealRegister::f23,
+   TR::RealRegister::f22,
+   TR::RealRegister::f21,
+   TR::RealRegister::f20,
+   TR::RealRegister::f19,
+   TR::RealRegister::f18,
+   TR::RealRegister::f17,
+   TR::RealRegister::f16,
    // callee-saved registers
-   TR::RealRegister::v15,
-   TR::RealRegister::v14,
-   TR::RealRegister::v13,
-   TR::RealRegister::v12,
-   TR::RealRegister::v11,
-   TR::RealRegister::v10,
-   TR::RealRegister::v9,
-   TR::RealRegister::v8,
+   TR::RealRegister::f15,
+   TR::RealRegister::f14,
+   TR::RealRegister::f13,
+   TR::RealRegister::f12,
+   TR::RealRegister::f11,
+   TR::RealRegister::f10,
+   TR::RealRegister::f9,
+   TR::RealRegister::f8,
    // parameter registers
-   TR::RealRegister::v7,
-   TR::RealRegister::v6,
-   TR::RealRegister::v5,
-   TR::RealRegister::v4,
-   TR::RealRegister::v3,
-   TR::RealRegister::v2,
-   TR::RealRegister::v1,
-   TR::RealRegister::v0
+   TR::RealRegister::f7,
+   TR::RealRegister::f6,
+   TR::RealRegister::f5,
+   TR::RealRegister::f4,
+   TR::RealRegister::f3,
+   TR::RealRegister::f2,
+   TR::RealRegister::f1,
+   TR::RealRegister::f0
    };

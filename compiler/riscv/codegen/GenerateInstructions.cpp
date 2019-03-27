@@ -301,7 +301,7 @@ static TR::Instruction *generateZeroSrc1ImmInstruction(TR::CodeGenerator *cg, TR
    {
    TR::Register *zeroReg = cg->allocateRegister();
    TR::RegisterDependencyConditions *cond = new (cg->trHeapMemory()) TR::RegisterDependencyConditions(1, 1, cg->trMemory());
-   addDependency(cond, zeroReg, TR::RealRegister::xzr, TR_GPR, cg);
+   addDependency(cond, zeroReg, TR::RealRegister::zero, TR_GPR, cg);
 
    TR::Instruction *instr =
       (preced) ?
@@ -339,7 +339,7 @@ static TR::Instruction *generateZeroSrc2Instruction(TR::CodeGenerator *cg, TR::I
    {
    TR::Register *zeroReg = cg->allocateRegister();
    TR::RegisterDependencyConditions *cond = new (cg->trHeapMemory()) TR::RegisterDependencyConditions(1, 1, cg->trMemory());
-   addDependency(cond, zeroReg, TR::RealRegister::xzr, TR_GPR, cg);
+   addDependency(cond, zeroReg, TR::RealRegister::zero, TR_GPR, cg);
 
    TR::Instruction *instr =
       (preced) ?
@@ -377,7 +377,7 @@ static TR::Instruction *generateTrg1ZeroSrc1Instruction(TR::CodeGenerator *cg, T
    {
    TR::Register *zeroReg = cg->allocateRegister();
    TR::RegisterDependencyConditions *cond = new (cg->trHeapMemory()) TR::RegisterDependencyConditions(1, 1, cg->trMemory());
-   addDependency(cond, zeroReg, TR::RealRegister::xzr, TR_GPR, cg);
+   addDependency(cond, zeroReg, TR::RealRegister::zero, TR_GPR, cg);
 
    TR::Instruction *instr =
       (preced) ?
@@ -420,7 +420,7 @@ TR::Instruction *generateMulInstruction(TR::CodeGenerator *cg, TR::Node *node,
    /* Use xzr as the third source register */
    TR::Register *zeroReg = cg->allocateRegister();
    TR::RegisterDependencyConditions *cond = new (cg->trHeapMemory()) TR::RegisterDependencyConditions(1, 1, cg->trMemory());
-   addDependency(cond, zeroReg, TR::RealRegister::xzr, TR_GPR, cg);
+   addDependency(cond, zeroReg, TR::RealRegister::zero, TR_GPR, cg);
 
    TR::Instruction *instr =
       (preced) ?

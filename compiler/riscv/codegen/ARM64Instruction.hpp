@@ -1055,7 +1055,7 @@ class ARM64Trg1CondInstruction : public ARM64Trg1Instruction
     */
    void insertZeroRegister(uint32_t *instruction)
       {
-      TR::RealRegister *zeroReg = cg()->machine()->getRealRegister(TR::RealRegister::xzr);
+      TR::RealRegister *zeroReg = cg()->machine()->getRealRegister(TR::RealRegister::zero);
       zeroReg->setRegisterFieldRM(instruction);
       zeroReg->setRegisterFieldRN(instruction);
       }

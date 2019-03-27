@@ -710,8 +710,8 @@ int32_t TR::ARM64SystemLinkage::buildArgs(TR::Node *callNode,
                   else
                      resultReg = cg()->allocateRegister(TR_FPR);
 
-                  dependencies->addPreCondition(argRegister, TR::RealRegister::v0);
-                  dependencies->addPostCondition(resultReg, TR::RealRegister::v0);
+                  dependencies->addPreCondition(argRegister, TR::RealRegister::fa0);
+                  dependencies->addPostCondition(resultReg, TR::RealRegister::fa0);
                   }
                else
                   {
@@ -753,7 +753,7 @@ int32_t TR::ARM64SystemLinkage::buildArgs(TR::Node *callNode,
       }
 
    int32_t floatRegsUsed = (numFloatArgs > properties.getNumFloatArgRegs()) ? properties.getNumFloatArgRegs() : numFloatArgs;
-   for (i = (TR::RealRegister::RegNum)((uint32_t)TR::RealRegister::v0 + floatRegsUsed); i <= TR::RealRegister::LastFPR; i++)
+   for (i = (TR::RealRegister::RegNum)((uint32_t)TR::RealRegister::f0 + floatRegsUsed); i <= TR::RealRegister::LastFPR; i++)
       {
       if (!properties.getPreserved((TR::RealRegister::RegNum)i))
          {

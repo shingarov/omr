@@ -36,20 +36,6 @@
       regname           = x31 + 1 + encoding,
 #include <codegen/riscv-regs.h>
 #undef DECLARE_FPR
-
-      // Following are AArch64 names defined here temporarily
-      // source-level compativility with to-be-replaced AArch64
-      // code. Will be removed.
-#if 1
-      lr                = ra,
-      xzr               = zero,
-#define DECLARE_FPR(regname, abiname, encoding) \
-      v##encoding       = x31 + 1 + encoding,
-#include <codegen/riscv-regs.h>
-#undef DECLARE_FPR
-#endif
-
-
       FirstGPR          = x0,
       LastGPR           = x31,
       LastAssignableGPR = x31,

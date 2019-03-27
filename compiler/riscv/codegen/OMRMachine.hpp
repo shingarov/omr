@@ -122,7 +122,7 @@ public:
     */
    bool getLinkRegisterKilled()
       {
-      return _registerFile[TR::RealRegister::lr]->getHasBeenAssignedInMethod();
+      return _registerFile[TR::RealRegister::ra]->getHasBeenAssignedInMethod();
       }
 
    /**
@@ -132,7 +132,7 @@ public:
     */
    bool setLinkRegisterKilled(bool b)
       {
-      return _registerFile[TR::RealRegister::lr]->setHasBeenAssignedInMethod(b);
+      return _registerFile[TR::RealRegister::ra]->setHasBeenAssignedInMethod(b);
       }
 
    /**
