@@ -23,7 +23,6 @@
 #include <stdint.h>
 #include <riscv.h>
 
-#include "codegen/ARM64ConditionCode.hpp"
 #include "codegen/ARM64Instruction.hpp"
 #include "codegen/CodeGenerator.hpp"
 #include "codegen/Relocation.hpp"
@@ -146,37 +145,6 @@ int32_t TR::ARM64LabelInstruction::estimateBinaryLength(int32_t currentEstimate)
    return currentEstimate + getEstimatedBinaryLength();
    }
 
-uint8_t *TR::ARM64ConditionalBranchInstruction::generateBinaryEncoding()
-   {
-   uint8_t *instructionStart = cg()->getBinaryBufferCursor();
-   uint8_t *cursor = instructionStart;
-   cursor = getOpCode().copyBinaryToBuffer(instructionStart);
-   insertConditionCodeField(toARM64Cursor(cursor));
-
-   TR::LabelSymbol *label = getLabelSymbol();
-   uintptr_t destination = (uintptr_t)label->getCodeLocation();
-   if (destination != 0)
-      {
-      intptr_t distance = destination - (uintptr_t)cursor;
-      TR_ASSERT(-0x100000 <= distance && distance < 0x100000, "Branch destination is too far away.");
-      insertImmediateField(toARM64Cursor(cursor), distance);
-      }
-   else
-      {
-      cg()->addRelocation(new (cg()->trHeapMemory()) TR::LabelRelative24BitRelocation(cursor, label));
-      }
-
-   cursor += ARM64_INSTRUCTION_LENGTH;
-   setBinaryLength(ARM64_INSTRUCTION_LENGTH);
-   setBinaryEncoding(instructionStart);
-   return cursor;
-   }
-
-int32_t TR::ARM64ConditionalBranchInstruction::estimateBinaryLength(int32_t currentEstimate)
-   {
-   setEstimatedBinaryLength(ARM64_INSTRUCTION_LENGTH);
-   return currentEstimate + getEstimatedBinaryLength();
-   }
 
 uint8_t *TR::ARM64CompareBranchInstruction::generateBinaryEncoding()
    {
@@ -229,20 +197,6 @@ uint8_t *TR::ARM64Trg1Instruction::generateBinaryEncoding()
    uint8_t *cursor = instructionStart;
    cursor = getOpCode().copyBinaryToBuffer(instructionStart);
    insertTargetRegister(toARM64Cursor(cursor));
-   cursor += ARM64_INSTRUCTION_LENGTH;
-   setBinaryLength(ARM64_INSTRUCTION_LENGTH);
-   setBinaryEncoding(instructionStart);
-   return cursor;
-   }
-
-uint8_t *TR::ARM64Trg1CondInstruction::generateBinaryEncoding()
-   {
-   uint8_t *instructionStart = cg()->getBinaryBufferCursor();
-   uint8_t *cursor = instructionStart;
-   cursor = getOpCode().copyBinaryToBuffer(instructionStart);
-   insertTargetRegister(toARM64Cursor(cursor));
-   insertZeroRegister(toARM64Cursor(cursor));
-   insertConditionCodeField(toARM64Cursor(cursor));
    cursor += ARM64_INSTRUCTION_LENGTH;
    setBinaryLength(ARM64_INSTRUCTION_LENGTH);
    setBinaryEncoding(instructionStart);

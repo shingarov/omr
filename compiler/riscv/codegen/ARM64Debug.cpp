@@ -24,7 +24,6 @@
 
 #include "ras/Debug.hpp"
 
-#include "codegen/ARM64ConditionCode.hpp"
 #include "codegen/ARM64Instruction.hpp"
 #include "codegen/CodeGenerator.hpp"
 #include "codegen/InstOpCode.hpp"
@@ -529,9 +528,6 @@ TR_Debug::print(TR::FILE *pOutFile, TR::Instruction *instr)
       case OMR::Instruction::IsLabel:
          print(pOutFile, (TR::ARM64LabelInstruction *)instr);
          break;
-      case OMR::Instruction::IsConditionalBranch:
-         print(pOutFile, (TR::ARM64ConditionalBranchInstruction *)instr);
-         break;
       case OMR::Instruction::IsCompareBranch:
          print(pOutFile, (TR::ARM64CompareBranchInstruction *)instr);
          break;
@@ -543,9 +539,6 @@ TR_Debug::print(TR::FILE *pOutFile, TR::Instruction *instr)
          break;
       case OMR::Instruction::IsTrg1:
          print(pOutFile, (TR::ARM64Trg1Instruction *)instr);
-         break;
-      case OMR::Instruction::IsTrg1Cond:
-         print(pOutFile, (TR::ARM64Trg1CondInstruction *)instr);
          break;
       case OMR::Instruction::IsTrg1Imm:
          print(pOutFile, (TR::ARM64Trg1ImmInstruction *)instr);
@@ -672,18 +665,6 @@ TR_Debug::print(TR::FILE *pOutFile, TR::ARM64LabelInstruction *instr)
    }
 
 void
-TR_Debug::print(TR::FILE *pOutFile, TR::ARM64ConditionalBranchInstruction *instr)
-   {
-   printPrefix(pOutFile, instr);
-   TR_ASSERT(instr->getOpCodeValue() == TR::InstOpCode::b_cond, "Unsupported instruction for conditional branch");
-   trfprintf(pOutFile, "b.%s \t", ARM64ConditionNames[instr->getConditionCode()]);
-   print(pOutFile, instr->getLabelSymbol());
-   if (instr->getDependencyConditions())
-      print(pOutFile, instr->getDependencyConditions());
-   trfflush(_comp->getOutFile());
-   }
-
-void
 TR_Debug::print(TR::FILE *pOutFile, TR::ARM64CompareBranchInstruction *instr)
    {
    printPrefix(pOutFile, instr);
@@ -732,26 +713,6 @@ TR_Debug::print(TR::FILE *pOutFile, TR::ARM64Trg1Instruction *instr)
    printPrefix(pOutFile, instr);
    trfprintf(pOutFile, "%s \t", getOpCodeName(&instr->getOpCode()));
    print(pOutFile, instr->getTargetRegister(), TR_WordReg);
-   trfflush(_comp->getOutFile());
-   }
-
-void
-TR_Debug::print(TR::FILE *pOutFile, TR::ARM64Trg1CondInstruction *instr)
-   {
-   printPrefix(pOutFile, instr);
-   if (instr->getOpCodeValue() == TR::InstOpCode::csincx)
-      {
-      // cset alias
-      trfprintf(pOutFile, "cset \t");
-      print(pOutFile, instr->getTargetRegister(), TR_WordReg);
-      trfprintf(pOutFile, ", %s", ARM64ConditionNames[cc_invert(instr->getConditionCode())]);
-      }
-   else
-      {
-      trfprintf(pOutFile, "%s \t", getOpCodeName(&instr->getOpCode()));
-      print(pOutFile, instr->getTargetRegister(), TR_WordReg);
-      trfprintf(pOutFile, ", xzr, xzr, %s", ARM64ConditionNames[instr->getConditionCode()]);
-      }
    trfflush(_comp->getOutFile());
    }
 
