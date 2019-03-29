@@ -226,7 +226,7 @@ OMR::ARM64::TreeEvaluator::iflcmpltEvaluator(TR::Node *node, TR::CodeGenerator *
 TR::Register *
 OMR::ARM64::TreeEvaluator::iflcmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   ificmpHelper(TR::InstOpCode::_blt, node, true, cg);
+   ificmpHelper(TR::InstOpCode::_bge, node, false, cg);
    return NULL;
    }
 
@@ -484,7 +484,7 @@ OMR::ARM64::TreeEvaluator::lcmpEvaluator(TR::Node *node, TR::CodeGenerator *cg)
     *   (i) trgReg = 0, tmpReg = 1  => lcmp =>  1
     *  (ii) trgReg = 1, tmpReg = 0  => lcmp => -1
     * (iii) trgReg = 0, tmpReg = 0  => lcmp =>  0
-   */
+    */
    generateRTYPE(TR::InstOpCode::_sub, node, trgReg, tmpReg, trgReg, cg);
 
    cg->stopUsingRegister(tmpReg);
