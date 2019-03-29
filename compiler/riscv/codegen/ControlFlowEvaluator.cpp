@@ -276,31 +276,24 @@ OMR::ARM64::TreeEvaluator::iflucmpleEvaluator(TR::Node *node, TR::CodeGenerator 
    return NULL;
    }
 
-static TR::Register *icmpHelper(TR::Node *node, TR::ARM64ConditionCode cc, bool is64bit, TR::CodeGenerator *cg)
+static TR::Register *icmpHelper(TR::InstOpCode::Mnemonic op1, TR::InstOpCode::Mnemonic op2, uint32_t imm2, TR::Node *node, bool reverse, TR::CodeGenerator *cg)
    {
    TR::Register *trgReg = cg->allocateRegister();
    TR::Node *firstChild = node->getFirstChild();
    TR::Node *secondChild = node->getSecondChild();
    TR::Register *src1Reg = cg->evaluate(firstChild);
-   bool useRegCompare = true;
+   TR::Register *src2Reg = cg->evaluate(secondChild);
+   TR::Instruction *result = nullptr;
 
-   if (secondChild->getOpCode().isLoadConst() && secondChild->getRegister() == NULL)
+   if (reverse)
+      result = generateRTYPE(op1, node, trgReg, src2Reg, src1Reg, cg);
+   else
+      result = generateRTYPE(op1, node, trgReg, src1Reg, src2Reg, cg);
+
+   if (op2 != TR::InstOpCode::bad)
       {
-      int64_t value = is64bit ? secondChild->getLongInt() : secondChild->getInt();
-      if (constantIsUnsignedImm12(value))
-         {
-         generateCompareImmInstruction(cg, node, src1Reg, value, is64bit);
-         useRegCompare = false;
-         }
+      result = generateITYPE(op2, node, trgReg, trgReg, imm2, cg, result);
       }
-
-   if (useRegCompare)
-      {
-      TR::Register *src2Reg = cg->evaluate(secondChild);
-      generateCompareInstruction(cg, node, src1Reg, src2Reg, is64bit);
-      }
-
-   generateCSetInstruction(cg, node, trgReg, cc);
 
    node->setRegister(trgReg);
    firstChild->decReferenceCount();
@@ -311,123 +304,159 @@ static TR::Register *icmpHelper(TR::Node *node, TR::ARM64ConditionCode cc, bool 
 TR::Register *
 OMR::ARM64::TreeEvaluator::icmpeqEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return icmpHelper(node, TR::CC_EQ, false, cg);
+   return icmpHelper(TR::InstOpCode::_sub, TR::InstOpCode::_sltiu, 1, node, false, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::icmpneEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return icmpHelper(node, TR::CC_NE, false, cg);
+   /*
+    * We cannot use icmpHelper() because that one generates
+    * RTYPE followed by ITYPE instruction. Here we need to
+    * generate
+    *
+    *     sub result, left, right
+    *     sltu result, zero, result
+    *
+    * i.e., RTYPE followed by RTYPE
+    */
+   TR::Register *trgReg = cg->allocateRegister();
+   TR::Node *firstChild = node->getFirstChild();
+   TR::Node *secondChild = node->getSecondChild();
+   TR::Register *src1Reg = cg->evaluate(firstChild);
+   TR::Register *src2Reg = cg->evaluate(secondChild);
+   TR::Register *zero = cg->machine()->getRealRegister(TR::RealRegister::zero);
+   TR::Instruction *result = nullptr;
+
+   result = generateRTYPE(TR::InstOpCode::_sub, node, trgReg, src1Reg, src2Reg, cg);
+   result = generateRTYPE(TR::InstOpCode::_sltu, node, trgReg, zero, trgReg, cg);
+
+
+   node->setRegister(trgReg);
+   firstChild->decReferenceCount();
+   secondChild->decReferenceCount();
+   return trgReg;
+
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::icmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return icmpHelper(node, TR::CC_LT, false, cg);
+   return icmpHelper(TR::InstOpCode::_slt, TR::InstOpCode::bad, 0, node, false, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::icmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return icmpHelper(node, TR::CC_LE, false, cg);
+   return icmpHelper(TR::InstOpCode::_slt, TR::InstOpCode::_sltiu, 1, node, true, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::icmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return icmpHelper(node, TR::CC_GE, false, cg);
+   return icmpHelper(TR::InstOpCode::_slt, TR::InstOpCode::_xori, 1, node, false, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::icmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return icmpHelper(node, TR::CC_GT, false, cg);
+   return icmpHelper(TR::InstOpCode::_slt, TR::InstOpCode::bad, 0, node, true, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::iucmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return icmpHelper(node, TR::CC_CC, false, cg);
+   return icmpHelper(TR::InstOpCode::_sltu, TR::InstOpCode::bad, 0, node, false, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::iucmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return icmpHelper(node, TR::CC_LS, false, cg);
+   return icmpHelper(TR::InstOpCode::_sltu, TR::InstOpCode::_xori, 1, node, true, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::iucmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return icmpHelper(node, TR::CC_CS, false, cg);
+   return icmpHelper(TR::InstOpCode::_sltu, TR::InstOpCode::_xori, 1, node, false, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::iucmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return icmpHelper(node, TR::CC_HI, false, cg);
+   return icmpHelper(TR::InstOpCode::_sltu, TR::InstOpCode::bad, 0, node, true, cg);
    }
 
 // also handles lucmpeq
 TR::Register *
 OMR::ARM64::TreeEvaluator::lcmpeqEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return icmpHelper(node, TR::CC_EQ, true, cg);
+   TR_ASSERT(TR::Compiler->target.is64Bit(), "RV32 not yet supported");
+   return icmpeqEvaluator(node, cg);
    }
 
 // also handles lucmpne
 TR::Register *
 OMR::ARM64::TreeEvaluator::lcmpneEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return icmpHelper(node, TR::CC_NE, true, cg);
+   TR_ASSERT(TR::Compiler->target.is64Bit(), "RV32 not yet supported");
+   return icmpneEvaluator(node, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::lcmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return icmpHelper(node, TR::CC_LT, true, cg);
+   TR_ASSERT(TR::Compiler->target.is64Bit(), "RV32 not yet supported");
+   return icmpltEvaluator(node, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::lcmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return icmpHelper(node, TR::CC_GE, true, cg);
+   TR_ASSERT(TR::Compiler->target.is64Bit(), "RV32 not yet supported");
+   return icmpgeEvaluator(node, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::lcmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return icmpHelper(node, TR::CC_GT, true, cg);
+   TR_ASSERT(TR::Compiler->target.is64Bit(), "RV32 not yet supported");
+   return icmpgtEvaluator(node, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::lcmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return icmpHelper(node, TR::CC_LE, true, cg);
+   TR_ASSERT(TR::Compiler->target.is64Bit(), "RV32 not yet supported");
+   return icmpleEvaluator(node, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::lucmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return icmpHelper(node, TR::CC_CC, true, cg);
+   TR_ASSERT(TR::Compiler->target.is64Bit(), "RV32 not yet supported");
+   return iucmpltEvaluator(node, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::lucmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return icmpHelper(node, TR::CC_CS, true, cg);
+   TR_ASSERT(TR::Compiler->target.is64Bit(), "RV32 not yet supported");
+   return iucmpgeEvaluator(node, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::lucmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return icmpHelper(node, TR::CC_HI, true, cg);
+   TR_ASSERT(TR::Compiler->target.is64Bit(), "RV32 not yet supported");
+   return iucmpgtEvaluator(node, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::lucmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return icmpHelper(node, TR::CC_LS, true, cg);
+   TR_ASSERT(TR::Compiler->target.is64Bit(), "RV32 not yet supported");
+   return iucmpleEvaluator(node, cg);
    }
 
 TR::Register *
@@ -440,10 +469,23 @@ OMR::ARM64::TreeEvaluator::lcmpEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    TR::Register *trgReg = cg->allocateRegister();
    TR::Register *tmpReg = cg->allocateRegister();
 
-   generateCompareInstruction(cg, node, src1Reg, src2Reg, true);
-   generateCSetInstruction(cg, node, trgReg, TR::CC_GE);
-   generateCSetInstruction(cg, node, tmpReg, TR::CC_LE);
-   generateTrg1Src2Instruction(cg, TR::InstOpCode::subw, node, trgReg, trgReg, tmpReg);
+   /* Here we set up registers such that
+    *
+    *  - trgReg = 1  iff  src1Reg < src2Reg
+    *  - tmpReg = 1  iff  src1Reg > src2Reg
+    *
+    */
+   generateRTYPE(TR::InstOpCode::_slt, node, trgReg, src1Reg, src2Reg, cg);
+   generateRTYPE(TR::InstOpCode::_slt, node, tmpReg, src2Reg, src1Reg, cg);
+
+   /*
+    * There are three outcomes possible:
+    *
+    *   (i) trgReg = 0, tmpReg = 1  => lcmp =>  1
+    *  (ii) trgReg = 1, tmpReg = 0  => lcmp => -1
+    * (iii) trgReg = 0, tmpReg = 0  => lcmp =>  0
+   */
+   generateRTYPE(TR::InstOpCode::_sub, node, trgReg, tmpReg, trgReg, cg);
 
    cg->stopUsingRegister(tmpReg);
 
