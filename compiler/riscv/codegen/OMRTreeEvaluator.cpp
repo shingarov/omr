@@ -43,11 +43,31 @@ TR::Instruction *loadConstant32(TR::CodeGenerator *cg, TR::Node *node, int32_t v
 
    if (VALID_ITYPE_IMM(value))
       {
-      cursor = generateITYPE(TR::InstOpCode::_addiw, node, trgReg, cg->machine()->getRealRegister(TR::RealRegister::zero), value, cg);
+      TR::Register *zero = cg->machine()->getRealRegister(TR::RealRegister::zero);
+      cursor = generateITYPE(TR::InstOpCode::_addiw, node, trgReg, zero, value, cg);
       }
    else
       {
-      TR_ASSERT(false, "Not yet implemented");
+      /* Since value is too big to fit in 12bit immediate, we have to generate
+         a sequence
+
+           lui  trgReg, %hi(value)
+           addi trgReg, trgReg, $lo(value)
+
+        Since addi is signed add and sign-extends its 12bit immediate operand to
+        XLEN bits, the value of %hi(value) has to be adjusted if sign-bit of
+        %lo(value) is 1 (to compensate for fact that addi adds negative value).
+      */
+      uint32_t lo = (uint32_t)value & ~(0xFFFFFFFF << RISCV_IMM_BITS);
+      uint32_t hi = (uint32_t)value & (0xFFFFFFFF << RISCV_IMM_BITS);
+
+      if (lo & (1 << (RISCV_IMM_BITS - 1)))
+         {
+         hi += 1 << RISCV_IMM_BITS;
+         }
+
+      cursor = generateUTYPE(TR::InstOpCode::_lui, node, hi, trgReg, cg);
+      cursor = generateITYPE(TR::InstOpCode::_addi, node, trgReg, trgReg, lo, cg);
       }
 
    if (!insertingInstructions)
