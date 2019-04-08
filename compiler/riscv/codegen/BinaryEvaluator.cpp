@@ -229,7 +229,7 @@ OMR::ARM64::TreeEvaluator::lremEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    return iremHelper(node, true, cg);
    }
 
-static TR::Register *shiftHelper(TR::Node *node, TR::ARM64ShiftCode shiftType, TR::CodeGenerator *cg)
+static TR::Register *shiftHelper(TR::Node *node, TR::InstOpCode::Mnemonic op, TR::CodeGenerator *cg)
    {
    TR::Node *firstChild = node->getFirstChild();
    TR::Node *secondChild = node->getSecondChild();
@@ -237,45 +237,39 @@ static TR::Register *shiftHelper(TR::Node *node, TR::ARM64ShiftCode shiftType, T
    TR::Register *srcReg = cg->evaluate(firstChild);
    TR::Register *trgReg = cg->allocateRegister();
    bool is64bit = node->getDataType().isInt64();
-   TR::InstOpCode::Mnemonic op;
 
    if (secondOp == TR::iconst || secondOp == TR::iuconst)
       {
       int32_t value = secondChild->getInt();
-      uint32_t shift = is64bit ? (value & 0x3F) : (value & 0x1F);
-      switch (shiftType)
+      switch (op)
          {
-         case TR::SH_LSL:
-            generateLogicalShiftLeftImmInstruction(cg, node, trgReg, srcReg, shift);
+         case TR::InstOpCode::_sllw:
+            op = TR::InstOpCode::_slliw;
             break;
-         case TR::SH_LSR:
-            generateLogicalShiftRightImmInstruction(cg, node, trgReg, srcReg, shift);
+         case TR::InstOpCode::_srlw:
+            op = TR::InstOpCode::_srliw;
             break;
-         case TR::SH_ASR:
-            generateArithmeticShiftRightImmInstruction(cg, node, trgReg, srcReg, shift);
+         case TR::InstOpCode::_sraw:
+            op = TR::InstOpCode::_sraiw;
+            break;
+         case TR::InstOpCode::_sll:
+            op = TR::InstOpCode::_slli;
+            break;
+         case TR::InstOpCode::_srl:
+            op = TR::InstOpCode::_srli;
+            break;
+         case TR::InstOpCode::_sra:
+            op = TR::InstOpCode::_srai;
             break;
          default:
             TR_ASSERT(false, "Unsupported shift type.");
          }
+      generateITYPE(op, node, trgReg, srcReg, value, cg);
       }
    else
       {
       TR::Register *shiftAmountReg = cg->evaluate(secondChild);
-      switch (shiftType)
-         {
-         case TR::SH_LSL:
-            op = is64bit ? TR::InstOpCode::lslvx : TR::InstOpCode::lslvw;
-            break;
-         case TR::SH_LSR:
-            op = is64bit ? TR::InstOpCode::lsrvx : TR::InstOpCode::lsrvw;
-            break;
-         case TR::SH_ASR:
-            op = is64bit ? TR::InstOpCode::asrvx : TR::InstOpCode::asrvw;
-            break;
-         default:
-            TR_ASSERT(false, "Unsupported shift type.");
-         }
-      generateTrg1Src2Instruction(cg, op, node, trgReg, srcReg, shiftAmountReg);
+      generateRTYPE(op, node, trgReg, srcReg, shiftAmountReg, cg);
       }
 
    node->setRegister(trgReg);
@@ -288,21 +282,21 @@ static TR::Register *shiftHelper(TR::Node *node, TR::ARM64ShiftCode shiftType, T
 TR::Register *
 OMR::ARM64::TreeEvaluator::ishlEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return shiftHelper(node, TR::SH_LSL, cg);
+   return shiftHelper(node, TR::InstOpCode::_sllw, cg);
    }
 
 // also handles lshr
 TR::Register *
 OMR::ARM64::TreeEvaluator::ishrEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return shiftHelper(node, TR::SH_ASR, cg);
+   return shiftHelper(node, TR::InstOpCode::_sraw, cg);
    }
 
 // also handles lushr
 TR::Register *
 OMR::ARM64::TreeEvaluator::iushrEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return shiftHelper(node, TR::SH_LSR, cg);
+   return shiftHelper(node, TR::InstOpCode::_srlw, cg);
    }
 
 // also handles lrol
