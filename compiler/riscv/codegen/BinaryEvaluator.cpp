@@ -306,9 +306,25 @@ OMR::ARM64::TreeEvaluator::irolEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    TR::Node *firstChild = node->getFirstChild();
    TR::Node *secondChild = node->getSecondChild();
    TR::Register *trgReg = cg->gprClobberEvaluate(firstChild);
+   TR::Register *tmpReg = cg->allocateRegister();
    bool is64bit = node->getDataType().isInt64();
    TR::InstOpCode::Mnemonic op;
 
+   /*
+    * RISC-V Base Integer ISA lacks a native rotate instruction, so here we need
+    * to use two shifts and or to implement a rotate, like (for 64bit):
+    *
+    *   sll tmp, src, shift
+    *   srl dst, src, 64 - shift,
+    *   or  dst, dst, tmp
+    *
+    * For 32bit, we must use .w instructions plus sign-extend the result with
+    *
+    *   sext.w dst  // aka addi.w dst, dst, 0
+    *
+    * TODO: in future, we may check for presence of B extension and use 'rot'
+    * instruction (if it finds its way to B extensions)
+    */
    if (secondChild->getOpCode().isLoadConst())
       {
       int32_t value = secondChild->getInt();
@@ -316,24 +332,44 @@ OMR::ARM64::TreeEvaluator::irolEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 
       if (shift != 0)
          {
-         shift = is64bit ? (64 - shift) : (32 - shift); // change ROL to ROR
-         op = is64bit ? TR::InstOpCode::extrx : TR::InstOpCode::extrw; // ROR is an alias of EXTR
-         generateTrg1Src2ShiftedInstruction(cg, op, node, trgReg, trgReg, trgReg, TR::SH_LSL, shift);
+         if (is64bit)
+            {
+            generateITYPE(TR::InstOpCode::_slli, node, tmpReg, trgReg, shift, cg);
+            generateITYPE(TR::InstOpCode::_srli, node, trgReg, trgReg, 64-shift, cg);
+            generateRTYPE(TR::InstOpCode::_or,   node, trgReg, trgReg, tmpReg, cg);
+            }
+         else
+            {
+            generateITYPE(TR::InstOpCode::_slliw, node, tmpReg, trgReg, shift, cg);
+            generateITYPE(TR::InstOpCode::_srliw, node, trgReg, trgReg, 32-shift, cg);
+            generateRTYPE(TR::InstOpCode::_or,    node, trgReg, trgReg, tmpReg, cg);
+            generateITYPE(TR::InstOpCode::_addiw, node, trgReg, trgReg, 0, cg);
+            }
          }
       }
    else
       {
-      TR::Register *shiftAmountReg = cg->evaluate(secondChild);
-      generateNegInstruction(cg, node, shiftAmountReg, shiftAmountReg); // change ROL to ROR
+      TR::Register *shift1Reg = cg->evaluate(secondChild);
+      TR::Register *shift2Reg = cg->allocateRegister();
+      TR::Register *zero = cg->machine()->getRealRegister(TR::RealRegister::zero);
+
+      generateRTYPE(TR::InstOpCode::_subw, node, shift2Reg, zero, shift1Reg, cg);
       if (is64bit)
          {
-         // 32->64 bit sign extension: SXTW is alias of SBFM
-         uint32_t imm = 0x101F; // N=1, immr=0, imms=31
-         generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::sbfmx, node, shiftAmountReg, shiftAmountReg, imm);
+         generateRTYPE(TR::InstOpCode::_sll,   node, tmpReg, trgReg, shift1Reg, cg);
+         generateRTYPE(TR::InstOpCode::_srl,   node, trgReg, trgReg, shift2Reg, cg);
+         generateRTYPE(TR::InstOpCode::_or,    node, trgReg, trgReg, tmpReg, cg);
          }
-      op = is64bit ? TR::InstOpCode::rorvx : TR::InstOpCode::rorvw;
-      generateTrg1Src2Instruction(cg, op, node, trgReg, trgReg, shiftAmountReg);
+      else
+         {
+         generateRTYPE(TR::InstOpCode::_sllw,  node, tmpReg, trgReg, shift1Reg, cg);
+         generateRTYPE(TR::InstOpCode::_srlw,  node, trgReg, trgReg, shift2Reg, cg);
+         generateRTYPE(TR::InstOpCode::_or,    node, trgReg, trgReg, tmpReg, cg);
+         generateITYPE(TR::InstOpCode::_addiw, node, trgReg, trgReg, 0, cg);
+         }
+      cg->stopUsingRegister(shift2Reg);
       }
+   cg->stopUsingRegister(tmpReg);
 
    node->setRegister(trgReg);
    firstChild->decReferenceCount();
