@@ -67,7 +67,7 @@ TR::Instruction *loadConstant32(TR::CodeGenerator *cg, TR::Node *node, int32_t v
          }
 
       cursor = generateUTYPE(TR::InstOpCode::_lui, node, hi, trgReg, cg);
-      cursor = generateITYPE(TR::InstOpCode::_addi, node, trgReg, trgReg, lo, cg);
+      cursor = generateITYPE(TR::InstOpCode::_addiw, node, trgReg, trgReg, lo, cg);
       }
 
    if (!insertingInstructions)
@@ -82,80 +82,25 @@ TR::Instruction *loadConstant64(TR::CodeGenerator *cg, TR::Node *node, int64_t v
    if (cursor == NULL)
       cursor = cg->getAppendInstruction();
 
-   if (value == 0LL)
+   if (INT32_MIN <= value && value <= INT32_MAX)
       {
-      // 0
-      cursor = generateTrg1ImmInstruction(cg, TR::InstOpCode::movzx, node, trgReg, 0, cursor);
-      }
-   else if (~value == 0LL)
-      {
-      // -1
-      cursor = generateTrg1ImmInstruction(cg, TR::InstOpCode::movnx, node, trgReg, 0, cursor);
+      return loadConstant32(cg, node, value & 0xFFFFFFFF, trgReg, cursor);
       }
    else
       {
-      uint16_t h[4];
-      int32_t count0000 = 0, countFFFF = 0;
-      int32_t use_movz;
-      int32_t i;
-
-      for (i = 0; i < 4; i++)
+      int32_t lo32 = (int32_t)((uint64_t)value & 0xFFFFFFFF);
+      int32_t hi32 = (int32_t)((uint64_t)value >> 32);
+      if (lo32 < 0)
          {
-         h[i] = (value >> (i * 16)) & 0xFFFF;
-         if (h[i] == 0)
-            {
-            count0000++;
-            }
-         else if (h[i] == 0xFFFF)
-            {
-            countFFFF++;
-            }
+         hi32 += 1;
          }
-      use_movz = (count0000 >= countFFFF);
 
-      TR::Instruction *start = cursor;
-
-      for (i = 0; i < 4; i++)
-         {
-         uint32_t shift = TR::MOV_LSL16 * i;
-         TR::InstOpCode::Mnemonic op = TR::InstOpCode::bad;
-         uint32_t imm;
-
-         if (use_movz && (h[i] != 0))
-            {
-            imm = h[i] | shift;
-            if (cursor != start)
-               {
-               op = TR::InstOpCode::movkx;
-               }
-            else
-               {
-               op = TR::InstOpCode::movzx;
-               }
-            }
-         else if (!use_movz && (h[i] != 0xFFFF))
-            {
-            if (cursor != start)
-               {
-               op = TR::InstOpCode::movkx;
-               imm = h[i] | shift;
-               }
-            else
-               {
-               op = TR::InstOpCode::movnx;
-               imm = (~h[i] & 0xFFFF) | shift;
-               }
-            }
-
-         if (op != TR::InstOpCode::bad)
-            {
-            cursor = generateTrg1ImmInstruction(cg, op, node, trgReg, imm, cursor);
-            }
-         else
-            {
-            // generate no instruction here
-            }
-         }
+      cursor = loadConstant32(cg, node, lo32, trgReg, cursor);
+      TR::Register *tmpReg = cg->allocateRegister();
+      cursor = loadConstant32(cg, node, hi32, tmpReg, cursor);
+      cursor = generateITYPE(TR::InstOpCode::_slli, node, tmpReg, tmpReg, 32, cg);
+      cursor = generateRTYPE(TR::InstOpCode::_add, node, trgReg, tmpReg, trgReg, cg);
+      cg->stopUsingRegister(tmpReg);
       }
 
    if (!insertingInstructions)
