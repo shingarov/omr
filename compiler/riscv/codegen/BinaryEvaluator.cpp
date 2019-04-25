@@ -236,7 +236,6 @@ static TR::Register *shiftHelper(TR::Node *node, TR::InstOpCode::Mnemonic op, TR
    TR::ILOpCodes secondOp = secondChild->getOpCodeValue();
    TR::Register *srcReg = cg->evaluate(firstChild);
    TR::Register *trgReg = cg->allocateRegister();
-   bool is64bit = node->getDataType().isInt64();
 
    if (secondOp == TR::iconst || secondOp == TR::iuconst)
       {
@@ -278,21 +277,18 @@ static TR::Register *shiftHelper(TR::Node *node, TR::InstOpCode::Mnemonic op, TR
    return trgReg;
    }
 
-// also handles lshl
 TR::Register *
 OMR::ARM64::TreeEvaluator::ishlEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return shiftHelper(node, TR::InstOpCode::_sllw, cg);
    }
 
-// also handles lshr
 TR::Register *
 OMR::ARM64::TreeEvaluator::ishrEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return shiftHelper(node, TR::InstOpCode::_sraw, cg);
    }
 
-// also handles lushr
 TR::Register *
 OMR::ARM64::TreeEvaluator::iushrEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
@@ -375,6 +371,24 @@ OMR::ARM64::TreeEvaluator::irolEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    firstChild->decReferenceCount();
    secondChild->decReferenceCount();
    return trgReg;
+   }
+
+TR::Register *
+OMR::ARM64::TreeEvaluator::lshlEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+   {
+   return shiftHelper(node, TR::InstOpCode::_sll, cg);
+   }
+
+TR::Register *
+OMR::ARM64::TreeEvaluator::lshrEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+   {
+   return shiftHelper(node, TR::InstOpCode::_sra, cg);
+   }
+
+TR::Register *
+OMR::ARM64::TreeEvaluator::lushrEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+   {
+   return shiftHelper(node, TR::InstOpCode::_srl, cg);
    }
 
 TR::Register *
