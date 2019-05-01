@@ -257,36 +257,6 @@ uint8_t *TR::ARM64Trg1Src2Instruction::generateBinaryEncoding()
    return cursor;
    }
 
-uint8_t *TR::ARM64Trg1Src2ShiftedInstruction::generateBinaryEncoding()
-   {
-   uint8_t *instructionStart = cg()->getBinaryBufferCursor();
-   uint8_t *cursor = instructionStart;
-   cursor = getOpCode().copyBinaryToBuffer(instructionStart);
-   insertTargetRegister(toARM64Cursor(cursor));
-   insertSource1Register(toARM64Cursor(cursor));
-   insertSource2Register(toARM64Cursor(cursor));
-   insertShift(toARM64Cursor(cursor));
-   cursor += ARM64_INSTRUCTION_LENGTH;
-   setBinaryLength(ARM64_INSTRUCTION_LENGTH);
-   setBinaryEncoding(instructionStart);
-   return cursor;
-   }
-
-uint8_t *TR::ARM64Trg1Src2ExtendedInstruction::generateBinaryEncoding()
-   {
-   uint8_t *instructionStart = cg()->getBinaryBufferCursor();
-   uint8_t *cursor = instructionStart;
-   cursor = getOpCode().copyBinaryToBuffer(instructionStart);
-   insertTargetRegister(toARM64Cursor(cursor));
-   insertSource1Register(toARM64Cursor(cursor));
-   insertSource2Register(toARM64Cursor(cursor));
-   insertExtend(toARM64Cursor(cursor));
-   cursor += ARM64_INSTRUCTION_LENGTH;
-   setBinaryLength(ARM64_INSTRUCTION_LENGTH);
-   setBinaryEncoding(instructionStart);
-   return cursor;
-   }
-
 uint8_t *TR::ARM64Trg1Src3Instruction::generateBinaryEncoding()
    {
    uint8_t *instructionStart = cg()->getBinaryBufferCursor();

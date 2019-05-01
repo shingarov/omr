@@ -36,46 +36,6 @@
 #include "env/IO.hpp"
 #include "il/Block.hpp"
 
-static const char *ARM64ConditionNames[] =
-   {
-   "eq",
-   "ne",
-   "cs",
-   "cc",
-   "mi",
-   "pl",
-   "vs",
-   "vc",
-   "hi",
-   "ls",
-   "ge",
-   "lt",
-   "gt",
-   "le",
-   "al",
-   "nv"
-   };
-
-static const char *ARM64ShiftCodeNames[] =
-   {
-   "lsl",
-   "lsr",
-   "asr",
-   "???"
-   };
-
-static const char *ARM64ExtendCodeNames[] =
-   {
-   "uxtb",
-   "uxth",
-   "uxtw",
-   "uxtx",
-   "sxtb",
-   "sxth",
-   "sxtw",
-   "sxtx"
-   };
-
 static const char *opCodeToNameMap[] =
    {
    "bad",
@@ -552,12 +512,6 @@ TR_Debug::print(TR::FILE *pOutFile, TR::Instruction *instr)
       case OMR::Instruction::IsTrg1Src2:
          print(pOutFile, (TR::ARM64Trg1Src2Instruction *)instr);
          break;
-      case OMR::Instruction::IsTrg1Src2Shifted:
-         print(pOutFile, (TR::ARM64Trg1Src2ShiftedInstruction *)instr);
-         break;
-      case OMR::Instruction::IsTrg1Src2Extended:
-         print(pOutFile, (TR::ARM64Trg1Src2ExtendedInstruction *)instr);
-         break;
       case OMR::Instruction::IsTrg1Src3:
          print(pOutFile, (TR::ARM64Trg1Src3Instruction *)instr);
          break;
@@ -765,32 +719,6 @@ TR_Debug::print(TR::FILE *pOutFile, TR::ARM64Trg1Src2Instruction *instr)
    if (instr->getDependencyConditions())
       print(pOutFile, instr->getDependencyConditions());
 
-   trfflush(_comp->getOutFile());
-   }
-
-void
-TR_Debug::print(TR::FILE *pOutFile, TR::ARM64Trg1Src2ShiftedInstruction *instr)
-   {
-   printPrefix(pOutFile, instr);
-   trfprintf(pOutFile, "%s \t", getOpCodeName(&instr->getOpCode()));
-
-   print(pOutFile, instr->getTargetRegister(), TR_WordReg); trfprintf(pOutFile, ", ");
-   print(pOutFile, instr->getSource1Register(), TR_WordReg); trfprintf(pOutFile, ", ");
-   print(pOutFile, instr->getSource2Register(), TR_WordReg);
-   trfprintf(pOutFile, " %s %d", ARM64ShiftCodeNames[instr->getShiftType()], instr->getShiftAmount());
-   trfflush(_comp->getOutFile());
-   }
-
-void
-TR_Debug::print(TR::FILE *pOutFile, TR::ARM64Trg1Src2ExtendedInstruction *instr)
-   {
-   printPrefix(pOutFile, instr);
-   trfprintf(pOutFile, "%s \t", getOpCodeName(&instr->getOpCode()));
-
-   print(pOutFile, instr->getTargetRegister(), TR_WordReg); trfprintf(pOutFile, ", ");
-   print(pOutFile, instr->getSource1Register(), TR_WordReg); trfprintf(pOutFile, ", ");
-   print(pOutFile, instr->getSource2Register(), TR_WordReg);
-   trfprintf(pOutFile, " %s %d", ARM64ExtendCodeNames[instr->getExtendType()], instr->getShiftAmount());
    trfflush(_comp->getOutFile());
    }
 

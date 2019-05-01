@@ -21,7 +21,6 @@
 
 #include <riscv.h>
 #include "codegen/RVInstruction.hpp"
-#include "codegen/ARM64ShiftCode.hpp"
 #include "codegen/CodeGenerator.hpp"
 #include "codegen/GenerateInstructions.hpp"
 #include "codegen/Linkage.hpp"
