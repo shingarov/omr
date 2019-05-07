@@ -165,11 +165,13 @@ ppcCreateHelperTrampolines(uint8_t *trampPtr, int32_t numHelpers)
 
 void ppcCodeCacheParameters(int32_t *trampolineSize, void **callBacks, int32_t *numHelpers, int32_t* CCPreLoadedCodeSize)
    {
+/*
 #if defined(TR_TARGET_64BIT)
    *trampolineSize = TRAMPOLINE_SIZE;
 #else
    *trampolineSize = TRAMPOLINE_SIZE + 4;
 #endif
+*/		*trampolineSize = 0;
    callBacks[0] = (void *)&ppcCodeCacheConfig;
    callBacks[1] = (void *)&ppcCreateHelperTrampolines;
    callBacks[2] = (void *)NULL;
