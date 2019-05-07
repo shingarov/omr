@@ -186,7 +186,7 @@ OMR::CodeCacheManager::destroy()
 
    if (_elfRelocatableGenerator)
    {
-         TR_ASSERT(_elfRelocatableGenerator->emitELF((const char*)_objectFileName,
+         TR_ASSERT(_elfRelocatableGenerator->emitELF((const char*)"obj.o",
                                               _relocatableSymbolContainer->_head,
                                               _relocatableSymbolContainer->_numSymbols,
                                               _relocatableSymbolContainer->_totalSymbolNameLength,

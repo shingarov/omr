@@ -438,7 +438,7 @@ void *       TR_ResolvedMethod::methodTypeTableEntryAddress(int32_t cpIndex)    
 TR_OpaqueClassBlock *TR_ResolvedMethod::getDeclaringClassFromFieldOrStatic(TR::Compilation *comp, int32_t cpIndex)  { TR_UNIMPLEMENTED(); return 0; }
 int32_t      TR_ResolvedMethod::classCPIndexOfFieldOrStatic(int32_t)       { TR_UNIMPLEMENTED(); return 0; }
 const char * TR_ResolvedMethod::signature(TR_Memory *, TR_AllocationKind)  { TR_UNIMPLEMENTED(); return 0; }
-const char * TR_ResolvedMethod::externalName(TR_Memory *, TR_AllocationKind)  { TR_UNIMPLEMENTED(); return 0; }
+const char * TR_ResolvedMethod::externalName(TR_Memory *, TR_AllocationKind)  { return "monkey"; }
 char *       TR_ResolvedMethod::fieldName (int32_t, TR_Memory *, TR_AllocationKind kind)           { TR_UNIMPLEMENTED(); return 0; }
 char *       TR_ResolvedMethod::staticName(int32_t, TR_Memory *, TR_AllocationKind kind)           { TR_UNIMPLEMENTED(); return 0; }
 char *       TR_ResolvedMethod::localName (uint32_t, uint32_t, TR_Memory *){ /*TR_UNIMPLEMENTED();*/ return 0; }
