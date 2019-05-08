@@ -38,7 +38,6 @@ namespace TR { class RegisterDependencyConditions; }
 namespace TR { class Snippet; }
 namespace TR { class SymbolReference; }
 
-
 /*
  * @brief Generates simple instruction
  * @param[in] cg : CodeGenerator
@@ -53,6 +52,7 @@ TR::Instruction *generateInstruction(
                    TR::Node *node,
                    TR::Instruction *preced = NULL);
 
+#ifdef TR_RISCV_ARM64_SOURCE_COMPAT
 /*
  * @brief Generates imm instruction
  * @param[in] cg : CodeGenerator
@@ -129,6 +129,7 @@ TR::Instruction *generateImmSymInstruction(
                    TR::Snippet *s,
                    TR::Instruction *preced = NULL);
 
+#endif // TR_RISCV_ARM64_SOURCE_COMPAT
 /*
  * @brief Generates label instruction
  * @param[in] cg : CodeGenerator
@@ -163,7 +164,7 @@ TR::Instruction *generateLabelInstruction(
                    TR::RegisterDependencyConditions *cond,
                    TR::Instruction *preced = NULL);
 
-
+#ifdef TR_RISCV_ARM64_SOURCE_COMPAT
 /*
  * @brief Generates compare and branch instruction
  * @param[in] cg : CodeGenerator
@@ -216,6 +217,7 @@ TR::Instruction *generateRegBranchInstruction(
                    TR::RegisterDependencyConditions *cond,
                    TR::Instruction *preced = NULL);
 
+#endif // TR_RISCV_ARM64_SOURCE_COMPAT
 /*
  * @brief Generates admin instruction
  * @param[in] cg : CodeGenerator
@@ -249,6 +251,7 @@ TR::Instruction *generateAdminInstruction(
                    TR::RegisterDependencyConditions *cond,
                    TR::Node *fenceNode = NULL,
                    TR::Instruction *preced = NULL);
+#ifdef TR_RISCV_ARM64_SOURCE_COMPAT
 
 /*
  * @brief Generates imm-to-trg instruction
@@ -598,5 +601,5 @@ TR::Instruction *generateMulInstruction(
                   TR::Register *s2reg,
                   TR::Instruction *preced = NULL);
 
-
+#endif
 #endif

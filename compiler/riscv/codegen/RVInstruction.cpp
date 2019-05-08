@@ -47,7 +47,6 @@
 #include "il/Node.hpp"                            // for Node
 #include "il/symbol/LabelSymbol.hpp"              // for LabelSymbol
 #include "infra/Assert.hpp"                       // for TR_ASSERT
-#include "codegen/GenerateInstructions.hpp"
 #include "codegen/ARM64OutOfLineCodeSection.hpp"
 
 #define TR_RISCV_RTYPE(insn, rd, rs1, rs2) \

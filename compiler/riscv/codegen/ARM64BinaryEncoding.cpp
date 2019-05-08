@@ -65,7 +65,7 @@ uint8_t *TR::ARM64ImmSymInstruction::generateBinaryEncoding()
    uint8_t *instructionStart = cg()->getBinaryBufferCursor();
    uint8_t *cursor = instructionStart;
    cursor = getOpCode().copyBinaryToBuffer(instructionStart);
-
+#ifdef TR_RISCV_ARM64_SOURCE_COMPAT
    if (getOpCodeValue() == TR::InstOpCode::bl)
       {
       uintptrj_t destination = getAddrImmediate();
@@ -81,6 +81,7 @@ uint8_t *TR::ARM64ImmSymInstruction::generateBinaryEncoding()
          }
       }
    else
+#endif
       {
       TR_ASSERT(false, "Unsupported opcode in ImmSymInstruction.");
       }

@@ -899,7 +899,7 @@ class ARM64Trg1ImmInstruction : public ARM64Trg1Instruction
    void insertImmediateField(uint32_t *instruction)
       {
       TR::InstOpCode::Mnemonic op = getOpCodeValue();
-
+#ifdef TR_RISCV_ARM64_SOURCE_COMPAT
       if (op == TR::InstOpCode::movzx || op == TR::InstOpCode::movzw ||
           op == TR::InstOpCode::movnx || op == TR::InstOpCode::movnw ||
           op == TR::InstOpCode::movkx || op == TR::InstOpCode::movkw)
@@ -911,6 +911,7 @@ class ARM64Trg1ImmInstruction : public ARM64Trg1Instruction
          *instruction |= ((_sourceImmediate & 0x7ffff) << 5) | ((_sourceImmediate & 0x3) << 29);
          }
       else
+#endif
          {
          TR_ASSERT(false, "Unsupported opcode in ARM64Trg1ImmInstruction.");
          }

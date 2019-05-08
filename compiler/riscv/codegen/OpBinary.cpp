@@ -35,8 +35,11 @@ const OMR::ARM64::InstOpCode::OpCodeBinaryEntry OMR::ARM64::InstOpCode::binaryEn
 /*
  * AArch64 instructions. They are defined for AArch64 source-level compatibility
  * only, they *must* die at some point
+ *
+ * However, until used at least at one place, we have to define them all because
+ * of binary compatibility.
  */
-#if 1
+#if defined(TR_RISCV_ARM64_SOURCE_COMPAT) || 1
 /* Branch,exception generation and system Instruction */
 	/* Compare _ Branch (immediate) */
 		0x34000000,	/* CBZ       	cbzw	 */

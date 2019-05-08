@@ -42,8 +42,10 @@ class InstOpCode: public OMR::InstOpCodeConnector
     */
    InstOpCode(TR::InstOpCode::Mnemonic m) : OMR::InstOpCodeConnector(m)
       {
+#ifdef TR_RISCV_ARM64_SOURCE_COMPAT
       TR_ASSERT((uint32_t)m < (uint32_t)TR::InstOpCode::cbzw || (uint32_t)m >= (uint32_t)TR::InstOpCode::proc,
                "Invalid RISC-V opcode (AArch64 opcode, perhaps?)");
+#endif
       }
    };
 
