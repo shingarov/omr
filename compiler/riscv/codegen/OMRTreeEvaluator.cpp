@@ -18,8 +18,6 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
-#define TR_RISCV_ARM64_SOURCE_COMPAT
-
 #include <riscv.h>
 #include "codegen/RVInstruction.hpp"
 #include "codegen/CodeGenerator.hpp"
@@ -128,11 +126,11 @@ TR::Register *commonLoadEvaluator(TR::Node *node, TR::InstOpCode::Mnemonic op, i
    TR::Register *tempReg;
    bool needSync = (node->getSymbolReference()->getSymbol()->isSyncVolatile() && TR::Compiler->target.isSMP());
 
-   if (op == TR::InstOpCode::vldrimms)
+   if (op == TR::InstOpCode::_flw)
       {
       tempReg = cg->allocateSinglePrecisionRegister();
       }
-   else if (op == TR::InstOpCode::vldrimmd)
+   else if (op == TR::InstOpCode::_fld)
       {
       tempReg = cg->allocateRegister(TR_FPR);
       }
@@ -187,7 +185,7 @@ OMR::ARM64::TreeEvaluator::aloadEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    node->setRegister(tempReg);
 
    TR::MemoryReference *tempMR = new (cg->trHeapMemory()) TR::MemoryReference(node, 8, cg);
-   generateTrg1MemInstruction(cg, TR::InstOpCode::ldrimmx, node, tempReg, tempMR);
+   generateLOAD(TR::InstOpCode::_ld, node, tempReg, tempMR, cg);
 
    /*
     * Enable this part when dmb instruction becomes available
@@ -541,7 +539,7 @@ OMR::ARM64::TreeEvaluator::BBEndEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    if (NULL == block->getNextBlock())
       {
       TR::Instruction *lastInstruction = cg->getAppendInstruction();
-      if (lastInstruction->getOpCodeValue() == TR::InstOpCode::bl
+      if (lastInstruction->getOpCodeValue() == TR::InstOpCode::_jal
               && lastInstruction->getNode()->getSymbolReference()->getReferenceNumber() == TR_aThrow)
          {
          lastInstruction = generateInstruction(cg, TR::InstOpCode::bad, node, lastInstruction);
