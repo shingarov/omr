@@ -18,7 +18,6 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
-#define TR_RISCV_ARM64_SOURCE_COMPAT
 
 #include <stddef.h> // for NULL, etc
 #include <stdint.h> // for uint16_t, int32_t, etc
@@ -242,16 +241,16 @@ TR::RealRegister *OMR::ARM64::Machine::freeBestRegister(TR::Instruction *current
    switch (rk)
       {
       case TR_GPR:
-         loadOp = TR::InstOpCode::ldrimmx;
+         loadOp = TR::InstOpCode::_ld;
          break;
       case TR_FPR:
-         loadOp = TR::InstOpCode::vldrimmd;
+         loadOp = TR::InstOpCode::_fld;
          break;
       default:
          TR_ASSERT(false, "Unsupported RegisterKind.");
          break;
       }
-   generateTrg1MemInstruction(self()->cg(), loadOp, currentNode, best, tmemref, currentInstruction);
+   generateLOAD(loadOp, currentNode, best, tmemref, self()->cg(), currentInstruction);
 
    self()->cg()->traceRegFreed(candidates[0], best);
 
@@ -313,18 +312,18 @@ TR::RealRegister *OMR::ARM64::Machine::reverseSpillState(TR::Instruction *curren
          {
          case TR_GPR:
             dataSize = TR::Compiler->om.sizeofReferenceAddress();
-            storeOp = TR::InstOpCode::strimmx;
+            storeOp = TR::InstOpCode::_sd;
             break;
          case TR_FPR:
             dataSize = 8;
-            storeOp = TR::InstOpCode::vstrimmd;
+            storeOp = TR::InstOpCode::_fsd;
             break;
          default:
             TR_ASSERT(false, "Unsupported RegisterKind.");
             break;
          }
          self()->cg()->freeSpill(location, dataSize, 0);
-         generateMemSrc1Instruction(self()->cg(), storeOp, currentNode, tmemref, targetRegister, currentInstruction);
+         generateSTORE(storeOp, currentNode, tmemref, targetRegister, self()->cg(), currentInstruction);
       }
    else
       {
@@ -427,16 +426,16 @@ TR::RealRegister *OMR::ARM64::Machine::reverseSpillState(TR::Instruction *curren
       switch (rk)
          {
          case TR_GPR:
-            storeOp = TR::InstOpCode::strimmx;
+            storeOp = TR::InstOpCode::_sd;
             break;
          case TR_FPR:
-            storeOp = TR::InstOpCode::vstrimmd;
+            storeOp = TR::InstOpCode::_fsd;
             break;
          default:
             TR_ASSERT(false, "Unsupported RegisterKind.");
             break;
          }
-         generateMemSrc1Instruction(self()->cg(), storeOp, currentNode, tmemref, targetRegister, currentInstruction);
+         generateSTORE(storeOp, currentNode, tmemref, targetRegister, self()->cg(), currentInstruction);
       }
    return targetRegister;
    }
@@ -517,9 +516,9 @@ static void registerExchange(TR::Instruction *precedingInstruction,
    TR::Node *node = precedingInstruction->getNode();
    if (rk == TR_GPR)
       {
-      generateTrg1Src2Instruction(cg, TR::InstOpCode::eorx, node, targetReg, targetReg, sourceReg, precedingInstruction);
-      generateTrg1Src2Instruction(cg, TR::InstOpCode::eorx, node, sourceReg, targetReg, sourceReg, precedingInstruction);
-      generateTrg1Src2Instruction(cg, TR::InstOpCode::eorx, node, targetReg, targetReg, sourceReg, precedingInstruction);
+      generateRTYPE(TR::InstOpCode::_xor, node, targetReg, targetReg, sourceReg, cg, precedingInstruction);
+      generateRTYPE(TR::InstOpCode::_xor, node, sourceReg, targetReg, sourceReg, cg, precedingInstruction);
+      generateRTYPE(TR::InstOpCode::_xor, node, targetReg, targetReg, sourceReg, cg, precedingInstruction);
       }
    else
       {
