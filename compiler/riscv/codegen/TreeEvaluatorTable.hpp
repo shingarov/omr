@@ -139,7 +139,7 @@
     TR::TreeEvaluator::unImpOpEvaluator ,        // TODO:ARM64: Enable when Implemented: TR::TreeEvaluator::sremEvaluator ,	// TR::srem		// remainder of 2 short integers          (child1 % child2)
     TR::TreeEvaluator::unImpOpEvaluator ,        // TODO:ARM64: Enable when Implemented: TR::TreeEvaluator::iuremEvaluator ,	// TR::iurem		// remainder of 2 unsigned integers       (child1 % child2)
     TR::TreeEvaluator::inegEvaluator, // TR::ineg		// negate an integer
-    TR::TreeEvaluator::lnegEvaluator, // TR::lneg		// negate a long integer
+    TR::TreeEvaluator::inegEvaluator, // TR::lneg		// negate a long integer
     TR::TreeEvaluator::fnegEvaluator, // TR::fneg		// negate a float
     TR::TreeEvaluator::dnegEvaluator, // TR::dneg		// negate a double
     TR::TreeEvaluator::unImpOpEvaluator ,        // TODO:ARM64: Enable when Implemented: TR::TreeEvaluator::bnegEvaluator ,	// TR::bneg		// negate a bytes
@@ -619,7 +619,7 @@
     TR::TreeEvaluator::unImpOpEvaluator ,        // TODO:ARM64: Enable when Implemented: TR::TreeEvaluator::aluaddEvaluator ,	// TR::aluadd		// add unsigned long integer to address with address result (child1 a; child2 i) (64-bit only)
     TR::TreeEvaluator::unImpOpEvaluator ,        // TODO:ARM64: Enable when Implemented: TR::TreeEvaluator::lusubhEvaluator ,	// TR::lusubh		// subtract 2 unsigned long integers (the high parts of prior lusub) as high part of 128bit subtraction.
     TR::TreeEvaluator::unImpOpEvaluator ,        // TODO:ARM64: Enable when Implemented: TR::TreeEvaluator::csubEvaluator ,	// TR::csub		// subtract 2 unsigned short integers (child1 - child2)
-    TR::TreeEvaluator::unImpOpEvaluator ,        // TODO:ARM64: Enable when Implemented: TR::TreeEvaluator::imulhEvaluator ,	// TR::imulh		// multiply 2 integers; and return the high word of the product
+    TR::TreeEvaluator::imulhEvaluator ,  // TR::imulh		// multiply 2 integers; and return the high word of the product
     TR::TreeEvaluator::unImpOpEvaluator ,        // TODO:ARM64: Enable when Implemented: TR::TreeEvaluator::iumulhEvaluator ,	// TR::iumulh		// multiply 2 unsigned integers; and return the high word of the product
     TR::TreeEvaluator::unImpOpEvaluator ,        // TODO:ARM64: Enable when Implemented: TR::TreeEvaluator::lmulhEvaluator ,	// TR::lmulh		// multiply 2 long integers; and return the high word of the product
     TR::TreeEvaluator::unImpOpEvaluator ,        // TODO:ARM64: Enable when Implemented: TR::TreeEvaluator::lumulhEvaluator ,	// TR::lumulh		// multiply 2 unsigned long integers; and return the high word of the product

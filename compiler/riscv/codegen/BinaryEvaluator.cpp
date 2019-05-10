@@ -18,7 +18,6 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
-#define TR_RISCV_ARM64_SOURCE_COMPAT
 
 #include <riscv.h>
 #include "codegen/ARM64Instruction.hpp"
@@ -102,17 +101,18 @@ static void mulConstant32(TR::Node *node, TR::Register *treg, TR::Register *sreg
       }
    else if (value == 1)
       {
-      generateMovInstruction(cg, node, treg, sreg);
+      generateITYPE(TR::InstOpCode::_addi, node, treg, sreg, 0, cg);
       }
    else if (value == -1)
       {
-      generateNegInstruction(cg, node, treg, sreg);
+      TR::Register *zero = cg->machine()->getRealRegister(TR::RealRegister::zero);
+      generateRTYPE(TR::InstOpCode::_subw, node, treg, zero, sreg, cg);
       }
    else
       {
       TR::Register *tmpReg = cg->allocateRegister();
       loadConstant32(cg, node, value, tmpReg);
-      generateMulInstruction(cg, node, treg, sreg, tmpReg);
+      generateRTYPE(TR::InstOpCode::_mulw, node, treg, sreg, tmpReg, cg);
       cg->stopUsingRegister(tmpReg);
       }
    }
@@ -155,8 +155,20 @@ OMR::ARM64::TreeEvaluator::imulEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 TR::Register *
 OMR::ARM64::TreeEvaluator::imulhEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	// TODO:ARM64: Enable TR::TreeEvaluator::imulhEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::ARM64::TreeEvaluator::unImpOpEvaluator(node, cg);
+   TR::Node *firstChild = node->getFirstChild();
+   TR::Register *src1Reg = cg->evaluate(firstChild);
+   TR::Node *secondChild = node->getSecondChild();
+   TR::Register *src2Reg = cg->evaluate(secondChild);
+   TR::Register *trgReg = cg->allocateRegister();
+
+   generateRTYPE(TR::InstOpCode::_mul,  node, trgReg, src1Reg, src2Reg, cg);
+   generateITYPE(TR::InstOpCode::_srai, node, trgReg, trgReg,  32, cg);
+
+   firstChild->decReferenceCount();
+   secondChild->decReferenceCount();
+   node->setRegister(trgReg);
+   return trgReg;
+
 	}
 
 TR::Register *
@@ -176,7 +188,7 @@ static TR::Register *idivHelper(TR::Node *node, bool is64bit, TR::CodeGenerator 
    TR::Register *src2Reg = cg->evaluate(secondChild);
    TR::Register *trgReg = cg->allocateRegister();
 
-   generateTrg1Src2Instruction(cg, is64bit ? TR::InstOpCode::sdivx : TR::InstOpCode::sdivw, node, trgReg, src1Reg, src2Reg);
+   generateRTYPE(is64bit ? TR::InstOpCode::_div : TR::InstOpCode::_divw, node, trgReg, src1Reg, src2Reg, cg);
 
    firstChild->decReferenceCount();
    secondChild->decReferenceCount();
@@ -195,8 +207,7 @@ static TR::Register *iremHelper(TR::Node *node, bool is64bit, TR::CodeGenerator 
    TR::Register *tmpReg = cg->allocateRegister();
    TR::Register *trgReg = cg->allocateRegister();
 
-   generateTrg1Src2Instruction(cg, is64bit ? TR::InstOpCode::sdivx : TR::InstOpCode::sdivw, node, tmpReg, src1Reg, src2Reg);
-   generateTrg1Src3Instruction(cg, is64bit ? TR::InstOpCode::msubx : TR::InstOpCode::msubw, node, trgReg, tmpReg, src2Reg, src1Reg);
+   generateRTYPE(is64bit ? TR::InstOpCode::_rem : TR::InstOpCode::_remw, node, trgReg, src1Reg, src2Reg, cg);
 
    cg->stopUsingRegister(tmpReg);
    firstChild->decReferenceCount();
