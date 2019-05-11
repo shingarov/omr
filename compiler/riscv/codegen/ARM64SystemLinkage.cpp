@@ -482,8 +482,8 @@ TR::ARM64SystemLinkage::createPrologue(TR::Instruction *cursor, List<TR::Paramet
          case TR::Double:
             if (nextFltArgReg < getProperties().getNumFloatArgRegs())
                {
-               op = (parameter->getSize() == 8) ? TR::InstOpCode::vstrimmd : TR::InstOpCode::vstrimms;
-               cursor = generateMemSrc1Instruction(cg(), op, firstNode, stackSlot, machine->getRealRegister((TR::RealRegister::RegNum)(TR::RealRegister::fa0 + nextFltArgReg)), cursor);
+               op = (parameter->getSize() == 8) ? TR::InstOpCode::_fsd : TR::InstOpCode::_fsw;
+               cursor = generateSTORE(op, firstNode, stackSlot, machine->getRealRegister((TR::RealRegister::RegNum)(TR::RealRegister::fa0 + nextFltArgReg)), codeGen, cursor);
                nextFltArgReg++;
                }
             else
@@ -650,7 +650,7 @@ int32_t TR::ARM64SystemLinkage::buildArgs(TR::Node *callNode,
                      tempReg = cg()->allocateCollectedReferenceRegister();
                   else
                      tempReg = cg()->allocateRegister();
-                  generateMovInstruction(cg(), callNode, tempReg, argRegister);
+                  generateITYPE(TR::InstOpCode::_addi, callNode, tempReg, argRegister, 0, cg());
                   argRegister = tempReg;
                   }
                if (numIntegerArgs == 0 &&
@@ -699,8 +699,10 @@ int32_t TR::ARM64SystemLinkage::buildArgs(TR::Node *callNode,
                if (!cg()->canClobberNodesRegister(child, 0))
                   {
                   tempReg = cg()->allocateRegister(TR_FPR);
-                  op = (childType == TR::Float) ? TR::InstOpCode::fmovs : TR::InstOpCode::fmovd;
-                  generateTrg1Src1Instruction(cg(), op, callNode, tempReg, argRegister);
+                  // TODO: check if this is the best way to move floating point values
+                  // between regs
+                  op = (childType == TR::Float) ? TR::InstOpCode::_fmax_d : TR::InstOpCode::_fmax_s;
+                  generateRTYPE(op, callNode, tempReg, argRegister, argRegister, cg());
                   argRegister = tempReg;
                   }
                if ((numFloatArgs == 0 && resType.isFloatingPoint()))
@@ -766,12 +768,12 @@ int32_t TR::ARM64SystemLinkage::buildArgs(TR::Node *callNode,
    if (numMemArgs > 0)
       {
       TR::RealRegister *sp = cg()->machine()->getRealRegister(properties.getStackPointerRegister());
-      generateTrg1Src1ImmInstruction(cg(), TR::InstOpCode::subimmx, callNode, argMemReg, sp, totalSize);
+      generateITYPE(TR::InstOpCode::_addi, callNode, argMemReg, sp, - totalSize, cg());
 
       for (argIndex = 0; argIndex < numMemArgs; argIndex++)
          {
          TR::Register *aReg = pushToMemory[argIndex].argRegister;
-         generateMemSrc1Instruction(cg(), pushToMemory[argIndex].opCode, callNode, pushToMemory[argIndex].argMemory, aReg);
+         generateSTORE(pushToMemory[argIndex].opCode, callNode, pushToMemory[argIndex].argMemory, aReg, cg());
          cg()->stopUsingRegister(aReg);
          }
 

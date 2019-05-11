@@ -18,13 +18,14 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
-#define TR_RISCV_ARM64_SOURCE_COMPAT
 
 #include "codegen/MemoryReference.hpp"
 
 #include <stddef.h>
 #include <stdint.h>
+#include <riscv.h>
 #include "codegen/ARM64Instruction.hpp"
+#include "codegen/RVInstruction.hpp"
 #include "codegen/CodeGenerator.hpp"
 #include "codegen/GenerateInstructions.hpp"
 #include "il/Node.hpp"
@@ -224,19 +225,19 @@ void OMR::ARM64::MemoryReference::addToOffset(TR::Node *node, intptrj_t amount, 
          {
          if (node->getOpCode().isLoadConst() && node->getRegister())
             {
-            generateTrg1Src2Instruction(cg, TR::InstOpCode::addx, node, newBase, _baseRegister, node->getRegister());
+            generateRTYPE(TR::InstOpCode::_add, node, newBase, _baseRegister, node->getRegister(), cg);
             }
          else
             {
-            if (constantIsUnsignedImm12(displacement))
+            if (VALID_ITYPE_IMM(displacement))
                {
-               generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::addimmx, node, newBase, _baseRegister, displacement);
+               generateITYPE(TR::InstOpCode::_addi, node, newBase, _baseRegister, displacement, cg);
                }
             else
                {
                TR::Register *tempReg = cg->allocateRegister();
                loadConstant64(cg, node, displacement, tempReg);
-               generateTrg1Src2Instruction(cg, TR::InstOpCode::addx, node, newBase, _baseRegister, tempReg);
+               generateRTYPE(TR::InstOpCode::_add, node, newBase, _baseRegister, tempReg, cg);
                cg->stopUsingRegister(tempReg);
                }
             }
@@ -417,7 +418,7 @@ void OMR::ARM64::MemoryReference::consolidateRegisters(TR::Register *srcReg, TR:
          else
             tempTargetRegister = cg->allocateRegister();
 
-         generateTrg1Src2Instruction(cg, TR::InstOpCode::addx, srcTree, tempTargetRegister, _baseRegister, _indexRegister);
+         generateRTYPE(TR::InstOpCode::_add, srcTree, tempTargetRegister, _baseRegister, _indexRegister, cg);
 
          if (_baseRegister != tempTargetRegister)
             {
@@ -446,7 +447,7 @@ void OMR::ARM64::MemoryReference::consolidateRegisters(TR::Register *srcReg, TR:
          else
             tempTargetRegister = cg->allocateRegister();
 
-         generateTrg1Src2Instruction(cg, TR::InstOpCode::addx, srcTree, tempTargetRegister, _baseRegister, srcReg);
+         generateRTYPE(TR::InstOpCode::_add, srcTree, tempTargetRegister, _baseRegister, srcReg, cg);
 
          if (_baseRegister != tempTargetRegister)
             {

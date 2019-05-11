@@ -18,12 +18,12 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
-#define TR_RISCV_ARM64_SOURCE_COMPAT
 
 #include <stdlib.h>
 #include <riscv.h>
 
 #include "codegen/ARM64Instruction.hpp"
+#include "codegen/RVInstruction.hpp"
 #include "codegen/ARM64SystemLinkage.hpp"
 #include "codegen/CodeGenerator.hpp"
 #include "codegen/CodeGenerator_inlines.hpp"
@@ -328,7 +328,7 @@ TR::Register *OMR::ARM64::CodeGenerator::gprClobberEvaluate(TR::Node *node)
    if (node->getReferenceCount() > 1)
       {
       TR::Register *targetReg = self()->allocateRegister();
-      generateMovInstruction(self(), node, targetReg, self()->evaluate(node));
+      generateITYPE(TR::InstOpCode::_addi, node, targetReg, self()->evaluate(node), 0, self());
       return targetReg;
       }
    else

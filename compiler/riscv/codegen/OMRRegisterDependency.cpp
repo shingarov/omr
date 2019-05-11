@@ -18,10 +18,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
-#define TR_RISCV_ARM64_SOURCE_COMPAT
 
 #include <stddef.h>
 #include "codegen/ARM64Instruction.hpp"
+#include "codegen/RVInstruction.hpp"
 #include "codegen/BackingStore.hpp"
 #include "codegen/CodeGenerator.hpp"
 #include "codegen/GenerateInstructions.hpp"
@@ -191,17 +191,17 @@ void TR_ARM64RegisterDependencyGroup::assignRegisters(
                switch (rk)
                   {
                   case TR_GPR:
-                     opCode = TR::InstOpCode::ldrimmx;
+                     opCode = TR::InstOpCode::_ld;
                      break;
                   case TR_FPR:
-                     opCode = TR::InstOpCode::vldrimmd;
+                     opCode = TR::InstOpCode::_fld;
                      break;
                   default:
                      TR_ASSERT(0, "\nRegister kind not supported in OOL spill\n");
                      break;
                   }
 
-               TR::Instruction *inst = generateTrg1MemInstruction(cg, opCode, currentNode, assignedReg, tempMR, currentInstruction);
+               TR::Instruction *inst = generateLOAD(opCode, currentNode, assignedReg, tempMR, cg, currentInstruction);
 
                assignedReg->setAssignedRegister(NULL);
                virtReg->setAssignedRegister(NULL);
