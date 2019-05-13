@@ -18,7 +18,6 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
-#define TR_RISCV_ARM64_SOURCE_COMPAT
 
 #include <riscv.h>
 #include "codegen/ARM64SystemLinkage.hpp"
@@ -675,11 +674,11 @@ int32_t TR::ARM64SystemLinkage::buildArgs(TR::Node *callNode,
                // numIntegerArgs >= properties.getNumIntArgRegs()
                if (childType == TR::Address || childType == TR::Int64)
                   {
-                  op = TR::InstOpCode::strpostx;
+                  op = TR::InstOpCode::_sd;
                   }
                else
                   {
-                  op = TR::InstOpCode::strpostw;
+                  op = TR::InstOpCode::_sw;
                   }
                mref = getOutgoingArgumentMemRef(argMemReg, argRegister, op, pushToMemory[argIndex++]);
                argSize += 8; // always 8-byte aligned
@@ -701,7 +700,7 @@ int32_t TR::ARM64SystemLinkage::buildArgs(TR::Node *callNode,
                   tempReg = cg()->allocateRegister(TR_FPR);
                   // TODO: check if this is the best way to move floating point values
                   // between regs
-                  op = (childType == TR::Float) ? TR::InstOpCode::_fmax_d : TR::InstOpCode::_fmax_s;
+                  op = (childType == TR::Float) ? TR::InstOpCode::_fsgnj_d : TR::InstOpCode::_fsgnj_s;
                   generateRTYPE(op, callNode, tempReg, argRegister, argRegister, cg());
                   argRegister = tempReg;
                   }
@@ -726,11 +725,11 @@ int32_t TR::ARM64SystemLinkage::buildArgs(TR::Node *callNode,
                // numFloatArgs >= properties.getNumFloatArgRegs()
                if (childType == TR::Double)
                   {
-                  op = TR::InstOpCode::vstrpostd;
+                  op = TR::InstOpCode::_fsd;
                   }
                else
                   {
-                  op = TR::InstOpCode::vstrposts;
+                  op = TR::InstOpCode::_fsw;
                   }
                mref = getOutgoingArgumentMemRef(argMemReg, argRegister, op, pushToMemory[argIndex++]);
                argSize += 8; // always 8-byte aligned
