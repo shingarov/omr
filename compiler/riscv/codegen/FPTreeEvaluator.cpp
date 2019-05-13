@@ -18,9 +18,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
-#define TR_RISCV_ARM64_SOURCE_COMPAT
 
 #include "codegen/CodeGenerator.hpp"
+#include "codegen/RVInstruction.hpp"
 #include "codegen/GenerateInstructions.hpp"
 #include "codegen/Linkage.hpp"
 #include "codegen/RegisterDependency.hpp"
@@ -32,8 +32,9 @@ static void fpBitsMovHelper(TR::Node *node, TR::InstOpCode::Mnemonic op, TR::Reg
    {
    TR::Node *child = node->getFirstChild();
    TR::Register *srcReg = cg->evaluate(child);
+   TR::RealRegister *zero = cg->machine()->getRealRegister(TR::RealRegister::zero);
 
-   generateTrg1Src1Instruction(cg, op, node, trgReg, srcReg);
+   generateRTYPE(op, node, trgReg, srcReg, zero, cg);
 
    cg->decReferenceCount(child);
    }
@@ -43,7 +44,7 @@ OMR::ARM64::TreeEvaluator::ibits2fEvaluator(TR::Node *node, TR::CodeGenerator *c
    {
    TR::Register *trgReg = cg->allocateSinglePrecisionRegister();
 
-   fpBitsMovHelper(node, TR::InstOpCode::fmov_wtos, trgReg, cg);
+   fpBitsMovHelper(node, TR::InstOpCode::_fmv_s_x, trgReg, cg);
 
    node->setRegister(trgReg);
    return trgReg;
@@ -54,7 +55,7 @@ OMR::ARM64::TreeEvaluator::fbits2iEvaluator(TR::Node *node, TR::CodeGenerator *c
    {
    TR::Register *trgReg = cg->allocateRegister();
 
-   fpBitsMovHelper(node, TR::InstOpCode::fmov_stow, trgReg, cg);
+   fpBitsMovHelper(node, TR::InstOpCode::_fmv_x_s, trgReg, cg);
 
    node->setRegister(trgReg);
    return trgReg;
@@ -65,7 +66,7 @@ OMR::ARM64::TreeEvaluator::lbits2dEvaluator(TR::Node *node, TR::CodeGenerator *c
    {
    TR::Register *trgReg = cg->allocateRegister(TR_FPR);
 
-   fpBitsMovHelper(node, TR::InstOpCode::fmov_xtod, trgReg, cg);
+   fpBitsMovHelper(node, TR::InstOpCode::_fmv_d_x, trgReg, cg);
 
    node->setRegister(trgReg);
    return trgReg;
@@ -76,7 +77,7 @@ OMR::ARM64::TreeEvaluator::dbits2lEvaluator(TR::Node *node, TR::CodeGenerator *c
    {
    TR::Register *trgReg = cg->allocateRegister();
 
-   fpBitsMovHelper(node, TR::InstOpCode::fmov_dtox, trgReg, cg);
+   fpBitsMovHelper(node, TR::InstOpCode::_fmv_x_d, trgReg, cg);
 
    node->setRegister(trgReg);
    return trgReg;
@@ -87,6 +88,8 @@ OMR::ARM64::TreeEvaluator::fconstEvaluator(TR::Node *node, TR::CodeGenerator *cg
    {
    TR::Register *trgReg = cg->allocateSinglePrecisionRegister();
    TR::Register *tmpReg = cg->allocateRegister();
+   TR::Register *zero = cg->machine()->getRealRegister(TR::RealRegister::zero);
+
 
    union {
       float f;
@@ -95,7 +98,7 @@ OMR::ARM64::TreeEvaluator::fconstEvaluator(TR::Node *node, TR::CodeGenerator *cg
 
    fvalue.f = node->getFloat();
    loadConstant32(cg, node, fvalue.i, tmpReg);
-   generateTrg1Src1Instruction(cg, TR::InstOpCode::fmov_wtos, node, trgReg, tmpReg);
+   generateRTYPE(TR::InstOpCode::_fmv_s_x, node, trgReg, tmpReg, zero, cg);
    cg->stopUsingRegister(tmpReg);
 
    node->setRegister(trgReg);
@@ -107,6 +110,7 @@ OMR::ARM64::TreeEvaluator::dconstEvaluator(TR::Node *node, TR::CodeGenerator *cg
    {
    TR::Register *trgReg = cg->allocateRegister(TR_FPR);
    TR::Register *tmpReg = cg->allocateRegister();
+   TR::Register *zero = cg->machine()->getRealRegister(TR::RealRegister::zero);
 
    union {
       double d;
@@ -115,7 +119,7 @@ OMR::ARM64::TreeEvaluator::dconstEvaluator(TR::Node *node, TR::CodeGenerator *cg
 
    dvalue.d = node->getDouble();
    loadConstant64(cg, node, dvalue.l, tmpReg);
-   generateTrg1Src1Instruction(cg, TR::InstOpCode::fmov_xtod, node, trgReg, tmpReg);
+   generateRTYPE(TR::InstOpCode::_fmv_d_x, node, trgReg, tmpReg, zero, cg);
    cg->stopUsingRegister(tmpReg);
 
    node->setRegister(trgReg);
@@ -126,28 +130,28 @@ OMR::ARM64::TreeEvaluator::dconstEvaluator(TR::Node *node, TR::CodeGenerator *cg
 TR::Register *
 OMR::ARM64::TreeEvaluator::floadEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return commonLoadEvaluator(node, TR::InstOpCode::vldrimms, 4, cg);
+   return commonLoadEvaluator(node, TR::InstOpCode::_flw, 4, cg);
    }
 
 // also handles dloadi
 TR::Register *
 OMR::ARM64::TreeEvaluator::dloadEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return commonLoadEvaluator(node, TR::InstOpCode::vldrimmd, 8, cg);
+   return commonLoadEvaluator(node, TR::InstOpCode::_fld, 8, cg);
    }
 
 // also handles fstorei
 TR::Register *
 OMR::ARM64::TreeEvaluator::fstoreEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return commonLoadEvaluator(node, TR::InstOpCode::vstrimms, 4, cg);
+   return commonStoreEvaluator(node, TR::InstOpCode::_fsw, 4, cg);
    }
 
 // also handles dstorei
 TR::Register *
 OMR::ARM64::TreeEvaluator::dstoreEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return commonLoadEvaluator(node, TR::InstOpCode::vstrimmd, 8, cg);
+   return commonStoreEvaluator(node, TR::InstOpCode::_fsd, 8, cg);
    }
 
 TR::Register *
@@ -172,7 +176,7 @@ commonFpEvaluator(TR::Node *node, TR::InstOpCode::Mnemonic op, bool isDouble, TR
    TR::Register *trgReg;
 
    trgReg = isDouble ? cg->allocateRegister(TR_FPR) : cg->allocateSinglePrecisionRegister();
-   generateTrg1Src2Instruction(cg, op, node, trgReg, src1Reg, src2Reg);
+   generateRTYPE(op, node, trgReg, src1Reg, src2Reg, cg);
    cg->decReferenceCount(firstChild);
    cg->decReferenceCount(secondChild);
    node->setRegister(trgReg);
@@ -194,49 +198,49 @@ doublePrecisionEvaluator(TR::Node *node, TR::InstOpCode::Mnemonic op, TR::CodeGe
 TR::Register *
 OMR::ARM64::TreeEvaluator::faddEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return singlePrecisionEvaluator(node, TR::InstOpCode::fadds, cg);
+   return singlePrecisionEvaluator(node, TR::InstOpCode::_fadd_s, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::daddEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return doublePrecisionEvaluator(node, TR::InstOpCode::faddd, cg);
+   return doublePrecisionEvaluator(node, TR::InstOpCode::_fadd_d, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::fsubEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return singlePrecisionEvaluator(node, TR::InstOpCode::fsubs, cg);
+   return singlePrecisionEvaluator(node, TR::InstOpCode::_fsub_s, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::dsubEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return doublePrecisionEvaluator(node, TR::InstOpCode::fsubd, cg);
+   return doublePrecisionEvaluator(node, TR::InstOpCode::_fsub_d, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::fmulEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return singlePrecisionEvaluator(node, TR::InstOpCode::fmuls, cg);
+   return singlePrecisionEvaluator(node, TR::InstOpCode::_fmul_s, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::dmulEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return doublePrecisionEvaluator(node, TR::InstOpCode::fmuld, cg);
+   return doublePrecisionEvaluator(node, TR::InstOpCode::_fmul_d, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::fdivEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return singlePrecisionEvaluator(node, TR::InstOpCode::fdivs, cg);
+   return singlePrecisionEvaluator(node, TR::InstOpCode::_fdiv_s, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::ddivEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return doublePrecisionEvaluator(node, TR::InstOpCode::fdivd, cg);
+   return doublePrecisionEvaluator(node, TR::InstOpCode::_fdiv_d, cg);
    }
 
 TR::Register *
@@ -268,7 +272,7 @@ commonFpUnaryEvaluator(TR::Node *node, TR::InstOpCode::Mnemonic op, bool isDoubl
       {
       trgReg = srcReg;
       }
-   generateTrg1Src1Instruction(cg, op, node, trgReg, srcReg);
+   generateRTYPE(op, node, trgReg, srcReg, srcReg, cg);
    cg->decReferenceCount(firstChild);
    node->setRegister(trgReg);
    return trgReg;
@@ -289,25 +293,25 @@ doublePrecisionUnaryEvaluator(TR::Node *node, TR::InstOpCode::Mnemonic op, TR::C
 TR::Register *
 OMR::ARM64::TreeEvaluator::fabsEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return singlePrecisionUnaryEvaluator(node, TR::InstOpCode::fabss, cg);
+   return singlePrecisionUnaryEvaluator(node, TR::InstOpCode::_fsgnjx_s, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::dabsEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return doublePrecisionUnaryEvaluator(node, TR::InstOpCode::fabsd, cg);
+   return doublePrecisionUnaryEvaluator(node, TR::InstOpCode::_fsgnjx_d, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::fnegEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return singlePrecisionUnaryEvaluator(node, TR::InstOpCode::fnegs, cg);
+   return singlePrecisionUnaryEvaluator(node, TR::InstOpCode::_fsgnjn_s, cg);
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::dnegEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return doublePrecisionUnaryEvaluator(node, TR::InstOpCode::fnegd, cg);
+   return doublePrecisionUnaryEvaluator(node, TR::InstOpCode::_fsgnjn_d, cg);
    }
 
 TR::Register *
