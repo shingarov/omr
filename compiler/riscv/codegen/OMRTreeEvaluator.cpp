@@ -18,6 +18,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
+
 #include <riscv.h>
 #include "codegen/RVInstruction.hpp"
 #include "codegen/CodeGenerator.hpp"
@@ -539,7 +540,9 @@ OMR::ARM64::TreeEvaluator::BBEndEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    if (NULL == block->getNextBlock())
       {
       TR::Instruction *lastInstruction = cg->getAppendInstruction();
-      if (lastInstruction->getOpCodeValue() == TR::InstOpCode::_jal
+      TR::InstOpCode::Mnemonic lastInstructionOp = lastInstruction->getOpCodeValue();
+      if ((lastInstructionOp == TR::InstOpCode::_jal || lastInstructionOp == TR::InstOpCode::_jalr)
+              && 0 /* TODO: check that jump stores return address into some register (not x0 / zero) */
               && lastInstruction->getNode()->getSymbolReference()->getReferenceNumber() == TR_aThrow)
          {
          lastInstruction = generateInstruction(cg, TR::InstOpCode::bad, node, lastInstruction);
