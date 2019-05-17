@@ -71,17 +71,18 @@ OMR::ARM64::TreeEvaluator::returnEvaluator(TR::Node *node, TR::CodeGenerator *cg
 TR::Register *OMR::ARM64::TreeEvaluator::gotoEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    TR::LabelSymbol *gotoLabel = node->getBranchDestination()->getNode()->getLabel();
+   TR::RealRegister *zero = cg->machine()->getRealRegister(TR::RealRegister::zero);
    if (node->getNumChildren() > 0)
       {
       TR::Node *child = node->getFirstChild();
       cg->evaluate(child);
-      generateLabelInstruction(cg, TR::InstOpCode::_jal, node, gotoLabel,
-            generateRegisterDependencyConditions(cg, child, 0));
+      generateJTYPE(TR::InstOpCode::_jal, node, zero, gotoLabel,
+            generateRegisterDependencyConditions(cg, child, 0), cg);
       cg->decReferenceCount(child);
       }
    else
       {
-      generateLabelInstruction(cg, TR::InstOpCode::_jal, node, gotoLabel);
+      generateJTYPE(TR::InstOpCode::_jal, node, zero, gotoLabel, cg);
       }
    return NULL;
    }

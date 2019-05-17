@@ -94,55 +94,24 @@ uint8_t *TR::ARM64ImmSymInstruction::generateBinaryEncoding()
 
 uint8_t *TR::ARM64LabelInstruction::generateBinaryEncoding()
    {
+   TR_ASSERT(getOpCodeValue() == OMR::InstOpCode::label, "Invalid opcode for label instruction, must be ::label");
+
    uint8_t *instructionStart = cg()->getBinaryBufferCursor();
-   uint8_t *cursor = instructionStart;
-   TR::LabelSymbol *label = getLabelSymbol();
 
-   if (getOpCodeValue() == OMR::InstOpCode::label)
-      {
-      label->setCodeLocation(instructionStart);
-      }
-   else
-      {
-      TR_ASSERT(getOpCodeValue() == OMR::InstOpCode::_jal, "Unsupported opcode in LabelInstruction.");
+   getLabelSymbol()->setCodeLocation(instructionStart);
 
-      uintptr_t destination = (uintptr_t)label->getCodeLocation();
-      intptr_t distance = 0;
-      if (destination != 0)
-         {
-         distance = destination - (uintptr_t)cursor;
-         }
-      else
-         {
-         cg()->addRelocation(new (cg()->trHeapMemory()) TR::LabelRelative32BitRelocation(cursor, label));
-         }
-
-      TR::RealRegister *zero = cg()->machine()->getRealRegister(TR::RealRegister::zero);
-      TR_ASSERT(VALID_UJTYPE_IMM(distance), "Branch destination is too far away.");
-         *((uint32_t*)cursor) = TR_RISCV_UJTYPE ((uint32_t)(getOpCode().getOpCodeBinaryEncoding()),
-                         toRealRegister(zero)->binaryRegCode(),
-                         distance);
-      cursor += ARM64_INSTRUCTION_LENGTH;
-      }
-
-   setBinaryLength(cursor - instructionStart);
+   setBinaryLength(0);
    cg()->addAccumulatedInstructionLengthError(getEstimatedBinaryLength() - getBinaryLength());
    setBinaryEncoding(instructionStart);
-   return cursor;
+   return instructionStart;
    }
 
 int32_t TR::ARM64LabelInstruction::estimateBinaryLength(int32_t currentEstimate)
    {
-   if (getOpCodeValue() == OMR::InstOpCode::label)
-      {
-      setEstimatedBinaryLength(0);
-      getLabelSymbol()->setEstimatedCodeLocation(currentEstimate);
-      }
-   else
-      {
-      setEstimatedBinaryLength(ARM64_INSTRUCTION_LENGTH);
-      }
+   TR_ASSERT(getOpCodeValue() == OMR::InstOpCode::label, "Invalid opcode for label instruction, must be ::label");
 
+   setEstimatedBinaryLength(0);
+   getLabelSymbol()->setEstimatedCodeLocation(currentEstimate);
    return currentEstimate + getEstimatedBinaryLength();
    }
 

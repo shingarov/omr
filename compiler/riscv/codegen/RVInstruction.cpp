@@ -62,6 +62,66 @@
 #define TR_RISCV_UJTYPE(insn, rd, target) \
   ((insn) | ((rd) << OP_SH_RD) | ENCODE_UJTYPE_IMM(target))
 
+// TR::RtypeInstruction:: member functions
+
+bool TR::RtypeInstruction::refsRegister(TR::Register *reg)
+   {
+   return (reg == getTargetRegister() ||
+           reg == getSource1Register() ||
+           reg == getSource2Register());
+   }
+
+bool TR::RtypeInstruction::usesRegister(TR::Register *reg)
+   {
+   return (reg == getSource1Register() || reg == getSource2Register());
+   }
+
+bool TR::RtypeInstruction::defsRegister(TR::Register *reg)
+   {
+   return (reg == getTargetRegister());
+   }
+
+bool TR::RtypeInstruction::defsRealRegister(TR::Register *reg)
+   {
+   return (reg == getTargetRegister()->getAssignedRegister());
+   }
+
+void TR::RtypeInstruction::assignRegisters(TR_RegisterKinds kindToBeAssigned)
+   {
+   TR::Machine *machine = cg()->machine();
+   TR::Register *target1Virtual = getTargetRegister();
+   TR::Register *source1Virtual = getSource1Register();
+   TR::Register *source2Virtual = getSource2Register();
+
+   if (getDependencyConditions())
+      getDependencyConditions()->assignPostConditionRegisters(this, kindToBeAssigned, cg());
+
+   source1Virtual->block();
+   target1Virtual->block();
+   TR::RealRegister *assignedSource2Register = machine->assignOneRegister(this, source2Virtual);
+   target1Virtual->unblock();
+   source1Virtual->unblock();
+
+   source2Virtual->block();
+   target1Virtual->block();
+   TR::RealRegister *assignedSource1Register = machine->assignOneRegister(this, source1Virtual);
+   target1Virtual->unblock();
+   source2Virtual->unblock();
+
+   source2Virtual->block();
+   source1Virtual->block();
+   TR::RealRegister *assignedTarget1Register = machine->assignOneRegister(this, target1Virtual);
+   source1Virtual->unblock();
+   source2Virtual->unblock();
+
+   if (getDependencyConditions())
+      getDependencyConditions()->assignPreConditionRegisters(this->getPrev(), kindToBeAssigned, cg());
+
+   setTargetRegister(assignedTarget1Register);
+   setSource1Register(assignedSource1Register);
+   setSource2Register(assignedSource2Register);
+   }
+
 uint8_t *TR::RtypeInstruction::generateBinaryEncoding() {
    uint8_t        *instructionStart = cg()->getBinaryBufferCursor();
    uint8_t        *cursor           = instructionStart;
@@ -78,6 +138,53 @@ uint8_t *TR::RtypeInstruction::generateBinaryEncoding() {
    return cursor;
 }
 
+// TR::ItypeInstruction:: member functions
+
+bool TR::ItypeInstruction::refsRegister(TR::Register *reg)
+   {
+   return (reg == getTargetRegister() ||
+           reg == getSource1Register() );
+   }
+
+bool TR::ItypeInstruction::usesRegister(TR::Register *reg)
+   {
+   return (reg == getSource1Register());
+   }
+
+bool TR::ItypeInstruction::defsRegister(TR::Register *reg)
+   {
+   return (reg == getTargetRegister());
+   }
+
+bool TR::ItypeInstruction::defsRealRegister(TR::Register *reg)
+   {
+   return (reg == getTargetRegister()->getAssignedRegister());
+   }
+
+void TR::ItypeInstruction::assignRegisters(TR_RegisterKinds kindToBeAssigned)
+   {
+   TR::Machine *machine = cg()->machine();
+   TR::Register *target1Virtual = getTargetRegister();
+   TR::Register *source1Virtual = getSource1Register();
+
+   if (getDependencyConditions())
+      getDependencyConditions()->assignPostConditionRegisters(this, kindToBeAssigned, cg());
+
+   target1Virtual->block();
+   TR::RealRegister *assignedSource1Register = machine->assignOneRegister(this, source1Virtual);
+   target1Virtual->unblock();
+
+   source1Virtual->block();
+   TR::RealRegister *assignedTarget1Register = machine->assignOneRegister(this, target1Virtual);
+   source1Virtual->unblock();
+
+   if (getDependencyConditions())
+      getDependencyConditions()->assignPreConditionRegisters(this->getPrev(), kindToBeAssigned, cg());
+
+   setTargetRegister(assignedTarget1Register);
+   setSource1Register(assignedSource1Register);
+   }
+
 uint8_t *TR::ItypeInstruction::generateBinaryEncoding() {
    uint8_t        *instructionStart = cg()->getBinaryBufferCursor();
    uint8_t        *cursor           = instructionStart;
@@ -93,6 +200,49 @@ uint8_t *TR::ItypeInstruction::generateBinaryEncoding() {
    setBinaryEncoding(instructionStart);
    return cursor;
 }
+
+// TR::LoadInstruction:: member functions
+
+bool TR::LoadInstruction::refsRegister(TR::Register *reg)
+   {
+   return (reg == getTargetRegister() || getMemoryReference()->refsRegister(reg));
+   }
+
+bool TR::LoadInstruction::usesRegister(TR::Register *reg)
+   {
+   return getMemoryReference()->refsRegister(reg);
+   }
+
+bool TR::LoadInstruction::defsRegister(TR::Register *reg)
+   {
+   return (reg == getTargetRegister());
+   }
+
+bool TR::LoadInstruction::defsRealRegister(TR::Register *reg)
+   {
+   return (reg == getTargetRegister()->getAssignedRegister());
+   }
+
+void TR::LoadInstruction::assignRegisters(TR_RegisterKinds kindToBeAssigned)
+   {
+   TR::Machine *machine = cg()->machine();
+   TR::MemoryReference *mref = getMemoryReference();
+   TR::Register *targetVirtual = getTargetRegister();
+
+   if (getDependencyConditions())
+      getDependencyConditions()->assignPostConditionRegisters(this, kindToBeAssigned, cg());
+
+   mref->blockRegisters();
+   setTargetRegister(machine->assignOneRegister(this, targetVirtual));
+   mref->unblockRegisters();
+
+   targetVirtual->block();
+   mref->assignRegisters(this, cg());
+   targetVirtual->unblock();
+
+   if (getDependencyConditions())
+      getDependencyConditions()->assignPreConditionRegisters(this->getPrev(), kindToBeAssigned, cg());
+   }
 
 uint8_t *TR::LoadInstruction::generateBinaryEncoding() {
    uint8_t        *instructionStart = cg()->getBinaryBufferCursor();
@@ -119,98 +269,29 @@ int32_t TR::LoadInstruction::estimateBinaryLength(int32_t currentEstimate)
    return currentEstimate + self()->getEstimatedBinaryLength();
    }
 
-uint8_t *TR::StypeInstruction::generateBinaryEncoding() {
-   uint8_t        *instructionStart = cg()->getBinaryBufferCursor();
-   uint8_t        *cursor           = instructionStart;
-   uint32_t *iPtr = (uint32_t*)instructionStart;
+// TR::StypeInstruction:: member functions
 
-   *iPtr = TR_RISCV_STYPE ((uint32_t)(getOpCode().getOpCodeBinaryEncoding()),
-                         toRealRegister(getSource1Register())->binaryRegCode(),
-                         toRealRegister(getSource2Register())->binaryRegCode(),
-                         getSourceImmediate());
-
-   cursor += RISCV_INSTRUCTION_LENGTH;
-   setBinaryLength(RISCV_INSTRUCTION_LENGTH);
-   setBinaryEncoding(instructionStart);
-   return cursor;
-}
-
-uint8_t *TR::StoreInstruction::generateBinaryEncoding() {
-   uint8_t        *instructionStart = cg()->getBinaryBufferCursor();
-   uint8_t        *cursor           = instructionStart;
-   uint32_t *iPtr = (uint32_t*)instructionStart;
-
-   TR_ASSERT(getMemoryIndex() == nullptr, "Unsupported addressing mode");
-
-   *iPtr = TR_RISCV_STYPE ((uint32_t)(getOpCode().getOpCodeBinaryEncoding()),
-                         toRealRegister(getMemoryBase())->binaryRegCode(),
-                         toRealRegister(getSource1Register())->binaryRegCode(),
-                         getMemoryReference()->getOffset(true));
-
-   cursor += RISCV_INSTRUCTION_LENGTH;
-   setBinaryLength(RISCV_INSTRUCTION_LENGTH);
-   setBinaryEncoding(instructionStart);
-   return cursor;
-}
-
-
-int32_t TR::StoreInstruction::estimateBinaryLength(int32_t currentEstimate)
-   {
-   setEstimatedBinaryLength(RISCV_INSTRUCTION_LENGTH);
-   return currentEstimate + self()->getEstimatedBinaryLength();
-   }
-
-
-
-uint8_t *TR::BtypeInstruction::generateBinaryEncoding()
-   {
-   uint8_t        *instructionStart = cg()->getBinaryBufferCursor();
-   uint8_t        *cursor           = instructionStart;
-   uint32_t *iPtr = (uint32_t*)instructionStart;
-
-   TR::LabelSymbol *label            = getLabelSymbol();
-
-
-   *iPtr = TR_RISCV_SBTYPE ((uint32_t)(getOpCode().getOpCodeBinaryEncoding()),
-                         toRealRegister(getSource1Register())->binaryRegCode(),
-                         toRealRegister(getSource2Register())->binaryRegCode(),
-                         0 /* to fix up in the future */ );
-
-   if (label->getCodeLocation() != NULL) {
-           // we already know the address
-           int32_t delta = label->getCodeLocation() - cursor;
-           *iPtr |= ENCODE_SBTYPE_IMM(delta);
-   } else {
-           cg()->addRelocation(new (cg()->trHeapMemory()) TR::LabelRelative16BitRelocation(cursor, label));
-   }
-
-   cursor += RISCV_INSTRUCTION_LENGTH;
-   setBinaryLength(RISCV_INSTRUCTION_LENGTH);
-   setBinaryEncoding(instructionStart);
-   return cursor;
-   }
-
-bool TR::BtypeInstruction::refsRegister(TR::Register *reg)
+bool TR::StypeInstruction::refsRegister(TR::Register *reg)
    {
    return (reg == getSource1Register() || reg == getSource2Register());
    }
 
-bool TR::BtypeInstruction::usesRegister(TR::Register *reg)
+bool TR::StypeInstruction::usesRegister(TR::Register *reg)
    {
    return (reg == getSource1Register() || reg == getSource2Register());
    }
 
-bool TR::BtypeInstruction::defsRegister(TR::Register *reg)
+bool TR::StypeInstruction::defsRegister(TR::Register *reg)
    {
    return false;
    }
 
-bool TR::BtypeInstruction::defsRealRegister(TR::Register *reg)
+bool TR::StypeInstruction::defsRealRegister(TR::Register *reg)
    {
    return false;
    }
 
-void TR::BtypeInstruction::assignRegisters(TR_RegisterKinds kindToBeAssigned)
+void TR::StypeInstruction::assignRegisters(TR_RegisterKinds kindToBeAssigned)
    {
    TR::Machine *machine = cg()->machine();
    TR::Register *source1Virtual = getSource1Register();
@@ -234,6 +315,161 @@ void TR::BtypeInstruction::assignRegisters(TR_RegisterKinds kindToBeAssigned)
    setSource2Register(assignedSource2Register);
    }
 
+uint8_t *TR::StypeInstruction::generateBinaryEncoding() {
+   uint8_t        *instructionStart = cg()->getBinaryBufferCursor();
+   uint8_t        *cursor           = instructionStart;
+   uint32_t *iPtr = (uint32_t*)instructionStart;
+
+   *iPtr = TR_RISCV_STYPE ((uint32_t)(getOpCode().getOpCodeBinaryEncoding()),
+                         toRealRegister(getSource1Register())->binaryRegCode(),
+                         toRealRegister(getSource2Register())->binaryRegCode(),
+                         getSourceImmediate());
+
+   cursor += RISCV_INSTRUCTION_LENGTH;
+   setBinaryLength(RISCV_INSTRUCTION_LENGTH);
+   setBinaryEncoding(instructionStart);
+   return cursor;
+}
+
+// TR::StoreInstruction:: member functions
+
+bool TR::StoreInstruction::refsRegister(TR::Register *reg)
+   {
+   return (getMemoryReference()->refsRegister(reg) || reg == getSource1Register());
+   }
+
+bool TR::StoreInstruction::usesRegister(TR::Register *reg)
+   {
+   return (getMemoryReference()->refsRegister(reg) || reg == getSource1Register());
+   }
+
+bool TR::StoreInstruction::defsRegister(TR::Register *reg)
+   {
+   return false;
+   }
+
+bool TR::StoreInstruction::defsRealRegister(TR::Register *reg)
+   {
+   return false;
+   }
+
+void TR::StoreInstruction::assignRegisters(TR_RegisterKinds kindToBeAssigned)
+   {
+   TR::Machine *machine = cg()->machine();
+   TR::MemoryReference *mref = getMemoryReference();
+   TR::Register *sourceVirtual = getSource1Register();
+
+   if (getDependencyConditions())
+      getDependencyConditions()->assignPostConditionRegisters(this, kindToBeAssigned, cg());
+
+   sourceVirtual->block();
+   mref->assignRegisters(this, cg());
+   sourceVirtual->unblock();
+
+   mref->blockRegisters();
+   TR::RealRegister *assignedRegister = sourceVirtual->getAssignedRealRegister();
+   if (assignedRegister == NULL)
+      {
+      assignedRegister = machine->assignOneRegister(this, sourceVirtual);
+      }
+   mref->unblockRegisters();
+
+   setSource1Register(assignedRegister);
+
+   if (getDependencyConditions())
+      getDependencyConditions()->assignPreConditionRegisters(this->getPrev(), kindToBeAssigned, cg());
+   }
+
+uint8_t *TR::StoreInstruction::generateBinaryEncoding() {
+   uint8_t        *instructionStart = cg()->getBinaryBufferCursor();
+   uint8_t        *cursor           = instructionStart;
+   uint32_t *iPtr = (uint32_t*)instructionStart;
+
+   TR_ASSERT(getMemoryIndex() == nullptr, "Unsupported addressing mode");
+
+   *iPtr = TR_RISCV_STYPE ((uint32_t)(getOpCode().getOpCodeBinaryEncoding()),
+                         toRealRegister(getMemoryBase())->binaryRegCode(),
+                         toRealRegister(getSource1Register())->binaryRegCode(),
+                         getMemoryReference()->getOffset(true));
+
+   cursor += RISCV_INSTRUCTION_LENGTH;
+   setBinaryLength(RISCV_INSTRUCTION_LENGTH);
+   setBinaryEncoding(instructionStart);
+   return cursor;
+}
+
+int32_t TR::StoreInstruction::estimateBinaryLength(int32_t currentEstimate)
+   {
+   setEstimatedBinaryLength(RISCV_INSTRUCTION_LENGTH);
+   return currentEstimate + self()->getEstimatedBinaryLength();
+   }
+
+
+// TR::BtypeInstruction:: member functions
+
+uint8_t *TR::BtypeInstruction::generateBinaryEncoding()
+   {
+   uint8_t        *instructionStart = cg()->getBinaryBufferCursor();
+   uint8_t        *cursor           = instructionStart;
+   uint32_t *iPtr = (uint32_t*)instructionStart;
+
+   TR::LabelSymbol *label            = getLabelSymbol();
+
+   *iPtr = TR_RISCV_SBTYPE ((uint32_t)(getOpCode().getOpCodeBinaryEncoding()),
+                         toRealRegister(getSource1Register())->binaryRegCode(),
+                         toRealRegister(getSource2Register())->binaryRegCode(),
+                         0 /* to fix up in the future */ );
+
+   if (label->getCodeLocation() != NULL) {
+           // we already know the address
+           int32_t delta = label->getCodeLocation() - cursor;
+           *iPtr |= ENCODE_SBTYPE_IMM(delta);
+   } else {
+           cg()->addRelocation(new (cg()->trHeapMemory()) TR::LabelRelative16BitRelocation(cursor, label));
+   }
+
+   cursor += RISCV_INSTRUCTION_LENGTH;
+   setBinaryLength(RISCV_INSTRUCTION_LENGTH);
+   setBinaryEncoding(instructionStart);
+   return cursor;
+   }
+
+
+// TR::UtypeInstruction:: member functions
+
+bool TR::UtypeInstruction::refsRegister(TR::Register *reg)
+   {
+   return (reg == getTargetRegister());
+   }
+
+bool TR::UtypeInstruction::usesRegister(TR::Register *reg)
+   {
+   return false;
+   }
+
+bool TR::UtypeInstruction::defsRegister(TR::Register *reg)
+   {
+   return (reg == getTargetRegister());
+   }
+
+bool TR::UtypeInstruction::defsRealRegister(TR::Register *reg)
+   {
+   return (reg == getTargetRegister()->getAssignedRegister());
+   }
+
+void TR::UtypeInstruction::assignRegisters(TR_RegisterKinds kindToBeAssigned)
+   {
+   if (getDependencyConditions())
+      getDependencyConditions()->assignPostConditionRegisters(this, kindToBeAssigned, cg());
+
+   TR::Machine *machine = cg()->machine();
+   TR::Register *targetVirtual = getTargetRegister();
+   setTargetRegister(machine->assignOneRegister(this, targetVirtual));
+
+   if (getDependencyConditions())
+      getDependencyConditions()->assignPreConditionRegisters(this->getPrev(), kindToBeAssigned, cg());
+   }
+
 
 uint8_t *TR::UtypeInstruction::generateBinaryEncoding() {
    uint8_t        *instructionStart = cg()->getBinaryBufferCursor();
@@ -250,33 +486,45 @@ uint8_t *TR::UtypeInstruction::generateBinaryEncoding() {
    return cursor;
 }
 
+// TR::JtypeInstruction:: member functions
+
 uint8_t *TR::JtypeInstruction::generateBinaryEncoding() {
    uint8_t        *instructionStart = cg()->getBinaryBufferCursor();
    uint8_t        *cursor           = instructionStart;
    uint32_t *iPtr = (uint32_t*)instructionStart;
-   ptrdiff_t offset = 0;
+   intptr_t offset = 0;
 
-   // First, compute the value of _imm
-   {
+   if (getSymbolReference() != nullptr)
+      {
+      TR_ASSERT(getLabelSymbol() == nullptr, "Both symbol reference and symbol set in J-type instruction");
       TR::ResolvedMethodSymbol *sym = getSymbolReference()->getSymbol()->getResolvedMethodSymbol();
       TR_ResolvedMethod *resolvedMethod = sym == NULL ? NULL : sym->getResolvedMethod();
 
       if (resolvedMethod != NULL && resolvedMethod->isSameMethod(cg()->comp()->getCurrentMethod()))
          {
          offset = cg()->getCodeStart() - cursor;
-         // to guard against silent truncation
-         TR_ASSERT( (INT32_MIN <= offset) && (offset <= INT32_MAX), "Jump offset out of range" );
          }
       else
          {
          TR_ASSERT(0, "Non-recursive calls not (yet) supported");
          }
-   }
-
+      }
+   else
+      {
+      uintptr_t destination = (uintptr_t)(getLabelSymbol()->getCodeLocation());
+      if (destination != 0)
+         {
+         offset = destination - (uintptr_t)cursor;
+         }
+      else
+         {
+         cg()->addRelocation(new (cg()->trHeapMemory()) TR::LabelRelative32BitRelocation(cursor, getLabelSymbol()));
+         }
+      }
 
    TR_ASSERT(VALID_UJTYPE_IMM(offset), "Jump offset out of range");
    *iPtr = TR_RISCV_UJTYPE ((uint32_t)(getOpCode().getOpCodeBinaryEncoding()),
-                         toRealRegister(getTargetRegister(0))->binaryRegCode(),
+                         toRealRegister(getTargetRegister())->binaryRegCode(),
                          offset);
 
    cursor += RISCV_INSTRUCTION_LENGTH;
@@ -397,3 +645,33 @@ TR::Instruction *generateJTYPE( TR::InstOpCode::Mnemonic op,
    else
       return new (cg->trHeapMemory()) TR::JtypeInstruction(op, n, trgReg, imm, cond, sr, s, cg);
    }
+
+TR::Instruction *generateJTYPE( TR::InstOpCode::Mnemonic op,
+                                TR::Node          *n,
+                                TR::Register      *trgReg,
+                                TR::LabelSymbol   *label,
+                                TR::CodeGenerator *cg,
+                                TR::Instruction   *previous)
+   {
+   if (previous)
+      return new (cg->trHeapMemory()) TR::JtypeInstruction(op, n, trgReg, label, previous, cg);
+   else
+      return new (cg->trHeapMemory()) TR::JtypeInstruction(op, n, trgReg, label, cg);
+   }
+
+TR::Instruction *generateJTYPE( TR::InstOpCode::Mnemonic op,
+                                TR::Node          *n,
+                                TR::Register      *trgReg,
+                                TR::LabelSymbol   *label,
+                                TR::RegisterDependencyConditions *cond,
+                                TR::CodeGenerator *cg,
+                                TR::Instruction   *previous)
+   {
+   if (previous)
+      return new (cg->trHeapMemory()) TR::JtypeInstruction(op, n, trgReg, label, cond, previous, cg);
+   else
+      return new (cg->trHeapMemory()) TR::JtypeInstruction(op, n, trgReg, label, cond, cg);
+   }
+
+
+

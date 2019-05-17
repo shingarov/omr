@@ -323,8 +323,8 @@ class ARM64LabelInstruction : public TR::Instruction
    ARM64LabelInstruction(TR::InstOpCode::Mnemonic op, TR::Node *node, TR::LabelSymbol *sym, TR::CodeGenerator *cg)
       : TR::Instruction(op, node, cg), _symbol(sym)
       {
-      if (sym != NULL && op == TR::InstOpCode::label)
-         sym->setInstruction(this);
+      TR_ASSERT(op == TR::InstOpCode::label, "Invalid opcode for label instruction, must be ::label");
+      sym->setInstruction(this);
       }
    /*
     * @brief Constructor
@@ -338,8 +338,8 @@ class ARM64LabelInstruction : public TR::Instruction
                          TR::Instruction *precedingInstruction, TR::CodeGenerator *cg)
       : TR::Instruction(op, node, precedingInstruction, cg), _symbol(sym)
       {
-      if (sym!=NULL && op==TR::InstOpCode::label)
-         sym->setInstruction(this);
+      TR_ASSERT(op == TR::InstOpCode::label, "Invalid opcode for label instruction, must be ::label");
+      sym->setInstruction(this);
       }
    /*
     * @brief Constructor
@@ -353,8 +353,8 @@ class ARM64LabelInstruction : public TR::Instruction
                          TR::RegisterDependencyConditions *cond, TR::CodeGenerator *cg)
       : TR::Instruction(op, node, cond, cg), _symbol(sym)
       {
-      if (sym!=NULL && op==TR::InstOpCode::label)
-         sym->setInstruction(this);
+      TR_ASSERT(op == TR::InstOpCode::label, "Invalid opcode for label instruction, must be ::label");
+      sym->setInstruction(this);
       }
    /*
     * @brief Constructor
@@ -370,8 +370,8 @@ class ARM64LabelInstruction : public TR::Instruction
                          TR::Instruction *precedingInstruction, TR::CodeGenerator *cg)
       : TR::Instruction(op, node, cond, precedingInstruction, cg), _symbol(sym)
       {
-      if (sym!=NULL && op==TR::InstOpCode::label)
-         sym->setInstruction(this);
+      TR_ASSERT(op == TR::InstOpCode::label, "Invalid opcode for label instruction, must be ::label");
+      sym->setInstruction(this);
       }
 
    /**
@@ -393,17 +393,6 @@ class ARM64LabelInstruction : public TR::Instruction
    TR::LabelSymbol *setLabelSymbol(TR::LabelSymbol *sym)
       {
       return (_symbol = sym);
-      }
-
-   /**
-    * @brief Sets immediate field in binary encoding
-    * @param[in] instruction : instruction cursor
-    * @param[in] distance : branch distance
-    */
-   void insertImmediateField(uint32_t *instruction, int32_t distance)
-      {
-      TR_ASSERT((distance & 0x3) == 0, "branch distance is not aligned");
-      *instruction |= ((distance >> 2) & 0x3ffffff); // imm26
       }
 
    /**
