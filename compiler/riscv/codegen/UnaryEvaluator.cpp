@@ -76,7 +76,7 @@ TR::Register *OMR::RV::TreeEvaluator::inegEvaluator(TR::Node *node, TR::CodeGene
    TR::Register *reg = cg->gprClobberEvaluate(firstChild);
    TR::Register *zero = cg->machine()->getRealRegister(TR::RealRegister::zero);
 
-   generateRTYPE(TR::InstOpCode::_subw, node, reg, zero, reg, cg);
+   generateRTYPE(TR::InstOpCode::_sub, node, reg, zero, reg, cg);
 
    firstChild->decReferenceCount();
    return node->setRegister(reg);
