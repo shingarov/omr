@@ -917,6 +917,196 @@ class JtypeInstruction : public UtypeInstruction
    virtual uint8_t *generateBinaryEncoding();
    };
 
+class LabelInstruction : public TR::Instruction
+   {
+   TR::LabelSymbol *_symbol;
+
+   public:
+
+   /*
+    * @brief Constructor
+    * @param[in] op : instruction opcode
+    * @param[in] node : node
+    * @param[in] sym : label symbol
+    * @param[in] cg : CodeGenerator
+    */
+   LabelInstruction(TR::InstOpCode::Mnemonic op, TR::Node *node, TR::LabelSymbol *sym, TR::CodeGenerator *cg)
+      : TR::Instruction(op, node, cg), _symbol(sym)
+      {
+      TR_ASSERT(op == TR::InstOpCode::label, "Invalid opcode for label instruction, must be ::label");
+      sym->setInstruction(this);
+      }
+   /*
+    * @brief Constructor
+    * @param[in] op : instruction opcode
+    * @param[in] node : node
+    * @param[in] sym : label symbol
+    * @param[in] precedingInstruction : preceding instruction
+    * @param[in] cg : CodeGenerator
+    */
+   LabelInstruction(TR::InstOpCode::Mnemonic op, TR::Node *node, TR::LabelSymbol *sym,
+                         TR::Instruction *precedingInstruction, TR::CodeGenerator *cg)
+      : TR::Instruction(op, node, precedingInstruction, cg), _symbol(sym)
+      {
+      TR_ASSERT(op == TR::InstOpCode::label, "Invalid opcode for label instruction, must be ::label");
+      sym->setInstruction(this);
+      }
+   /*
+    * @brief Constructor
+    * @param[in] op : instruction opcode
+    * @param[in] node : node
+    * @param[in] sym : label symbol
+    * @param[in] cond : register dependency condition
+    * @param[in] cg : CodeGenerator
+    */
+   LabelInstruction(TR::InstOpCode::Mnemonic op, TR::Node *node, TR::LabelSymbol *sym,
+                         TR::RegisterDependencyConditions *cond, TR::CodeGenerator *cg)
+      : TR::Instruction(op, node, cond, cg), _symbol(sym)
+      {
+      TR_ASSERT(op == TR::InstOpCode::label, "Invalid opcode for label instruction, must be ::label");
+      sym->setInstruction(this);
+      }
+   /*
+    * @brief Constructor
+    * @param[in] op : instruction opcode
+    * @param[in] node : node
+    * @param[in] sym : label symbol
+    * @param[in] cond : register dependency condition
+    * @param[in] precedingInstruction : preceding instruction
+    * @param[in] cg : CodeGenerator
+    */
+   LabelInstruction(TR::InstOpCode::Mnemonic op, TR::Node *node, TR::LabelSymbol *sym,
+                         TR::RegisterDependencyConditions *cond,
+                         TR::Instruction *precedingInstruction, TR::CodeGenerator *cg)
+      : TR::Instruction(op, node, cond, precedingInstruction, cg), _symbol(sym)
+      {
+      TR_ASSERT(op == TR::InstOpCode::label, "Invalid opcode for label instruction, must be ::label");
+      sym->setInstruction(this);
+      }
+
+   /**
+    * @brief Gets instruction kind
+    * @return instruction kind
+    */
+   virtual Kind getKind() { return IsLabel; }
+
+   /**
+    * @brief Gets label symbol
+    * @return label symbol
+    */
+   TR::LabelSymbol *getLabelSymbol() {return _symbol;}
+   /**
+    * @brief Sets label symbol
+    * @param[in] sym : label symbol
+    * @return label symbol
+    */
+   TR::LabelSymbol *setLabelSymbol(TR::LabelSymbol *sym)
+      {
+      return (_symbol = sym);
+      }
+
+   /**
+    * @brief Generates binary encoding of the instruction
+    * @return instruction cursor
+    */
+   virtual uint8_t *generateBinaryEncoding();
+
+   /**
+    * @brief Estimates binary length
+    * @param[in] currentEstimate : current estimated length
+    * @return estimated binary length
+    */
+   virtual int32_t estimateBinaryLength(int32_t currentEstimate);
+   };
+
+class AdminInstruction : public TR::Instruction
+   {
+   TR::Node *_fenceNode;
+
+   public:
+
+   /*
+    * @brief Constructor
+    * @param[in] op : instruction opcode
+    * @param[in] node : node
+    * @param[in] fenceNode : fence node
+    * @param[in] cg : CodeGenerator
+    */
+   AdminInstruction(TR::InstOpCode::Mnemonic op, TR::Node *node, TR::Node *fenceNode, TR::CodeGenerator *cg)
+      : TR::Instruction(op, node, cg), _fenceNode(fenceNode)
+      {
+      }
+
+   /*
+    * @brief Constructor
+    * @param[in] op : instruction opcode
+    * @param[in] node : node
+    * @param[in] fenceNode : fence node
+    * @param[in] precedingInstruction : preceding instruction
+    * @param[in] cg : CodeGenerator
+    */
+   AdminInstruction(TR::InstOpCode::Mnemonic op, TR::Node *node, TR::Node *fenceNode,
+                         TR::Instruction *precedingInstruction, TR::CodeGenerator *cg)
+      : TR::Instruction(op, node, precedingInstruction, cg), _fenceNode(fenceNode)
+      {
+      }
+
+   /*
+    * @brief Constructor
+    * @param[in] op : instruction opcode
+    * @param[in] cond : register dependency conditions
+    * @param[in] node : node
+    * @param[in] fenceNode : fence node
+    * @param[in] cg : CodeGenerator
+    */
+   AdminInstruction(TR::InstOpCode::Mnemonic op, TR::RegisterDependencyConditions *cond,
+                         TR::Node *node, TR::Node *fenceNode, TR::CodeGenerator *cg)
+      : TR::Instruction(op, node, cond, cg), _fenceNode(fenceNode)
+      {
+      }
+
+   /*
+    * @brief Constructor
+    * @param[in] op : instruction opcode
+    * @param[in] cond : register dependency conditions
+    * @param[in] node : node
+    * @param[in] fenceNode : fence node
+    * @param[in] precedingInstruction : preceding instruction
+    * @param[in] cg : CodeGenerator
+    */
+   AdminInstruction(TR::InstOpCode::Mnemonic op, TR::RegisterDependencyConditions *cond,
+                         TR::Node *node, TR::Node *fenceNode, TR::Instruction *precedingInstruction,
+                         TR::CodeGenerator *cg)
+      : TR::Instruction(op, node, cond, precedingInstruction, cg), _fenceNode(fenceNode)
+      {
+      }
+
+   /**
+    * @brief Gets instruction kind
+    * @return instruction kind
+    */
+   virtual Kind getKind() { return IsAdmin; }
+
+   /**
+    * @brief Gets fence node
+    * @return fence node
+    */
+   TR::Node *getFenceNode() { return _fenceNode; }
+
+   /**
+    * @brief Generates binary encoding of the instruction
+    * @return instruction cursor
+    */
+   virtual uint8_t *generateBinaryEncoding();
+
+   /**
+    * @brief Estimates binary length
+    * @param[in] currentEstimate : current estimated length
+    * @return estimated binary length
+    */
+   virtual int32_t estimateBinaryLength(int32_t currentEstimate);
+   };
+
 } // namespace TR
 
 TR::Instruction *generateRTYPE( TR::InstOpCode::Mnemonic op,

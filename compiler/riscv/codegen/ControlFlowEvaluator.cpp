@@ -37,7 +37,7 @@ genericReturnEvaluator(TR::Node *node, TR::RealRegister::RegNum rnum, TR_Registe
 
    TR::RegisterDependencyConditions *deps = new (cg->trHeapMemory()) TR::RegisterDependencyConditions(1, 0, cg->trMemory());
    deps->addPreCondition(returnRegister, rnum);
-   generateAdminInstruction(cg, TR::InstOpCode::retn, node, deps);
+   generateADMIN(cg, TR::InstOpCode::retn, node, deps);
 
    cg->comp()->setReturnInfo(i);
    cg->decReferenceCount(firstChild);
@@ -63,7 +63,7 @@ OMR::ARM64::TreeEvaluator::lreturnEvaluator(TR::Node *node, TR::CodeGenerator *c
 TR::Register *
 OMR::ARM64::TreeEvaluator::returnEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   generateAdminInstruction(cg, TR::InstOpCode::retn, node);
+   generateADMIN(cg, TR::InstOpCode::retn, node);
    cg->comp()->setReturnInfo(TR_VoidReturn);
    return NULL;
    }

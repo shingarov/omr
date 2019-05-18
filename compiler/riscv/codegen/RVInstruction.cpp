@@ -531,8 +531,55 @@ uint8_t *TR::JtypeInstruction::generateBinaryEncoding() {
    setBinaryLength(RISCV_INSTRUCTION_LENGTH);
    setBinaryEncoding(instructionStart);
    return cursor;
-
 }
+
+// TR::LabelInstruction:: member functions
+
+uint8_t *TR::LabelInstruction::generateBinaryEncoding()
+   {
+   TR_ASSERT(getOpCodeValue() == OMR::InstOpCode::label, "Invalid opcode for label instruction, must be ::label");
+
+   uint8_t *instructionStart = cg()->getBinaryBufferCursor();
+
+   getLabelSymbol()->setCodeLocation(instructionStart);
+
+   setBinaryLength(0);
+   cg()->addAccumulatedInstructionLengthError(getEstimatedBinaryLength() - getBinaryLength());
+   setBinaryEncoding(instructionStart);
+   return instructionStart;
+   }
+
+int32_t TR::LabelInstruction::estimateBinaryLength(int32_t currentEstimate)
+   {
+   TR_ASSERT(getOpCodeValue() == OMR::InstOpCode::label, "Invalid opcode for label instruction, must be ::label");
+
+   setEstimatedBinaryLength(0);
+   getLabelSymbol()->setEstimatedCodeLocation(currentEstimate);
+   return currentEstimate;
+   }
+
+uint8_t *TR::AdminInstruction::generateBinaryEncoding()
+   {
+   uint8_t *instructionStart = cg()->getBinaryBufferCursor();
+   TR::InstOpCode::Mnemonic op = getOpCodeValue();
+
+   if (op != OMR::InstOpCode::proc && op != OMR::InstOpCode::fence && op != OMR::InstOpCode::retn)
+      {
+      TR_ASSERT(false, "Unsupported opcode in AdminInstruction.");
+      }
+
+   setBinaryLength(0);
+   setBinaryEncoding(instructionStart);
+
+   return instructionStart;
+   }
+
+int32_t TR::AdminInstruction::estimateBinaryLength(int32_t currentEstimate)
+   {
+   setEstimatedBinaryLength(0);
+   return currentEstimate;
+   }
+
 
 TR::Instruction *generateRTYPE( TR::InstOpCode::Mnemonic op,
                                 TR::Node          *n,

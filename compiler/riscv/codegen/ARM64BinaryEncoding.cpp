@@ -92,41 +92,6 @@ uint8_t *TR::ARM64ImmSymInstruction::generateBinaryEncoding()
    return cursor;
    }
 
-uint8_t *TR::ARM64LabelInstruction::generateBinaryEncoding()
-   {
-   TR_ASSERT(getOpCodeValue() == OMR::InstOpCode::label, "Invalid opcode for label instruction, must be ::label");
-
-   uint8_t *instructionStart = cg()->getBinaryBufferCursor();
-
-   getLabelSymbol()->setCodeLocation(instructionStart);
-
-   setBinaryLength(0);
-   cg()->addAccumulatedInstructionLengthError(getEstimatedBinaryLength() - getBinaryLength());
-   setBinaryEncoding(instructionStart);
-   return instructionStart;
-   }
-
-int32_t TR::ARM64LabelInstruction::estimateBinaryLength(int32_t currentEstimate)
-   {
-   TR_ASSERT(getOpCodeValue() == OMR::InstOpCode::label, "Invalid opcode for label instruction, must be ::label");
-
-   setEstimatedBinaryLength(0);
-   getLabelSymbol()->setEstimatedCodeLocation(currentEstimate);
-   return currentEstimate + getEstimatedBinaryLength();
-   }
-
-
-uint8_t *TR::ARM64CompareBranchInstruction::generateBinaryEncoding()
-   {
-   uint8_t *instructionStart = cg()->getBinaryBufferCursor();
-   uint8_t *cursor = instructionStart;
-   TR::LabelSymbol *label = getLabelSymbol();
-
-   TR_ASSERT(false, "Not implemented yet.");
-
-   return cursor;
-   }
-
 uint8_t *TR::ARM64RegBranchInstruction::generateBinaryEncoding()
    {
    uint8_t *instructionStart = cg()->getBinaryBufferCursor();
@@ -137,28 +102,6 @@ uint8_t *TR::ARM64RegBranchInstruction::generateBinaryEncoding()
    setBinaryLength(ARM64_INSTRUCTION_LENGTH);
    setBinaryEncoding(instructionStart);
    return cursor;
-   }
-
-uint8_t *TR::ARM64AdminInstruction::generateBinaryEncoding()
-   {
-   uint8_t *instructionStart = cg()->getBinaryBufferCursor();
-   TR::InstOpCode::Mnemonic op = getOpCodeValue();
-
-   if (op != OMR::InstOpCode::proc && op != OMR::InstOpCode::fence && op != OMR::InstOpCode::retn)
-      {
-      TR_ASSERT(false, "Unsupported opcode in AdminInstruction.");
-      }
-
-   setBinaryLength(0);
-   setBinaryEncoding(instructionStart);
-
-   return instructionStart;
-   }
-
-int32_t TR::ARM64AdminInstruction::estimateBinaryLength(int32_t currentEstimate)
-   {
-   setEstimatedBinaryLength(0);
-   return currentEstimate;
    }
 
 uint8_t *TR::ARM64Trg1Instruction::generateBinaryEncoding()

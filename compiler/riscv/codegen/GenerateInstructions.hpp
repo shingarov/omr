@@ -61,7 +61,7 @@ TR::Instruction *generateInstruction(
  * @param[in] preced : preceding instruction
  * @return generated instruction
  */
-TR::Instruction *generateLabelInstruction(
+TR::Instruction *generateLABEL(
                    TR::CodeGenerator *cg,
                    TR::InstOpCode::Mnemonic op,
                    TR::Node *node,
@@ -78,7 +78,7 @@ TR::Instruction *generateLabelInstruction(
  * @param[in] preced : preceding instruction
  * @return generated instruction
  */
-TR::Instruction *generateLabelInstruction(
+TR::Instruction *generateLABEL(
                    TR::CodeGenerator *cg,
                    TR::InstOpCode::Mnemonic op,
                    TR::Node *node,
@@ -95,7 +95,7 @@ TR::Instruction *generateLabelInstruction(
  * @param[in] preced : preceding instruction
  * @return generated instruction
  */
-TR::Instruction *generateAdminInstruction(
+TR::Instruction *generateADMIN(
                    TR::CodeGenerator *cg,
                    TR::InstOpCode::Mnemonic op,
                    TR::Node *node,
@@ -112,7 +112,7 @@ TR::Instruction *generateAdminInstruction(
  * @param[in] preced : preceding instruction
  * @return generated instruction
  */
-TR::Instruction *generateAdminInstruction(
+TR::Instruction *generateADMIN(
                    TR::CodeGenerator *cg,
                    TR::InstOpCode::Mnemonic op,
                    TR::Node *node,

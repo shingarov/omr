@@ -218,7 +218,7 @@ void TR_ARM64RegisterDependencyGroup::assignRegisters(
          // we also need to free up all locked backing storage if we are exiting the OOL during backwards RA assignment
          else if (currentInstruction->isLabel() && virtReg->getAssignedRealRegister())
             {
-            TR::ARM64LabelInstruction *labelInstr = (TR::ARM64LabelInstruction *)currentInstruction;
+            TR::LabelInstruction *labelInstr = (TR::LabelInstruction *)currentInstruction;
             TR_BackingStore *location = virtReg->getBackingStorage();
             TR_RegisterKinds rk = virtReg->getKind();
             int32_t dataSize;

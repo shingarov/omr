@@ -359,6 +359,8 @@ namespace TR { class ARM64Src1Instruction; }
 namespace TR { class ARM64Src2Instruction; }
 namespace TR { class ARM64HelperCallSnippet; }
 
+namespace TR { class LabelInstruction; }
+namespace TR { class AdminInstruction; }
 #ifdef J9_PROJECT_SPECIFIC
 namespace TR { class ARM64VirtualGuardNOPInstruction; }
 
@@ -1152,13 +1154,14 @@ public:
 #ifdef TR_TARGET_RISCV
    void printPrefix(TR::FILE *, TR::Instruction *);
 
+   void print(TR::FILE *, TR::LabelInstruction *);
+   void print(TR::FILE *, TR::AdminInstruction *);
+
    void print(TR::FILE *, TR::ARM64ImmInstruction *);
    void print(TR::FILE *, TR::ARM64ImmSymInstruction *);
-   void print(TR::FILE *, TR::ARM64LabelInstruction *);
    void print(TR::FILE *, TR::ARM64ConditionalBranchInstruction *);
    void print(TR::FILE *, TR::ARM64CompareBranchInstruction *);
    void print(TR::FILE *, TR::ARM64RegBranchInstruction *);
-   void print(TR::FILE *, TR::ARM64AdminInstruction *);
    void print(TR::FILE *, TR::ARM64Trg1Instruction *);
    void print(TR::FILE *, TR::ARM64Trg1CondInstruction *);
    void print(TR::FILE *, TR::ARM64Trg1ImmInstruction *);

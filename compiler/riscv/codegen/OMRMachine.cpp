@@ -344,7 +344,7 @@ TR::RealRegister *OMR::ARM64::Machine::reverseSpillState(TR::Instruction *curren
          bool isOOLentryReverseSpill = false;
          if (currentInstruction->isLabel())
             {
-            if (((TR::ARM64LabelInstruction*)currentInstruction)->getLabelSymbol()->isStartOfColdInstructionStream())
+            if (((TR::LabelInstruction*)currentInstruction)->getLabelSymbol()->isStartOfColdInstructionStream())
                {
                // indicates that we are at OOL entry point post conditions. Since
                // we are now exiting the OOL cold path (going reverse order)

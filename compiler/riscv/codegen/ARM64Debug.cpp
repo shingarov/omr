@@ -25,6 +25,7 @@
 #include "ras/Debug.hpp"
 
 #include "codegen/ARM64Instruction.hpp"
+#include "codegen/RVInstruction.hpp"
 #include "codegen/CodeGenerator.hpp"
 #include "codegen/InstOpCode.hpp"
 #include "codegen/MemoryReference.hpp"
@@ -87,16 +88,13 @@ TR_Debug::print(TR::FILE *pOutFile, TR::Instruction *instr)
          print(pOutFile, (TR::ARM64ImmSymInstruction *)instr);
          break;
       case OMR::Instruction::IsLabel:
-         print(pOutFile, (TR::ARM64LabelInstruction *)instr);
-         break;
-      case OMR::Instruction::IsCompareBranch:
-         print(pOutFile, (TR::ARM64CompareBranchInstruction *)instr);
+         print(pOutFile, (TR::LabelInstruction *)instr);
          break;
       case OMR::Instruction::IsRegBranch:
          print(pOutFile, (TR::ARM64RegBranchInstruction *)instr);
          break;
       case OMR::Instruction::IsAdmin:
-         print(pOutFile, (TR::ARM64AdminInstruction *)instr);
+         print(pOutFile, (TR::AdminInstruction *)instr);
          break;
       case OMR::Instruction::IsTrg1:
          print(pOutFile, (TR::ARM64Trg1Instruction *)instr);
@@ -189,7 +187,7 @@ TR_Debug::print(TR::FILE *pOutFile, TR::ARM64ImmSymInstruction *instr)
    }
 
 void
-TR_Debug::print(TR::FILE *pOutFile, TR::ARM64LabelInstruction *instr)
+TR_Debug::print(TR::FILE *pOutFile, TR::LabelInstruction *instr)
    {
    printPrefix(pOutFile, instr);
 
@@ -220,13 +218,6 @@ TR_Debug::print(TR::FILE *pOutFile, TR::ARM64LabelInstruction *instr)
    }
 
 void
-TR_Debug::print(TR::FILE *pOutFile, TR::ARM64CompareBranchInstruction *instr)
-   {
-   printPrefix(pOutFile, instr);
-   TR_ASSERT(false, "Not implemented yet.");
-   }
-
-void
 TR_Debug::print(TR::FILE *pOutFile, TR::ARM64RegBranchInstruction *instr)
    {
    printPrefix(pOutFile, instr);
@@ -238,7 +229,7 @@ TR_Debug::print(TR::FILE *pOutFile, TR::ARM64RegBranchInstruction *instr)
    }
 
 void
-TR_Debug::print(TR::FILE *pOutFile, TR::ARM64AdminInstruction *instr)
+TR_Debug::print(TR::FILE *pOutFile, TR::AdminInstruction *instr)
    {
    printPrefix(pOutFile, instr);
    trfprintf(pOutFile, "%s ", getOpCodeName(&instr->getOpCode()));

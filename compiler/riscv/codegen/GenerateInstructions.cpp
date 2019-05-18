@@ -23,6 +23,7 @@
 
 #include "codegen/GenerateInstructions.hpp"
 #include "codegen/ARM64Instruction.hpp"
+#include "codegen/RVInstruction.hpp"
 #include "codegen/CodeGenerator.hpp"
 #include "codegen/InstOpCode.hpp"
 #include "codegen/Linkage.hpp"
@@ -43,34 +44,34 @@ TR::Instruction *generateInstruction(TR::CodeGenerator *cg, TR::InstOpCode::Mnem
    }
 
 
-TR::Instruction *generateLabelInstruction(TR::CodeGenerator *cg, TR::InstOpCode::Mnemonic op, TR::Node *node,
+TR::Instruction *generateLABEL(TR::CodeGenerator *cg, TR::InstOpCode::Mnemonic op, TR::Node *node,
    TR::LabelSymbol *sym, TR::Instruction *preced)
    {
    if (preced)
-      return new (cg->trHeapMemory()) TR::ARM64LabelInstruction(op, node, sym, preced, cg);
-   return new (cg->trHeapMemory()) TR::ARM64LabelInstruction(op, node, sym, cg);
+      return new (cg->trHeapMemory()) TR::LabelInstruction(op, node, sym, preced, cg);
+   return new (cg->trHeapMemory()) TR::LabelInstruction(op, node, sym, cg);
    }
 
-TR::Instruction *generateLabelInstruction(TR::CodeGenerator *cg, TR::InstOpCode::Mnemonic op, TR::Node *node,
+TR::Instruction *generateLABEL(TR::CodeGenerator *cg, TR::InstOpCode::Mnemonic op, TR::Node *node,
    TR::LabelSymbol *sym, TR::RegisterDependencyConditions *cond, TR::Instruction *preced)
    {
    if (preced)
-      return new (cg->trHeapMemory()) TR::ARM64LabelInstruction(op, node, sym, cond, preced, cg);
-   return new (cg->trHeapMemory()) TR::ARM64LabelInstruction(op, node, sym, cond, cg);
+      return new (cg->trHeapMemory()) TR::LabelInstruction(op, node, sym, cond, preced, cg);
+   return new (cg->trHeapMemory()) TR::LabelInstruction(op, node, sym, cond, cg);
    }
 
-TR::Instruction *generateAdminInstruction(TR::CodeGenerator *cg, TR::InstOpCode::Mnemonic op, TR::Node *node,
+TR::Instruction *generateADMIN(TR::CodeGenerator *cg, TR::InstOpCode::Mnemonic op, TR::Node *node,
    TR::Node *fenceNode, TR::Instruction *preced)
    {
    if (preced)
-      return new (cg->trHeapMemory()) TR::ARM64AdminInstruction(op, node, fenceNode, preced, cg);
-   return new (cg->trHeapMemory()) TR::ARM64AdminInstruction(op, node, fenceNode, cg);
+      return new (cg->trHeapMemory()) TR::AdminInstruction(op, node, fenceNode, preced, cg);
+   return new (cg->trHeapMemory()) TR::AdminInstruction(op, node, fenceNode, cg);
    }
 
-TR::Instruction *generateAdminInstruction(TR::CodeGenerator *cg, TR::InstOpCode::Mnemonic op, TR::Node *node,
+TR::Instruction *generateADMIN(TR::CodeGenerator *cg, TR::InstOpCode::Mnemonic op, TR::Node *node,
    TR::RegisterDependencyConditions *cond, TR::Node *fenceNode, TR::Instruction *preced)
    {
    if (preced)
-      return new (cg->trHeapMemory()) TR::ARM64AdminInstruction(op, cond, node, fenceNode, preced, cg);
-   return new (cg->trHeapMemory()) TR::ARM64AdminInstruction(op, cond, node, fenceNode, cg);
+      return new (cg->trHeapMemory()) TR::AdminInstruction(op, cond, node, fenceNode, preced, cg);
+   return new (cg->trHeapMemory()) TR::AdminInstruction(op, cond, node, fenceNode, cg);
    }

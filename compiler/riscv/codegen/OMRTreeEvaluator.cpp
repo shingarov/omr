@@ -516,11 +516,11 @@ OMR::ARM64::TreeEvaluator::BBStartEvaluator(TR::Node *node, TR::CodeGenerator *c
 
    if (node->getLabel() != NULL)
       {
-      node->getLabel()->setInstruction(generateLabelInstruction(cg, TR::InstOpCode::label, node, node->getLabel(), deps));
+      node->getLabel()->setInstruction(generateLABEL(cg, TR::InstOpCode::label, node, node->getLabel(), deps));
       }
 
    TR::Node *fenceNode = TR::Node::createRelative32BitFenceNode(node, &block->getInstructionBoundaries()._startPC);
-   TR::Instruction *fence = generateAdminInstruction(cg, TR::InstOpCode::fence, node, fenceNode);
+   TR::Instruction *fence = generateADMIN(cg, TR::InstOpCode::fence, node, fenceNode);
 
    if (block->isCatchBlock())
       {
@@ -562,7 +562,7 @@ OMR::ARM64::TreeEvaluator::BBEndEvaluator(TR::Node *node, TR::CodeGenerator *cg)
       }
 
    // put the dependencies (if any) on the fence
-   generateAdminInstruction(cg, TR::InstOpCode::fence, node, deps, fenceNode);
+   generateADMIN(cg, TR::InstOpCode::fence, node, deps, fenceNode);
 
    return NULL;
    }

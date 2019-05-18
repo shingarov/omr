@@ -129,14 +129,14 @@ OMR::ARM64::CodeGenerator::beginInstructionSelection()
       {
       TR_ASSERT(false, "Not implemented yet.");
 
-      _returnTypeInfoInstruction = new (self()->trHeapMemory()) TR::ARM64ImmInstruction(TR::InstOpCode::dd, startNode, 0, self());
+      //_returnTypeInfoInstruction = new (self()->trHeapMemory()) TR::ARM64ImmInstruction(TR::InstOpCode::dd, startNode, 0, self());
       }
    else
       {
       _returnTypeInfoInstruction = NULL;
       }
 
-   new (self()->trHeapMemory()) TR::ARM64AdminInstruction(TR::InstOpCode::proc, startNode, NULL, _returnTypeInfoInstruction, self());
+   new (self()->trHeapMemory()) TR::AdminInstruction(TR::InstOpCode::proc, startNode, NULL, _returnTypeInfoInstruction, self());
    }
 
 void
@@ -180,7 +180,7 @@ OMR::ARM64::CodeGenerator::doRegisterAssignment(TR_RegisterKinds kindsToAssign)
       // Track internal control flow on labels
       if (instructionCursor->isLabel())
          {
-         TR::ARM64LabelInstruction *li = (TR::ARM64LabelInstruction *)instructionCursor;
+         TR::LabelInstruction *li = (TR::LabelInstruction *)instructionCursor;
 
          if (li->getLabelSymbol() != NULL)
             {
