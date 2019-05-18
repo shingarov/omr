@@ -30,33 +30,44 @@
 #include "il/Node_inlines.hpp"
 #include "infra/Bit.hpp"
 
-static TR::Register *addOrSubInteger(TR::Node *node, TR::CodeGenerator *cg)
+/*
+ * Common helper for binary operation using R-type instruction or I-type
+ * instruction. The I-type instruction is used when second operand is a loak
+ * constant and constant value fits into I-type instruction immediate,
+ * Otherwise, R-type instruction is used.
+ */
+static TR::Register *RorIhelper(TR::Node *node, TR::InstOpCode::Mnemonic opr, TR::InstOpCode::Mnemonic opi, TR::CodeGenerator *cg)
    {
    TR::Node *firstChild = node->getFirstChild();
    TR::Register *src1Reg = cg->evaluate(firstChild);
    TR::Node *secondChild = node->getSecondChild();
    TR::Register *trgReg = cg->allocateRegister();
-   bool isAdd = node->getOpCode().isAdd();
 
-   if (secondChild->getOpCode().isLoadConst() && secondChild->getRegister() == NULL)
+   if (secondChild->getOpCode().isLoadConst() && secondChild->getRegister() == NULL && opi != TR::InstOpCode::bad)
       {
-      int32_t value = secondChild->getInt();
+      int64_t value = secondChild->getLongInt();
       if (VALID_ITYPE_IMM(value))
          {
-         generateITYPE(TR::InstOpCode::_addi, node, trgReg, src1Reg, isAdd ? value : - value, cg);
+         /*
+          * We have to convert _sub (_subw) to _addi (_addiw) since there's no
+          * _subi (_subiw)
+          */
+         if (opr == TR::InstOpCode::_sub || opr == TR::InstOpCode::_subw)
+            {
+            value = -value;
+            }
+         generateITYPE(opi, node, trgReg, src1Reg, value, cg);
          }
       else
          {
-         TR::Register *tmpReg = cg->allocateRegister();
-         loadConstant32(cg, node, value, tmpReg);
-         generateRTYPE(isAdd ? TR::InstOpCode::_add : TR::InstOpCode::_sub, node, trgReg, src1Reg, tmpReg, cg);
-         cg->stopUsingRegister(tmpReg);
+         TR::Register *src2Reg = cg->evaluate(secondChild);
+         generateRTYPE(opr, node, trgReg, src1Reg, src2Reg, cg);
          }
       }
    else
       {
       TR::Register *src2Reg = cg->evaluate(secondChild);
-      generateRTYPE(isAdd ? TR::InstOpCode::_add : TR::InstOpCode::_sub, node, trgReg, src1Reg, src2Reg, cg);
+      generateRTYPE(opr, node, trgReg, src1Reg, src2Reg, cg);
       }
 
    node->setRegister(trgReg);
@@ -65,10 +76,30 @@ static TR::Register *addOrSubInteger(TR::Node *node, TR::CodeGenerator *cg)
    return trgReg;
    }
 
+/*
+ * Common helper for binary operation using R-type instruction.
+ */
+static TR::Register *Rhelper(TR::Node *node, TR::InstOpCode::Mnemonic op, TR::CodeGenerator *cg)
+   {
+   TR::Node *firstChild = node->getFirstChild();
+   TR::Register *src1Reg = cg->evaluate(firstChild);
+   TR::Node *secondChild = node->getSecondChild();
+   TR::Register *src2Reg = cg->evaluate(secondChild);
+   TR::Register *trgReg = cg->allocateRegister();
+
+   generateRTYPE(op, node, trgReg, src1Reg, src2Reg, cg);
+
+   node->setRegister(trgReg);
+   firstChild->decReferenceCount();
+   secondChild->decReferenceCount();
+   return trgReg;
+   }
+
+
 TR::Register *
 OMR::RV::TreeEvaluator::iaddEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return addOrSubInteger(node, cg);
+   return RorIhelper(node, TR::InstOpCode::_addw, TR::InstOpCode::_addiw, cg);
    }
 
 TR::Register *
@@ -81,7 +112,7 @@ OMR::RV::TreeEvaluator::laddEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 TR::Register *
 OMR::RV::TreeEvaluator::isubEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return addOrSubInteger(node, cg);
+   return RorIhelper(node, TR::InstOpCode::_subw, TR::InstOpCode::_addiw, cg);
    }
 
 TR::Register *
@@ -91,30 +122,7 @@ OMR::RV::TreeEvaluator::lsubEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
 	}
 
-// Multiply a register by a 32-bit constant
-static void mulConstant32(TR::Node *node, TR::Register *treg, TR::Register *sreg, int32_t value, TR::CodeGenerator *cg)
-   {
-   if (value == 0)
-      {
-      loadConstant32(cg, node, 0, treg);
-      }
-   else if (value == 1)
-      {
-      generateITYPE(TR::InstOpCode::_addi, node, treg, sreg, 0, cg);
-      }
-   else if (value == -1)
-      {
-      TR::Register *zero = cg->machine()->getRealRegister(TR::RealRegister::zero);
-      generateRTYPE(TR::InstOpCode::_subw, node, treg, zero, sreg, cg);
-      }
-   else
-      {
-      TR::Register *tmpReg = cg->allocateRegister();
-      loadConstant32(cg, node, value, tmpReg);
-      generateRTYPE(TR::InstOpCode::_mulw, node, treg, sreg, tmpReg, cg);
-      cg->stopUsingRegister(tmpReg);
-      }
-   }
+
 
 TR::Register *
 OMR::RV::TreeEvaluator::imulEvaluator(TR::Node *node, TR::CodeGenerator *cg)
@@ -126,7 +134,7 @@ OMR::RV::TreeEvaluator::imulEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 
    if (secondChild->getOpCode().isLoadConst() && secondChild->getRegister() == NULL)
       {
-      int32_t value = secondChild->getInt();
+      int64_t value = secondChild->getLongInt();
       if (value > 0 && cg->convertMultiplyToShift(node))
          {
          // The multiply has been converted to a shift.
@@ -136,14 +144,33 @@ OMR::RV::TreeEvaluator::imulEvaluator(TR::Node *node, TR::CodeGenerator *cg)
       else
          {
          trgReg = cg->allocateRegister();
-         mulConstant32(node, trgReg, src1Reg, value, cg);
+         if (value == 0)
+            {
+            TR::Register *zero = cg->machine()->getRealRegister(TR::RealRegister::zero);
+            generateITYPE(TR::InstOpCode::_addi, node, trgReg, zero, 0, cg);
+            }
+         else if (value == 1)
+            {
+            generateITYPE(TR::InstOpCode::_addi, node, trgReg, src1Reg, 0, cg);
+            }
+         else if (value == -1)
+            {
+            TR::Register *zero = cg->machine()->getRealRegister(TR::RealRegister::zero);
+            generateRTYPE(TR::InstOpCode::_subw, node, trgReg, zero, src1Reg, cg);
+            }
+         else
+            {
+            TR::Register *src2Reg = cg->evaluate(secondChild);
+            trgReg = cg->allocateRegister();
+            generateRTYPE(TR::InstOpCode::_mulw, node, trgReg, src1Reg, src2Reg, cg);
+            }
          }
       }
    else
       {
       TR::Register *src2Reg = cg->evaluate(secondChild);
       trgReg = cg->allocateRegister();
-      generateRTYPE(TR::InstOpCode::_mul, node, trgReg, src1Reg, src2Reg, cg);
+      generateRTYPE(TR::InstOpCode::_mulw, node, trgReg, src1Reg, src2Reg, cg);
       }
    firstChild->decReferenceCount();
    secondChild->decReferenceCount();
@@ -167,7 +194,6 @@ OMR::RV::TreeEvaluator::imulhEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    secondChild->decReferenceCount();
    node->setRegister(trgReg);
    return trgReg;
-
 	}
 
 TR::Register *
@@ -177,132 +203,54 @@ OMR::RV::TreeEvaluator::lmulEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
 	}
 
-static TR::Register *idivHelper(TR::Node *node, bool is64bit, TR::CodeGenerator *cg)
-   {
-   // TODO: Add checks for special cases
-
-   TR::Node *firstChild = node->getFirstChild();
-   TR::Register *src1Reg = cg->evaluate(firstChild);
-   TR::Node *secondChild = node->getSecondChild();
-   TR::Register *src2Reg = cg->evaluate(secondChild);
-   TR::Register *trgReg = cg->allocateRegister();
-
-   generateRTYPE(is64bit ? TR::InstOpCode::_div : TR::InstOpCode::_divw, node, trgReg, src1Reg, src2Reg, cg);
-
-   firstChild->decReferenceCount();
-   secondChild->decReferenceCount();
-   node->setRegister(trgReg);
-   return trgReg;
-   }
-
-static TR::Register *iremHelper(TR::Node *node, bool is64bit, TR::CodeGenerator *cg)
-   {
-   // TODO: Add checks for special cases
-
-   TR::Node *firstChild = node->getFirstChild();
-   TR::Register *src1Reg = cg->evaluate(firstChild);
-   TR::Node *secondChild = node->getSecondChild();
-   TR::Register *src2Reg = cg->evaluate(secondChild);
-   TR::Register *tmpReg = cg->allocateRegister();
-   TR::Register *trgReg = cg->allocateRegister();
-
-   generateRTYPE(is64bit ? TR::InstOpCode::_rem : TR::InstOpCode::_remw, node, trgReg, src1Reg, src2Reg, cg);
-
-   cg->stopUsingRegister(tmpReg);
-   firstChild->decReferenceCount();
-   secondChild->decReferenceCount();
-   node->setRegister(trgReg);
-   return trgReg;
-   }
-
 TR::Register *
 OMR::RV::TreeEvaluator::idivEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return idivHelper(node, false, cg);
+   return Rhelper(node, TR::InstOpCode::_divw, cg);
    }
 
 TR::Register *
 OMR::RV::TreeEvaluator::iremEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return iremHelper(node, false, cg);
+   return Rhelper(node, TR::InstOpCode::_remw, cg);
    }
 
 TR::Register *
 OMR::RV::TreeEvaluator::ldivEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return idivHelper(node, true, cg);
+   return Rhelper(node, TR::InstOpCode::_div, cg);
    }
 
 TR::Register *
 OMR::RV::TreeEvaluator::lremEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return iremHelper(node, true, cg);
+   return Rhelper(node, TR::InstOpCode::_remw, cg);
    }
 
-static TR::Register *shiftHelper(TR::Node *node, TR::InstOpCode::Mnemonic op, TR::CodeGenerator *cg)
+static TR::Register *shiftHelper(TR::Node *node, TR::InstOpCode::Mnemonic op, TR::InstOpCode::Mnemonic opi, TR::CodeGenerator *cg)
    {
-   TR::Node *firstChild = node->getFirstChild();
-   TR::Node *secondChild = node->getSecondChild();
-   TR::ILOpCodes secondOp = secondChild->getOpCodeValue();
-   TR::Register *srcReg = cg->evaluate(firstChild);
-   TR::Register *trgReg = cg->allocateRegister();
-
-   if (secondOp == TR::iconst || secondOp == TR::iuconst)
-      {
-      int32_t value = secondChild->getInt();
-      switch (op)
-         {
-         case TR::InstOpCode::_sllw:
-            op = TR::InstOpCode::_slliw;
-            break;
-         case TR::InstOpCode::_srlw:
-            op = TR::InstOpCode::_srliw;
-            break;
-         case TR::InstOpCode::_sraw:
-            op = TR::InstOpCode::_sraiw;
-            break;
-         case TR::InstOpCode::_sll:
-            op = TR::InstOpCode::_slli;
-            break;
-         case TR::InstOpCode::_srl:
-            op = TR::InstOpCode::_srli;
-            break;
-         case TR::InstOpCode::_sra:
-            op = TR::InstOpCode::_srai;
-            break;
-         default:
-            TR_ASSERT(false, "Unsupported shift type.");
-         }
-      generateITYPE(op, node, trgReg, srcReg, value, cg);
-      }
-   else
-      {
-      TR::Register *shiftAmountReg = cg->evaluate(secondChild);
-      generateRTYPE(op, node, trgReg, srcReg, shiftAmountReg, cg);
-      }
-
-   node->setRegister(trgReg);
-   firstChild->decReferenceCount();
-   secondChild->decReferenceCount();
-   return trgReg;
+   // TODO: if second arg is an int constant, shall we make mask it so
+   // that we're sure the only low 5 bits are set? This is the assumption
+   // under which we can use RorIhelper. Is this guaranteed at this level?
+   return RorIhelper(node, op, opi, cg);
    }
 
 TR::Register *
 OMR::RV::TreeEvaluator::ishlEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return shiftHelper(node, TR::InstOpCode::_sllw, cg);
+   return shiftHelper(node, TR::InstOpCode::_sllw, TR::InstOpCode::_slliw, cg);
    }
 
 TR::Register *
 OMR::RV::TreeEvaluator::ishrEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return shiftHelper(node, TR::InstOpCode::_sraw, cg);
+   return shiftHelper(node, TR::InstOpCode::_sraw, TR::InstOpCode::_sraiw, cg);
    }
 
 TR::Register *
 OMR::RV::TreeEvaluator::iushrEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return shiftHelper(node, TR::InstOpCode::_srlw, cg);
+   return shiftHelper(node, TR::InstOpCode::_srlw, TR::InstOpCode::_srliw, cg);
    }
 
 // also handles lrol
@@ -386,19 +334,19 @@ OMR::RV::TreeEvaluator::irolEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 TR::Register *
 OMR::RV::TreeEvaluator::lshlEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return shiftHelper(node, TR::InstOpCode::_sll, cg);
+   return shiftHelper(node, TR::InstOpCode::_sll, TR::InstOpCode::_slli, cg);
    }
 
 TR::Register *
 OMR::RV::TreeEvaluator::lshrEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return shiftHelper(node, TR::InstOpCode::_sra, cg);
+   return shiftHelper(node, TR::InstOpCode::_sra, TR::InstOpCode::_srai, cg);
    }
 
 TR::Register *
 OMR::RV::TreeEvaluator::lushrEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return shiftHelper(node, TR::InstOpCode::_srl, cg);
+   return shiftHelper(node, TR::InstOpCode::_srl, TR::InstOpCode::_srli, cg);
    }
 
 TR::Register *
