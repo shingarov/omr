@@ -315,53 +315,60 @@ OMR::RV::TreeEvaluator::dnegEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    }
 
 TR::Register *
-OMR::RV::TreeEvaluator::i2fEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+conversionHelper(TR::Node *node, TR::InstOpCode::Mnemonic op, TR::CodeGenerator *cg)
+{
+   TR::Node *firstChild = node->getFirstChild();
+   TR::Register *src1Reg = cg->evaluate(firstChild);
+   TR::Register *zero = cg->machine()->getRealRegister(TR::RealRegister::zero);
+   TR::Register *trgReg = cg->allocateRegister(node->getDataType().isFloatingPoint() ? TR_FPR : TR_GPR);
+
+   generateRTYPE(op, node, trgReg, src1Reg, zero, cg);
+
+   cg->decReferenceCount(firstChild);
+   node->setRegister(trgReg);
+   return trgReg;
+}
+
+TR::Register *
 	{
-	// TODO:RV: Enable TR::TreeEvaluator::i2fEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
+	return conversionHelper(node, TR::InstOpCode::_fcvt_s_w, cg);
 	}
 
 TR::Register *
 OMR::RV::TreeEvaluator::i2dEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	// TODO:RV: Enable TR::TreeEvaluator::i2dEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
-	}
+   return conversionHelper(node, TR::InstOpCode::_fcvt_d_w, cg);
+   }
 
 TR::Register *
 OMR::RV::TreeEvaluator::l2fEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	// TODO:RV: Enable TR::TreeEvaluator::l2fEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
+	return conversionHelper(node, TR::InstOpCode::_fcvt_s_l, cg);
 	}
 
 TR::Register *
 OMR::RV::TreeEvaluator::l2dEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	// TODO:RV: Enable TR::TreeEvaluator::l2dEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
+	return conversionHelper(node, TR::InstOpCode::_fcvt_d_l, cg);
 	}
 
 TR::Register *
 OMR::RV::TreeEvaluator::f2dEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	// TODO:RV: Enable TR::TreeEvaluator::f2dEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
+	return conversionHelper(node, TR::InstOpCode::_fcvt_d_s, cg);
 	}
 
 TR::Register *
 OMR::RV::TreeEvaluator::f2iEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	// TODO:RV: Enable TR::TreeEvaluator::f2iEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
+	return conversionHelper(node, TR::InstOpCode::_fcvt_w_s, cg);
 	}
 
 TR::Register *
 OMR::RV::TreeEvaluator::d2iEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	// TODO:RV: Enable TR::TreeEvaluator::d2iEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
-	}
+	return conversionHelper(node, TR::InstOpCode::_fcvt_w_d, cg);
+   }
 
 TR::Register *
 OMR::RV::TreeEvaluator::d2cEvaluator(TR::Node *node, TR::CodeGenerator *cg)
@@ -387,22 +394,19 @@ OMR::RV::TreeEvaluator::d2bEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 TR::Register *
 OMR::RV::TreeEvaluator::f2lEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	// TODO:RV: Enable TR::TreeEvaluator::f2lEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
+	return conversionHelper(node, TR::InstOpCode::_fcvt_l_s, cg);
 	}
 
 TR::Register *
 OMR::RV::TreeEvaluator::d2lEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	// TODO:RV: Enable TR::TreeEvaluator::d2lEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
+	return conversionHelper(node, TR::InstOpCode::_fcvt_l_d, cg);
 	}
 
 TR::Register *
 OMR::RV::TreeEvaluator::d2fEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	// TODO:RV: Enable TR::TreeEvaluator::d2fEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
+	return conversionHelper(node, TR::InstOpCode::_fcvt_s_d, cg);
 	}
 
 TR::Register *
