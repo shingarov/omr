@@ -314,7 +314,7 @@ OMR::RV::TreeEvaluator::dnegEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    return doublePrecisionUnaryEvaluator(node, TR::InstOpCode::_fsgnjn_d, cg);
    }
 
-TR::Register *
+static TR::Register *
 conversionHelper(TR::Node *node, TR::InstOpCode::Mnemonic op, TR::CodeGenerator *cg)
 {
    TR::Node *firstChild = node->getFirstChild();
@@ -330,6 +330,7 @@ conversionHelper(TR::Node *node, TR::InstOpCode::Mnemonic op, TR::CodeGenerator 
 }
 
 TR::Register *
+OMR::RV::TreeEvaluator::i2fEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
 	return conversionHelper(node, TR::InstOpCode::_fcvt_s_w, cg);
 	}
@@ -451,33 +452,101 @@ OMR::RV::TreeEvaluator::ifdcmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
 	}
 
+static TR::Register *
+compareHelper(TR::Node *node, TR::InstOpCode::Mnemonic op, bool reverse, TR::CodeGenerator *cg)
+{
+   TR::Node *firstChild = node->getFirstChild();
+   TR::Register *src1Reg = cg->evaluate(firstChild);
+   TR::Node *secondChild = node->getSecondChild();
+   TR::Register *src2Reg = cg->evaluate(secondChild);
+
+   TR::Register *trgReg = cg->allocateRegister();
+
+   if (reverse)
+      generateRTYPE(op, node, trgReg, src2Reg, src1Reg, cg);
+   else
+      generateRTYPE(op, node, trgReg, src1Reg, src2Reg, cg);
+
+   cg->decReferenceCount(firstChild);
+   node->setRegister(trgReg);
+   return trgReg;
+}
+
+TR::Register *
+OMR::RV::TreeEvaluator::fcmpeqEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+   {
+   return compareHelper(node, TR::InstOpCode::_feq_s, false, cg);
+   }
+
+TR::Register *
+OMR::RV::TreeEvaluator::fcmpneEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+   {
+   TR::Register *trgReg = compareHelper(node, TR::InstOpCode::_feq_s, false, cg);
+   generateITYPE(TR::InstOpCode::_xori, node, trgReg, trgReg, 1, cg);
+   return trgReg;
+   }
+
+TR::Register *
+OMR::RV::TreeEvaluator::fcmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+   {
+   return compareHelper(node, TR::InstOpCode::_flt_s, false, cg);
+   }
+
+TR::Register *
+OMR::RV::TreeEvaluator::fcmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+   {
+   return compareHelper(node, TR::InstOpCode::_fle_s, false, cg);
+   }
+
+TR::Register *
+OMR::RV::TreeEvaluator::fcmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+   {
+   return compareHelper(node, TR::InstOpCode::_flt_s, true, cg);
+   }
+
+TR::Register *
+OMR::RV::TreeEvaluator::fcmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+   {
+   return compareHelper(node, TR::InstOpCode::_fle_s, true, cg);
+   }
+
 TR::Register *
 OMR::RV::TreeEvaluator::dcmpeqEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	// TODO:RV: Enable TR::TreeEvaluator::dcmpeqEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
+	return compareHelper(node, TR::InstOpCode::_feq_d, false, cg);
 	}
 
 TR::Register *
 OMR::RV::TreeEvaluator::dcmpneEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	// TODO:RV: Enable TR::TreeEvaluator::dcmpneEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
+   TR::Register *trgReg = compareHelper(node, TR::InstOpCode::_feq_d, false, cg);
+	generateITYPE(TR::InstOpCode::_xori, node, trgReg, trgReg, 1, cg);
+   return trgReg;
 	}
 
 TR::Register *
 OMR::RV::TreeEvaluator::dcmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	// TODO:RV: Enable TR::TreeEvaluator::dcmpltEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
+	return compareHelper(node, TR::InstOpCode::_flt_d, false, cg);
 	}
 
 TR::Register *
-OMR::RV::TreeEvaluator::dcmplEvaluator(TR::Node *node, TR::CodeGenerator *cg)
-	{
-	// TODO:RV: Enable TR::TreeEvaluator::dcmplEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
-	}
+OMR::RV::TreeEvaluator::dcmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+   {
+   return compareHelper(node, TR::InstOpCode::_fle_d, false, cg);
+   }
+
+TR::Register *
+OMR::RV::TreeEvaluator::dcmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+   {
+   return compareHelper(node, TR::InstOpCode::_flt_d, true, cg);
+   }
+
+TR::Register *
+OMR::RV::TreeEvaluator::dcmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+   {
+   return compareHelper(node, TR::InstOpCode::_fle_d, true, cg);
+   }
 
 // also handles dRegLoad
 TR::Register *
