@@ -28,6 +28,7 @@
 #include "codegen/TreeEvaluator.hpp"
 #include "il/Node.hpp"
 #include "il/Node_inlines.hpp"
+#include "il/symbol/AutomaticSymbol.hpp"
 #include "infra/Bit.hpp"
 
 /*
@@ -102,10 +103,71 @@ OMR::RV::TreeEvaluator::iaddEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    return RorIhelper(node, TR::InstOpCode::_addw, TR::InstOpCode::_addiw, cg);
    }
 
+// also handles aiadd and aladd
 TR::Register *
 OMR::RV::TreeEvaluator::laddEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	return RorIhelper(node, TR::InstOpCode::_add, TR::InstOpCode::_addi, cg);
+   TR::Node *firstChild = node->getFirstChild();
+   TR::Register *src1Reg = cg->evaluate(firstChild);
+   TR::Node *secondChild = node->getSecondChild();
+   TR::Register *trgReg = cg->allocateRegister();
+
+   if (secondChild->getOpCode().isLoadConst() && secondChild->getRegister() == NULL)
+      {
+      int64_t value = secondChild->getLongInt();
+      if (VALID_ITYPE_IMM(value))
+         {
+         generateITYPE(TR::InstOpCode::_addi, node, trgReg, src1Reg, value, cg);
+         }
+      else
+         {
+         TR::Register *src2Reg = cg->evaluate(secondChild);
+         generateRTYPE(TR::InstOpCode::_add, node, trgReg, src1Reg, src2Reg, cg);
+         }
+      }
+   else
+      {
+      TR::Register *src2Reg = cg->evaluate(secondChild);
+      generateRTYPE(TR::InstOpCode::_add, node, trgReg, src1Reg, src2Reg, cg);
+      }
+
+   if ((node->getOpCodeValue() == TR::aiadd || node->getOpCodeValue() == TR::aladd) &&
+       node->isInternalPointer())
+      {
+      if (node->getPinningArrayPointer())
+         {
+         trgReg->setContainsInternalPointer();
+         trgReg->setPinningArrayPointer(node->getPinningArrayPointer());
+         }
+      else
+         {
+         TR::Node *firstChild = node->getFirstChild();
+         if ((firstChild->getOpCodeValue() == TR::aload) &&
+             firstChild->getSymbolReference()->getSymbol()->isAuto() &&
+             firstChild->getSymbolReference()->getSymbol()->isPinningArrayPointer())
+            {
+            trgReg->setContainsInternalPointer();
+
+            if (!firstChild->getSymbolReference()->getSymbol()->isInternalPointer())
+               {
+               trgReg->setPinningArrayPointer(firstChild->getSymbolReference()->getSymbol()->castToAutoSymbol());
+               }
+            else
+               trgReg->setPinningArrayPointer(firstChild->getSymbolReference()->getSymbol()->castToInternalPointerAutoSymbol()->getPinningArrayPointer());
+            }
+         else if (firstChild->getRegister() &&
+                  firstChild->getRegister()->containsInternalPointer())
+            {
+            trgReg->setContainsInternalPointer();
+            trgReg->setPinningArrayPointer(firstChild->getRegister()->getPinningArrayPointer());
+            }
+         }
+      }
+
+   node->setRegister(trgReg);
+   firstChild->decReferenceCount();
+   secondChild->decReferenceCount();
+   return trgReg;
 	}
 
 TR::Register *
