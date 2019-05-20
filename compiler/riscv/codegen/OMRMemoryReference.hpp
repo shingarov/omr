@@ -317,6 +317,13 @@ class OMR_EXTENSIBLE MemoryReference : public OMR::MemoryReference
    void incRegisterTotalUseCounts(TR::CodeGenerator *cg);
 
    /**
+    * @brief Keep track of registers in MemoryReference.
+    * @param[in] instr : Instruction
+    * @param[in] cg : CodeGenerator
+    */
+   void bookKeepingRegisterUses(TR::Instruction *instr, TR::CodeGenerator *cg);
+
+   /**
     * @brief Assigns registers
     * @param[in] currentInstruction : current instruction
     * @param[in] cg : CodeGenerator

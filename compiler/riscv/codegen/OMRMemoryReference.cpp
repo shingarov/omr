@@ -439,6 +439,15 @@ void OMR::RV::MemoryReference::incRegisterTotalUseCounts(TR::CodeGenerator * cg)
       }
    }
 
+void OMR::RV::MemoryReference::bookKeepingRegisterUses(TR::Instruction *instr, TR::CodeGenerator *cg)
+   {
+   if (_baseRegister != NULL)
+      {
+      instr->useRegister(_baseRegister);
+      }
+   }
+
+
 
 void OMR::RV::MemoryReference::assignRegisters(TR::Instruction *currentInstruction, TR::CodeGenerator *cg)
    {

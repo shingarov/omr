@@ -295,6 +295,7 @@ class LoadInstruction : public TR::Instruction
         _memoryReference(mr)
       {
       useRegister(treg);
+      mr->bookKeepingRegisterUses(this, codeGen);
       }
 
    LoadInstruction(TR::InstOpCode::Mnemonic op,
@@ -308,9 +309,10 @@ class LoadInstruction : public TR::Instruction
         _memoryReference(mr)
       {
       useRegister(treg);
+      mr->bookKeepingRegisterUses(this, codeGen);
       // TODO: why incRegisterTotalUseCounts() here but not above?
       // This is how it's done in Aarch64. but could be wrong. Investigate.
-      mr->incRegisterTotalUseCounts(codeGen);
+      //mr->incRegisterTotalUseCounts(codeGen);
       }
 
    /**
@@ -526,6 +528,7 @@ class StoreInstruction : public TR::Instruction
         _memoryReference(mr)
       {
       useRegister(sreg);
+      mr->bookKeepingRegisterUses(this, codeGen);
       }
 
    StoreInstruction(TR::InstOpCode::Mnemonic op,
@@ -539,6 +542,7 @@ class StoreInstruction : public TR::Instruction
         _memoryReference(mr)
       {
       useRegister(sreg);
+      mr->bookKeepingRegisterUses(this, codeGen);
       }
 
    /**
