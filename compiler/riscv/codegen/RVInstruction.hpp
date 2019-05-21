@@ -337,11 +337,6 @@ class LoadInstruction : public TR::Instruction
     */
    virtual TR::Register *getMemoryBase() {return getMemoryReference()->getBaseRegister();}
    /**
-    * @brief Gets index register of memory reference
-    * @return index register
-    */
-   virtual TR::Register *getMemoryIndex() {return getMemoryReference()->getIndexRegister();}
-   /**
     * @brief Gets offset of memory reference
     * @return offset
     */
@@ -569,11 +564,6 @@ class StoreInstruction : public TR::Instruction
     * @return base register
     */
    virtual TR::Register *getMemoryBase() {return getMemoryReference()->getBaseRegister();}
-   /**
-    * @brief Gets index register of memory reference
-    * @return index register
-    */
-   virtual TR::Register *getMemoryIndex() {return getMemoryReference()->getIndexRegister();}
    /**
     * @brief Gets offset of memory reference
     * @return offset

@@ -1290,7 +1290,7 @@ class ARM64Trg1MemInstruction : public ARM64Trg1Instruction
     * @brief Gets index register of memory reference
     * @return index register
     */
-   virtual TR::Register *getMemoryIndex() {return getMemoryReference()->getIndexRegister();}
+   virtual TR::Register *getMemoryIndex() {return NULL; }
    /**
     * @brief Gets offset of memory reference
     * @return offset
@@ -1407,7 +1407,7 @@ class ARM64MemInstruction : public TR::Instruction
     * @brief Gets index register of memory reference
     * @return index register
     */
-   virtual TR::Register *getMemoryIndex() {return getMemoryReference()->getIndexRegister();}
+   virtual TR::Register *getMemoryIndex() {return NULL;}
    /**
     * @brief Gets offset of memory reference
     * @return offset

@@ -48,27 +48,11 @@ class OMR_EXTENSIBLE MemoryReference : public OMR::MemoryReferenceConnector
    /**
     * @brief Constructor
     * @param[in] br : base register
-    * @param[in] ir : index register
     * @param[in] cg : CodeGenerator object
     */
    MemoryReference(TR::Register *br,
-      TR::Register *ir,
       TR::CodeGenerator *cg) :
-         OMR::MemoryReferenceConnector(br, ir, cg) {}
-
-   /**
-    * @brief Constructor
-    * @param[in] br : base register
-    * @param[in] ir : index register
-    * @param[in] scale : scale of index
-    * @param[in] cg : CodeGenerator object
-    */
-   MemoryReference(
-      TR::Register *br,
-      TR::Register *ir,
-      uint8_t scale,
-      TR::CodeGenerator *cg) :
-         OMR::MemoryReferenceConnector(br, ir, scale, cg) {}
+         OMR::MemoryReferenceConnector(br, cg) {}
 
    /**
     * @brief Constructor

@@ -57,8 +57,6 @@ class OMR_EXTENSIBLE MemoryReference : public OMR::MemoryReference
    {
    TR::Register *_baseRegister;
    TR::Node *_baseNode;
-   TR::Register *_indexRegister;
-   TR::Node *_indexNode;
    int32_t _offset;
 
    TR::UnresolvedDataSnippet *_unresolvedSnippet;
@@ -75,7 +73,6 @@ class OMR_EXTENSIBLE MemoryReference : public OMR::MemoryReference
    typedef enum
       {
       TR_ARM64MemoryReferenceControl_Base_Modifiable  = 0x01,
-      TR_ARM64MemoryReferenceControl_Index_Modifiable = 0x02,
       /* To be added more if necessary */
       } TR_ARM64MemoryReferenceControl;
 
@@ -88,25 +85,10 @@ class OMR_EXTENSIBLE MemoryReference : public OMR::MemoryReference
    /**
     * @brief Constructor
     * @param[in] br : base register
-    * @param[in] ir : index register
     * @param[in] cg : CodeGenerator object
     */
    MemoryReference(
          TR::Register *br,
-         TR::Register *ir,
-         TR::CodeGenerator *cg);
-
-   /**
-    * @brief Constructor
-    * @param[in] br : base register
-    * @param[in] ir : index register
-    * @param[in] scale : scale of index
-    * @param[in] cg : CodeGenerator object
-    */
-   MemoryReference(
-         TR::Register *br,
-         TR::Register *ir,
-         uint8_t scale,
          TR::CodeGenerator *cg);
 
    /**
@@ -160,30 +142,6 @@ class OMR_EXTENSIBLE MemoryReference : public OMR::MemoryReference
     * @return base node
     */
    TR::Node *setBaseNode(TR::Node *bn) {return (_baseNode = bn);}
-
-   /**
-    * @brief Gets index register
-    * @return index register
-    */
-   TR::Register *getIndexRegister() {return _indexRegister;}
-   /**
-    * @brief Sets index register
-    * @param[in] ir : index register
-    * @return index register
-    */
-   TR::Register *setIndexRegister(TR::Register *ir) {return (_indexRegister = ir);}
-
-   /**
-    * @brief Gets index node
-    * @return index node
-    */
-   TR::Node *getIndexNode() {return _indexNode;}
-   /**
-    * @brief Sets index node
-    * @param[in] in : index node
-    * @return index node
-    */
-   TR::Node *setIndexNode(TR::Node *in) {return (_indexNode = in);}
 
    /**
     * @brief Gets length
@@ -253,8 +211,7 @@ class OMR_EXTENSIBLE MemoryReference : public OMR::MemoryReference
     */
    bool refsRegister(TR::Register *reg)
       {
-      return (reg == _baseRegister ||
-              reg == _indexRegister);
+      return reg == _baseRegister;
       }
 
    /**
@@ -266,10 +223,6 @@ class OMR_EXTENSIBLE MemoryReference : public OMR::MemoryReference
          {
          _baseRegister->block();
          }
-      if (_indexRegister != NULL)
-         {
-         _indexRegister->block();
-         }
       }
 
    /**
@@ -280,10 +233,6 @@ class OMR_EXTENSIBLE MemoryReference : public OMR::MemoryReference
       if (_baseRegister != NULL)
          {
          _baseRegister->unblock();
-         }
-      if (_indexRegister != NULL)
-         {
-         _indexRegister->unblock();
          }
       }
 
@@ -303,23 +252,6 @@ class OMR_EXTENSIBLE MemoryReference : public OMR::MemoryReference
     * @brief Clears the BaseModifiable flag
     */
    void clearBaseModifiable() {_flag &= ~TR_ARM64MemoryReferenceControl_Base_Modifiable;}
-
-   /**
-    * @brief Index register is modifiable or not
-    * @return true when index register is modifiable
-    */
-   bool isIndexModifiable()
-      {
-      return ((_flag & TR_ARM64MemoryReferenceControl_Index_Modifiable) != 0);
-      }
-   /**
-    * @brief Sets the IndexModifiable flag
-    */
-   void setIndexModifiable() {_flag |= TR_ARM64MemoryReferenceControl_Index_Modifiable;}
-   /**
-    * @brief Clears the IndexModifiable flag
-    */
-   void clearIndexModifiable() {_flag &= ~TR_ARM64MemoryReferenceControl_Index_Modifiable;}
 
    /**
     * @brief Gets the unresolved data snippet
@@ -391,21 +323,6 @@ class OMR_EXTENSIBLE MemoryReference : public OMR::MemoryReference
     */
    void assignRegisters(TR::Instruction *currentInstruction, TR::CodeGenerator *cg);
 
-   /**
-    * @brief Estimates the length of generated binary
-    * @param[in] op : opcode of the instruction to attach this memory reference to
-    * @return estimated binary length
-    */
-   uint32_t estimateBinaryLength(TR::InstOpCode op);
-
-   /**
-    * @brief Generates binary encoding
-    * @param[in] ci : current instruction
-    * @param[in] cursor : instruction cursor
-    * @param[in] cg : CodeGenerator
-    * @return estimated binary length
-    */
-   uint8_t *generateBinaryEncoding(TR::Instruction *ci, uint8_t *cursor, TR::CodeGenerator *cg);
    };
 
 } // ARM64

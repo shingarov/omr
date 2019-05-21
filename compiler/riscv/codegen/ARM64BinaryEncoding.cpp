@@ -187,58 +187,33 @@ uint8_t *TR::ARM64Trg1Src3Instruction::generateBinaryEncoding()
 
 uint8_t *TR::ARM64Trg1MemInstruction::generateBinaryEncoding()
    {
-   uint8_t *instructionStart = cg()->getBinaryBufferCursor();
-   uint8_t *cursor = instructionStart;
-   cursor = getOpCode().copyBinaryToBuffer(instructionStart);
-   insertTargetRegister(toARM64Cursor(cursor));
-   cursor = getMemoryReference()->generateBinaryEncoding(this, cursor, cg());
-   setBinaryLength(cursor - instructionStart);
-   setBinaryEncoding(instructionStart);
-   cg()->addAccumulatedInstructionLengthError(getEstimatedBinaryLength() - getBinaryLength());
-   return cursor;
+   TR_ASSERT(false, "Should no longer be used");
    }
 
 int32_t TR::ARM64Trg1MemInstruction::estimateBinaryLength(int32_t currentEstimate)
    {
-   setEstimatedBinaryLength(getMemoryReference()->estimateBinaryLength(getOpCodeValue()));
-   return currentEstimate + getEstimatedBinaryLength();
+   TR_ASSERT(false, "Should no longer be used");
    }
 
 uint8_t *TR::ARM64MemInstruction::generateBinaryEncoding()
    {
-   uint8_t *instructionStart = cg()->getBinaryBufferCursor();
-   uint8_t *cursor = instructionStart;
-   cursor = getOpCode().copyBinaryToBuffer(instructionStart);
-   cursor = getMemoryReference()->generateBinaryEncoding(this, cursor, cg());
-   setBinaryLength(cursor - instructionStart);
-   setBinaryEncoding(instructionStart);
-   cg()->addAccumulatedInstructionLengthError(getEstimatedBinaryLength() - getBinaryLength());
-   return cursor;
+   TR_ASSERT(false, "Should no longer be used");
    }
 
 int32_t TR::ARM64MemInstruction::estimateBinaryLength(int32_t currentEstimate)
    {
-   setEstimatedBinaryLength(getMemoryReference()->estimateBinaryLength(getOpCodeValue()));
-   return(currentEstimate + getEstimatedBinaryLength());
+   TR_ASSERT(false, "Should no longer be used");
    }
+
 
 uint8_t *TR::ARM64MemSrc1Instruction::generateBinaryEncoding()
    {
-   uint8_t *instructionStart = cg()->getBinaryBufferCursor();
-   uint8_t *cursor = instructionStart;
-   cursor = getOpCode().copyBinaryToBuffer(instructionStart);
-   insertSource1Register(toARM64Cursor(cursor));
-   cursor = getMemoryReference()->generateBinaryEncoding(this, cursor, cg());
-   setBinaryLength(cursor - instructionStart);
-   setBinaryEncoding(instructionStart);
-   cg()->addAccumulatedInstructionLengthError(getEstimatedBinaryLength() - getBinaryLength());
-   return cursor;
+   TR_ASSERT(false, "Should no longer be used");
    }
 
 int32_t TR::ARM64MemSrc1Instruction::estimateBinaryLength(int32_t currentEstimate)
    {
-   setEstimatedBinaryLength(getMemoryReference()->estimateBinaryLength(getOpCodeValue()));
-   return(currentEstimate + getEstimatedBinaryLength());
+   TR_ASSERT(false, "Should no longer be used");
    }
 
 uint8_t *TR::ARM64Src1Instruction::generateBinaryEncoding()
