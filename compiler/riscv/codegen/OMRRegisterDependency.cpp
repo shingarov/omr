@@ -20,7 +20,6 @@
  *******************************************************************************/
 
 #include <stddef.h>
-#include "codegen/ARM64Instruction.hpp"
 #include "codegen/RVInstruction.hpp"
 #include "codegen/BackingStore.hpp"
 #include "codegen/CodeGenerator.hpp"

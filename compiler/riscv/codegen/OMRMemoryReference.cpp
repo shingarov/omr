@@ -24,7 +24,6 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <riscv.h>
-#include "codegen/ARM64Instruction.hpp"
 #include "codegen/RVInstruction.hpp"
 #include "codegen/CodeGenerator.hpp"
 #include "codegen/GenerateInstructions.hpp"
@@ -188,7 +187,7 @@ void OMR::ARM64::MemoryReference::addToOffset(TR::Node *node, intptrj_t amount, 
       }
 
    intptrj_t displacement = self()->getOffset() + amount;
-   if (!constantIsImm9(displacement))
+   if (!VALID_ITYPE_IMM(displacement))
       {
       TR::Register *newBase;
 

@@ -22,7 +22,6 @@
 #include <stdint.h>
 
 #include "codegen/GenerateInstructions.hpp"
-#include "codegen/ARM64Instruction.hpp"
 #include "codegen/RVInstruction.hpp"
 #include "codegen/CodeGenerator.hpp"
 #include "codegen/InstOpCode.hpp"

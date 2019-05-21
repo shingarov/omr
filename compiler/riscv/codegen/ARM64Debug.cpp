@@ -24,7 +24,6 @@
 
 #include "ras/Debug.hpp"
 
-#include "codegen/ARM64Instruction.hpp"
 #include "codegen/RVInstruction.hpp"
 #include "codegen/CodeGenerator.hpp"
 #include "codegen/InstOpCode.hpp"
@@ -81,53 +80,11 @@ TR_Debug::print(TR::FILE *pOutFile, TR::Instruction *instr)
 
    switch (instr->getKind())
       {
-      case OMR::Instruction::IsImm:
-         print(pOutFile, (TR::ARM64ImmInstruction *)instr);
-         break;
-      case OMR::Instruction::IsImmSym:
-         print(pOutFile, (TR::ARM64ImmSymInstruction *)instr);
-         break;
       case OMR::Instruction::IsLabel:
          print(pOutFile, (TR::LabelInstruction *)instr);
          break;
-      case OMR::Instruction::IsRegBranch:
-         print(pOutFile, (TR::ARM64RegBranchInstruction *)instr);
-         break;
       case OMR::Instruction::IsAdmin:
          print(pOutFile, (TR::AdminInstruction *)instr);
-         break;
-      case OMR::Instruction::IsTrg1:
-         print(pOutFile, (TR::ARM64Trg1Instruction *)instr);
-         break;
-      case OMR::Instruction::IsTrg1Imm:
-         print(pOutFile, (TR::ARM64Trg1ImmInstruction *)instr);
-         break;
-      case OMR::Instruction::IsTrg1Src1:
-         print(pOutFile, (TR::ARM64Trg1Src1Instruction *)instr);
-         break;
-      case OMR::Instruction::IsTrg1Src1Imm:
-         print(pOutFile, (TR::ARM64Trg1Src1ImmInstruction *)instr);
-         break;
-      case OMR::Instruction::IsTrg1Src2:
-         print(pOutFile, (TR::ARM64Trg1Src2Instruction *)instr);
-         break;
-      case OMR::Instruction::IsTrg1Src3:
-         print(pOutFile, (TR::ARM64Trg1Src3Instruction *)instr);
-         break;
-      case OMR::Instruction::IsTrg1Mem:
-         print(pOutFile, (TR::ARM64Trg1MemInstruction *)instr);
-         break;
-      case OMR::Instruction::IsMem:
-         print(pOutFile, (TR::ARM64MemInstruction *)instr);
-         break;
-      case OMR::Instruction::IsMemSrc1:
-         print(pOutFile, (TR::ARM64MemSrc1Instruction *)instr);
-         break;
-      case OMR::Instruction::IsSrc1:
-         print(pOutFile, (TR::ARM64Src1Instruction *)instr);
-         break;
-      case OMR::Instruction::IsSrc2:
-         print(pOutFile, (TR::ARM64Src2Instruction *)instr);
          break;
       default:
          TR_ASSERT(false, "unexpected instruction kind");
@@ -162,31 +119,6 @@ TR_Debug::printPrefix(TR::FILE *pOutFile, TR::Instruction *instr)
    }
 
 void
-TR_Debug::print(TR::FILE *pOutFile, TR::ARM64ImmInstruction *instr)
-   {
-   printPrefix(pOutFile, instr);
-   trfprintf(pOutFile, "%s \t0x%08x", getOpCodeName(&instr->getOpCode()), instr->getSourceImmediate());
-   trfflush(_comp->getOutFile());
-   }
-
-void
-TR_Debug::print(TR::FILE *pOutFile, TR::ARM64ImmSymInstruction *instr)
-   {
-   printPrefix(pOutFile, instr);
-
-   TR::Symbol *target = instr->getSymbolReference()->getSymbol();
-   const char *name = target ? getName(instr->getSymbolReference()) : 0;
-   if (name)
-      trfprintf(pOutFile, "%s \t" POINTER_PRINTF_FORMAT "\t\t; Direct Call \"%s\"", getOpCodeName(&instr->getOpCode()), instr->getAddrImmediate(), name);
-   else
-      trfprintf(pOutFile, "%s \t" POINTER_PRINTF_FORMAT, getOpCodeName(&instr->getOpCode()), instr->getAddrImmediate());
-
-   if (instr->getDependencyConditions())
-      print(pOutFile, instr->getDependencyConditions());
-   trfflush(_comp->getOutFile());
-   }
-
-void
 TR_Debug::print(TR::FILE *pOutFile, TR::LabelInstruction *instr)
    {
    printPrefix(pOutFile, instr);
@@ -218,17 +150,6 @@ TR_Debug::print(TR::FILE *pOutFile, TR::LabelInstruction *instr)
    }
 
 void
-TR_Debug::print(TR::FILE *pOutFile, TR::ARM64RegBranchInstruction *instr)
-   {
-   printPrefix(pOutFile, instr);
-   trfprintf(pOutFile, "%s \t", getOpCodeName(&instr->getOpCode()));
-   print(pOutFile, instr->getTargetRegister(), TR_DoubleWordReg);
-   if (instr->getDependencyConditions())
-      print(pOutFile, instr->getDependencyConditions());
-   trfflush(_comp->getOutFile());
-   }
-
-void
 TR_Debug::print(TR::FILE *pOutFile, TR::AdminInstruction *instr)
    {
    printPrefix(pOutFile, instr);
@@ -253,6 +174,7 @@ TR_Debug::print(TR::FILE *pOutFile, TR::AdminInstruction *instr)
    trfflush(pOutFile);
    }
 
+/*
 void
 TR_Debug::print(TR::FILE *pOutFile, TR::ARM64Trg1Instruction *instr)
    {
@@ -261,140 +183,7 @@ TR_Debug::print(TR::FILE *pOutFile, TR::ARM64Trg1Instruction *instr)
    print(pOutFile, instr->getTargetRegister(), TR_WordReg);
    trfflush(_comp->getOutFile());
    }
-
-void
-TR_Debug::print(TR::FILE *pOutFile, TR::ARM64Trg1ImmInstruction *instr)
-   {
-   printPrefix(pOutFile, instr);
-   trfprintf(pOutFile, "%s \t", getOpCodeName(&instr->getOpCode()));
-   print(pOutFile, instr->getTargetRegister(), TR_WordReg);
-   trfprintf(pOutFile, ", 0x%08x", instr->getSourceImmediate());
-   trfflush(_comp->getOutFile());
-   }
-
-void
-TR_Debug::print(TR::FILE *pOutFile, TR::ARM64Trg1Src1Instruction *instr)
-   {
-   printPrefix(pOutFile, instr);
-   trfprintf(pOutFile, "%s \t", getOpCodeName(&instr->getOpCode()));
-
-   print(pOutFile, instr->getTargetRegister(), TR_WordReg); trfprintf(pOutFile, ", ");
-   print(pOutFile, instr->getSource1Register(), TR_WordReg);
-   trfflush(_comp->getOutFile());
-   }
-
-void
-TR_Debug::print(TR::FILE *pOutFile, TR::ARM64Trg1Src1ImmInstruction *instr)
-   {
-   printPrefix(pOutFile, instr);
-   trfprintf(pOutFile, "%s \t", getOpCodeName(&instr->getOpCode()));
-   print(pOutFile, instr->getTargetRegister(), TR_WordReg); trfprintf(pOutFile, ", ");
-   print(pOutFile, instr->getSource1Register(), TR_WordReg);
-   trfprintf(pOutFile, ", %d", instr->getSourceImmediate());
-
-   if (instr->getDependencyConditions())
-      print(pOutFile, instr->getDependencyConditions());
-
-   trfflush(_comp->getOutFile());
-   }
-
-void
-TR_Debug::print(TR::FILE *pOutFile, TR::ARM64Trg1Src2Instruction *instr)
-   {
-   printPrefix(pOutFile, instr);
-   trfprintf(pOutFile, "%s \t", getOpCodeName(&instr->getOpCode()));
-
-   print(pOutFile, instr->getTargetRegister(), TR_WordReg); trfprintf(pOutFile, ", ");
-   print(pOutFile, instr->getSource1Register(), TR_WordReg); trfprintf(pOutFile, ", ");
-   print(pOutFile, instr->getSource2Register(), TR_WordReg);
-
-   if (instr->getDependencyConditions())
-      print(pOutFile, instr->getDependencyConditions());
-
-   trfflush(_comp->getOutFile());
-   }
-
-void
-TR_Debug::print(TR::FILE *pOutFile, TR::ARM64Trg1Src3Instruction *instr)
-   {
-   printPrefix(pOutFile, instr);
-   trfprintf(pOutFile, "%s \t", getOpCodeName(&instr->getOpCode()));
-   print(pOutFile, instr->getTargetRegister(), TR_WordReg); trfprintf(pOutFile, ", ");
-   print(pOutFile, instr->getSource1Register(), TR_WordReg); trfprintf(pOutFile, ", ");
-   print(pOutFile, instr->getSource2Register(), TR_WordReg); trfprintf(pOutFile, ", ");
-   print(pOutFile, instr->getSource3Register(), TR_WordReg);
-
-   if (instr->getDependencyConditions())
-      print(pOutFile, instr->getDependencyConditions());
-
-   trfflush(_comp->getOutFile());
-   }
-
-void
-TR_Debug::print(TR::FILE *pOutFile, TR::ARM64Trg1MemInstruction *instr)
-   {
-   printPrefix(pOutFile, instr);
-   trfprintf(pOutFile, "%s \t", getOpCodeName(&instr->getOpCode()));
-
-   print(pOutFile, instr->getTargetRegister(), TR_WordReg); trfprintf(pOutFile, ", ");
-
-   print(pOutFile, instr->getMemoryReference());
-   TR::Symbol *symbol = instr->getMemoryReference()->getSymbolReference()->getSymbol();
-   if (symbol && symbol->isSpillTempAuto())
-      {
-      trfprintf(pOutFile, "\t\t; spilled for %s", getName(instr->getNode()->getOpCode()));
-      }
-   if (instr->getSnippetForGC() != NULL)
-      {
-      trfprintf(pOutFile, "\t\t; Backpatched branch to Unresolved Data %s", getName(instr->getSnippetForGC()->getSnippetLabel()));
-      }
-
-   printMemoryReferenceComment(pOutFile, instr->getMemoryReference());
-   trfflush(_comp->getOutFile());
-   }
-
-void
-TR_Debug::print(TR::FILE *pOutFile, TR::ARM64MemInstruction *instr)
-   {
-   printPrefix(pOutFile, instr);
-   trfprintf(pOutFile, "%s \t", getOpCodeName(&instr->getOpCode()));
-   print(pOutFile, instr->getMemoryReference());
-   printMemoryReferenceComment(pOutFile, instr->getMemoryReference());
-   trfflush(_comp->getOutFile());
-   }
-
-void
-TR_Debug::print(TR::FILE *pOutFile, TR::ARM64MemSrc1Instruction *instr)
-   {
-   printPrefix(pOutFile, instr);
-   trfprintf(pOutFile, "%s \t", getOpCodeName(&instr->getOpCode()));
-
-   print(pOutFile, instr->getSource1Register(), TR_WordReg); trfprintf(pOutFile, ", ");
-   print(pOutFile, instr->getMemoryReference());
-
-   printMemoryReferenceComment(pOutFile, instr->getMemoryReference());
-   trfflush(_comp->getOutFile());
-   }
-
-void
-TR_Debug::print(TR::FILE *pOutFile, TR::ARM64Src1Instruction *instr)
-   {
-   printPrefix(pOutFile, instr);
-   trfprintf(pOutFile, "%s \t", getOpCodeName(&instr->getOpCode()));
-   print(pOutFile, instr->getSource1Register(), TR_WordReg);
-   trfflush(_comp->getOutFile());
-   }
-
-void
-TR_Debug::print(TR::FILE *pOutFile, TR::ARM64Src2Instruction *instr)
-   {
-   printPrefix(pOutFile, instr);
-   trfprintf(pOutFile, "%s \t", getOpCodeName(&instr->getOpCode()));
-   print(pOutFile, instr->getSource1Register(), TR_WordReg); trfprintf(pOutFile, ", ");
-   print(pOutFile, instr->getSource2Register(), TR_WordReg);
-
-   trfflush(_comp->getOutFile());
-   }
+*/
 
 void
 TR_Debug::print(TR::FILE *pOutFile, TR::RegisterDependency *dep)

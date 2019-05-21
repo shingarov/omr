@@ -317,7 +317,7 @@ class OMR_EXTENSIBLE CodeGenerator : public OMR::CodeGenerator
 
    TR::RealRegister *_stackPtrRegister;
    TR::RealRegister *_methodMetaDataRegister;
-   TR::ARM64ImmInstruction *_returnTypeInfoInstruction;
+   TR::Instruction *_returnTypeInfoInstruction;
    TR::ConstantDataSnippet *_constantData;
    const TR::ARM64LinkageProperties *_linkageProperties;
    TR::list<TR_ARM64OutOfLineCodeSection*> _outOfLineCodeSectionList;

@@ -20,7 +20,6 @@
  *******************************************************************************/
 
 #include <riscv.h>
-#include "codegen/ARM64Instruction.hpp"
 #include "codegen/RVInstruction.hpp"
 #include "codegen/CodeGenerator.hpp"
 #include "codegen/GenerateInstructions.hpp"

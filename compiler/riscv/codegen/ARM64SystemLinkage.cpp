@@ -21,7 +21,6 @@
 
 #include <riscv.h>
 #include "codegen/ARM64SystemLinkage.hpp"
-#include "codegen/ARM64Instruction.hpp"
 #include "codegen/RVInstruction.hpp"
 #include "codegen/GenerateInstructions.hpp"
 #include "codegen/MemoryReference.hpp"
@@ -535,7 +534,7 @@ TR::ARM64SystemLinkage::createEpilogue(TR::Instruction *cursor)
 
    // remove space for preserved registers
    uint32_t frameSize = codeGen->getFrameSizeInBytes();
-   if (constantIsUnsignedImm12(frameSize))
+   if (VALID_ITYPE_IMM(frameSize))
       {
       cursor = generateITYPE(TR::InstOpCode::_addi, lastNode, sp, sp, frameSize, codeGen, cursor);
       }

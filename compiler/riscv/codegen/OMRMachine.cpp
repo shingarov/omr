@@ -22,7 +22,6 @@
 #include <stddef.h> // for NULL, etc
 #include <stdint.h> // for uint16_t, int32_t, etc
 
-#include "codegen/ARM64Instruction.hpp"
 #include "codegen/RVInstruction.hpp"
 #include "codegen/BackingStore.hpp"
 #include "codegen/CodeGenerator.hpp"

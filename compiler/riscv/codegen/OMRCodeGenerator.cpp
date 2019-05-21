@@ -22,7 +22,6 @@
 #include <stdlib.h>
 #include <riscv.h>
 
-#include "codegen/ARM64Instruction.hpp"
 #include "codegen/RVInstruction.hpp"
 #include "codegen/ARM64SystemLinkage.hpp"
 #include "codegen/CodeGenerator.hpp"
@@ -144,7 +143,9 @@ OMR::ARM64::CodeGenerator::endInstructionSelection()
    {
    if (_returnTypeInfoInstruction != NULL)
       {
-      _returnTypeInfoInstruction->setSourceImmediate(static_cast<uint32_t>(self()->comp()->getReturnInfo()));
+      TR_ASSERT(false, "Not implemented yet.");
+
+      //_returnTypeInfoInstruction->setSourceImmediate(static_cast<uint32_t>(self()->comp()->getReturnInfo()));
       }
    }
 

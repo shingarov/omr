@@ -22,7 +22,16 @@
 #ifndef RVINSTRUCTION_INCL
 #define RVINSTRUCTION_INCL
 
-#include "codegen/ARM64Instruction.hpp"
+#include <stddef.h>
+#include <stdint.h>
+
+#include "codegen/CodeGenerator.hpp"
+#include "codegen/Instruction.hpp"
+#include "codegen/MemoryReference.hpp"
+#include "il/symbol/LabelSymbol.hpp"
+#include "infra/Assert.hpp"
+
+namespace TR { class SymbolReference; }
 
 #define RISCV_INSTRUCTION_LENGTH 4
 
