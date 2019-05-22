@@ -19,18 +19,18 @@
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
 
-#ifndef OMR_ARM64_INSTOPCODE_INCL
-#define OMR_ARM64_INSTOPCODE_INCL
+#ifndef OMR_RV_INSTOPCODE_INCL
+#define OMR_RV_INSTOPCODE_INCL
 
 /*
  * The following #define and typedef must appear before any #includes in this file
  */
 #ifndef OMR_INSTOPCODE_CONNECTOR
 #define OMR_INSTOPCODE_CONNECTOR
-namespace OMR { namespace ARM64 { class InstOpCode; } }
-namespace OMR { typedef OMR::ARM64::InstOpCode InstOpCodeConnector; }
+namespace OMR { namespace RV { class InstOpCode; } }
+namespace OMR { typedef OMR::RV::InstOpCode InstOpCodeConnector; }
 #else
-#error OMR::ARM64::InstOpCode expected to be a primary connector, but a OMR connector is already defined
+#error OMR::RV::InstOpCode expected to be a primary connector, but a OMR connector is already defined
 #endif
 
 #include "compiler/codegen/OMRInstOpCode.hpp"
@@ -38,7 +38,7 @@ namespace OMR { typedef OMR::ARM64::InstOpCode InstOpCodeConnector; }
 namespace OMR
 {
 
-namespace ARM64
+namespace RV
 {
 
 class InstOpCode: public OMR::InstOpCode
@@ -58,7 +58,7 @@ class InstOpCode: public OMR::InstOpCode
    public:
 
    typedef uint32_t OpCodeBinaryEntry;
-   static const OpCodeBinaryEntry binaryEncodings[ARM64NumOpCodes];
+   static const OpCodeBinaryEntry binaryEncodings[RVNumOpCodes];
 
    /*
     * @brief Answers binary encoding of Mnemonic
@@ -91,6 +91,6 @@ class InstOpCode: public OMR::InstOpCode
       }
    };
 
-} // ARM64
+} // RV
 } // OMR
 #endif

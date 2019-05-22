@@ -23,7 +23,7 @@
 #include "codegen/CodeGenerator.hpp"
 
 
-OMR::ARM64::Snippet::Snippet(
+OMR::RV::Snippet::Snippet(
       TR::CodeGenerator *cg,
       TR::Node *node,
       TR::LabelSymbol *label,
@@ -33,7 +33,7 @@ OMR::ARM64::Snippet::Snippet(
    }
 
 
-OMR::ARM64::Snippet::Snippet(
+OMR::RV::Snippet::Snippet(
       TR::CodeGenerator *cg,
       TR::Node *node,
       TR::LabelSymbol *label) :

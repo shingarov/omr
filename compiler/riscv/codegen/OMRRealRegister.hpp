@@ -19,18 +19,18 @@
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
 
-#ifndef OMR_ARM64_REAL_REGISTER_INCL
-#define OMR_ARM64_REAL_REGISTER_INCL
+#ifndef OMR_RV_REAL_REGISTER_INCL
+#define OMR_RV_REAL_REGISTER_INCL
 
 /*
  * The following #define and typedef must appear before any #includes in this file
  */
 #ifndef OMR_REAL_REGISTER_CONNECTOR
 #define OMR_REAL_REGISTER_CONNECTOR
-   namespace OMR { namespace ARM64 { class RealRegister; } }
-   namespace OMR { typedef OMR::ARM64::RealRegister RealRegisterConnector; }
+   namespace OMR { namespace RV { class RealRegister; } }
+   namespace OMR { typedef OMR::RV::RealRegister RealRegisterConnector; }
 #else
-   #error OMR::ARM64::RealRegister expected to be a primary connector, but an OMR connector is already defined
+   #error OMR::RV::RealRegister expected to be a primary connector, but an OMR connector is already defined
 #endif
 
 #include "compiler/codegen/OMRRealRegister.hpp"
@@ -44,7 +44,7 @@ namespace TR { class CodeGenerator; }
 namespace OMR
 {
 
-namespace ARM64
+namespace RV
 {
 
 class OMR_EXTENSIBLE RealRegister : public OMR::RealRegister
@@ -77,7 +77,7 @@ class OMR_EXTENSIBLE RealRegister : public OMR::RealRegister
       pos_RT2    = 10,
       pos_RS     = 16,
       pos_RA     = 10
-   } ARM64OperandPosition;
+   } RVOperandPosition;
 
    /**
     * @brief Return binary encoding of the register

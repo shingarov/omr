@@ -46,28 +46,28 @@ genericReturnEvaluator(TR::Node *node, TR::RealRegister::RegNum rnum, TR_Registe
 
 // also handles iureturn
 TR::Register *
-OMR::ARM64::TreeEvaluator::ireturnEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::ireturnEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return genericReturnEvaluator(node, cg->getProperties().getIntegerReturnRegister(), TR_GPR, TR_IntReturn, cg);
    }
 
 // also handles lureturn, areturn
 TR::Register *
-OMR::ARM64::TreeEvaluator::lreturnEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::lreturnEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return genericReturnEvaluator(node, cg->getProperties().getLongReturnRegister(), TR_GPR, TR_LongReturn, cg);
    }
 
 // void return
 TR::Register *
-OMR::ARM64::TreeEvaluator::returnEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::returnEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    generateADMIN(cg, TR::InstOpCode::retn, node);
    cg->comp()->setReturnInfo(TR_VoidReturn);
    return NULL;
    }
 
-TR::Register *OMR::ARM64::TreeEvaluator::gotoEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+TR::Register *OMR::RV::TreeEvaluator::gotoEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    TR::LabelSymbol *gotoLabel = node->getBranchDestination()->getNode()->getLabel();
    TR::RealRegister *zero = cg->machine()->getRealRegister(TR::RealRegister::zero);
@@ -129,7 +129,7 @@ static TR::Instruction *ificmpHelper(TR::InstOpCode::Mnemonic op, TR::Node *node
 
 // also handles ifiucmpeq
 TR::Register *
-OMR::ARM64::TreeEvaluator::ificmpeqEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::ificmpeqEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    ificmpHelper(TR::InstOpCode::_beq, node, false, cg);
    return NULL;
@@ -137,63 +137,63 @@ OMR::ARM64::TreeEvaluator::ificmpeqEvaluator(TR::Node *node, TR::CodeGenerator *
 
 // also handles ifiucmpne
 TR::Register *
-OMR::ARM64::TreeEvaluator::ificmpneEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::ificmpneEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    ificmpHelper(TR::InstOpCode::_bne, node, false, cg);
    return NULL;
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::ificmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::ificmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    ificmpHelper(TR::InstOpCode::_blt, node, false, cg);
    return NULL;
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::ificmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::ificmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    ificmpHelper(TR::InstOpCode::_bge, node, false, cg);
    return NULL;
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::ificmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::ificmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    ificmpHelper(TR::InstOpCode::_blt, node, true, cg);
    return NULL;
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::ificmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::ificmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    ificmpHelper(TR::InstOpCode::_bge, node, true, cg);
    return NULL;
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::ifiucmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::ifiucmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    ificmpHelper(TR::InstOpCode::_bltu, node, false, cg);
    return NULL;
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::ifiucmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::ifiucmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    ificmpHelper(TR::InstOpCode::_bgeu, node, false, cg);
    return NULL;
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::ifiucmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::ifiucmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    ificmpHelper(TR::InstOpCode::_bltu, node, true, cg);
    return NULL;
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::ifiucmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::ifiucmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    ificmpHelper(TR::InstOpCode::_bgeu, node, true, cg);
    return NULL;
@@ -201,7 +201,7 @@ OMR::ARM64::TreeEvaluator::ifiucmpleEvaluator(TR::Node *node, TR::CodeGenerator 
 
 // also handles iflucmpeq, ifacmpeq
 TR::Register *
-OMR::ARM64::TreeEvaluator::iflcmpeqEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::iflcmpeqEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    ificmpHelper(TR::InstOpCode::_beq, node, false, cg);
    return NULL;
@@ -209,21 +209,21 @@ OMR::ARM64::TreeEvaluator::iflcmpeqEvaluator(TR::Node *node, TR::CodeGenerator *
 
 // also handles iflucmpne, ifacmpne
 TR::Register *
-OMR::ARM64::TreeEvaluator::iflcmpneEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::iflcmpneEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    ificmpHelper(TR::InstOpCode::_bne, node, false, cg);
    return NULL;
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::iflcmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::iflcmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    ificmpHelper(TR::InstOpCode::_blt, node, false, cg);
    return NULL;
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::iflcmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::iflcmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    ificmpHelper(TR::InstOpCode::_bge, node, false, cg);
    return NULL;
@@ -231,7 +231,7 @@ OMR::ARM64::TreeEvaluator::iflcmpgeEvaluator(TR::Node *node, TR::CodeGenerator *
 
 // also handles ifacmplt
 TR::Register *
-OMR::ARM64::TreeEvaluator::iflucmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::iflucmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    ificmpHelper(TR::InstOpCode::_bltu, node, false, cg);
    return NULL;
@@ -239,21 +239,21 @@ OMR::ARM64::TreeEvaluator::iflucmpltEvaluator(TR::Node *node, TR::CodeGenerator 
 
 // also handles ifacmpge
 TR::Register *
-OMR::ARM64::TreeEvaluator::iflucmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::iflucmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    ificmpHelper(TR::InstOpCode::_bgeu, node, false, cg);
    return NULL;
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::iflcmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::iflcmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    ificmpHelper(TR::InstOpCode::_blt, node, true, cg);
    return NULL;
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::iflcmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::iflcmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    ificmpHelper(TR::InstOpCode::_bge, node, true, cg);
    return NULL;
@@ -261,7 +261,7 @@ OMR::ARM64::TreeEvaluator::iflcmpleEvaluator(TR::Node *node, TR::CodeGenerator *
 
 // also handles ifacmpgt
 TR::Register *
-OMR::ARM64::TreeEvaluator::iflucmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::iflucmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    ificmpHelper(TR::InstOpCode::_bltu, node, true, cg);
    return NULL;
@@ -269,7 +269,7 @@ OMR::ARM64::TreeEvaluator::iflucmpgtEvaluator(TR::Node *node, TR::CodeGenerator 
 
 // also handles ifacmple
 TR::Register *
-OMR::ARM64::TreeEvaluator::iflucmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::iflucmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    ificmpHelper(TR::InstOpCode::_bgeu, node, true, cg);
    return NULL;
@@ -301,13 +301,13 @@ static TR::Register *icmpHelper(TR::InstOpCode::Mnemonic op1, TR::InstOpCode::Mn
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::icmpeqEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::icmpeqEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return icmpHelper(TR::InstOpCode::_sub, TR::InstOpCode::_sltiu, 1, node, false, cg);
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::icmpneEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::icmpneEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    /*
     * We cannot use icmpHelper() because that one generates
@@ -339,56 +339,56 @@ OMR::ARM64::TreeEvaluator::icmpneEvaluator(TR::Node *node, TR::CodeGenerator *cg
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::icmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::icmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return icmpHelper(TR::InstOpCode::_slt, TR::InstOpCode::bad, 0, node, false, cg);
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::icmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::icmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return icmpHelper(TR::InstOpCode::_slt, TR::InstOpCode::_sltiu, 1, node, true, cg);
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::icmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::icmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return icmpHelper(TR::InstOpCode::_slt, TR::InstOpCode::_xori, 1, node, false, cg);
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::icmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::icmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return icmpHelper(TR::InstOpCode::_slt, TR::InstOpCode::bad, 0, node, true, cg);
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::iucmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::iucmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return icmpHelper(TR::InstOpCode::_sltu, TR::InstOpCode::bad, 0, node, false, cg);
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::iucmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::iucmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return icmpHelper(TR::InstOpCode::_sltu, TR::InstOpCode::_xori, 1, node, true, cg);
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::iucmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::iucmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return icmpHelper(TR::InstOpCode::_sltu, TR::InstOpCode::_xori, 1, node, false, cg);
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::iucmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::iucmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return icmpHelper(TR::InstOpCode::_sltu, TR::InstOpCode::bad, 0, node, true, cg);
    }
 
 // also handles lucmpeq
 TR::Register *
-OMR::ARM64::TreeEvaluator::lcmpeqEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::lcmpeqEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    TR_ASSERT(TR::Compiler->target.is64Bit(), "RV32 not yet supported");
    return icmpeqEvaluator(node, cg);
@@ -396,70 +396,70 @@ OMR::ARM64::TreeEvaluator::lcmpeqEvaluator(TR::Node *node, TR::CodeGenerator *cg
 
 // also handles lucmpne
 TR::Register *
-OMR::ARM64::TreeEvaluator::lcmpneEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::lcmpneEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    TR_ASSERT(TR::Compiler->target.is64Bit(), "RV32 not yet supported");
    return icmpneEvaluator(node, cg);
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::lcmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::lcmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    TR_ASSERT(TR::Compiler->target.is64Bit(), "RV32 not yet supported");
    return icmpltEvaluator(node, cg);
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::lcmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::lcmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    TR_ASSERT(TR::Compiler->target.is64Bit(), "RV32 not yet supported");
    return icmpgeEvaluator(node, cg);
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::lcmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::lcmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    TR_ASSERT(TR::Compiler->target.is64Bit(), "RV32 not yet supported");
    return icmpgtEvaluator(node, cg);
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::lcmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::lcmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    TR_ASSERT(TR::Compiler->target.is64Bit(), "RV32 not yet supported");
    return icmpleEvaluator(node, cg);
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::lucmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::lucmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    TR_ASSERT(TR::Compiler->target.is64Bit(), "RV32 not yet supported");
    return iucmpltEvaluator(node, cg);
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::lucmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::lucmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    TR_ASSERT(TR::Compiler->target.is64Bit(), "RV32 not yet supported");
    return iucmpgeEvaluator(node, cg);
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::lucmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::lucmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    TR_ASSERT(TR::Compiler->target.is64Bit(), "RV32 not yet supported");
    return iucmpgtEvaluator(node, cg);
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::lucmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::lucmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    TR_ASSERT(TR::Compiler->target.is64Bit(), "RV32 not yet supported");
    return iucmpleEvaluator(node, cg);
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::lcmpEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::lcmpEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    TR::Node *firstChild = node->getFirstChild();
    TR::Node *secondChild = node->getSecondChild();
@@ -495,78 +495,78 @@ OMR::ARM64::TreeEvaluator::lcmpEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    }
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::acmpeqEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::acmpeqEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	// TODO:ARM64: Enable TR::TreeEvaluator::acmpeqEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::ARM64::TreeEvaluator::unImpOpEvaluator(node, cg);
+	// TODO:RV: Enable TR::TreeEvaluator::acmpeqEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
+	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
 	}
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::lookupEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::lookupEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	// TODO:ARM64: Enable TR::TreeEvaluator::lookupEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::ARM64::TreeEvaluator::unImpOpEvaluator(node, cg);
+	// TODO:RV: Enable TR::TreeEvaluator::lookupEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
+	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
 	}
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::tableEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::tableEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	// TODO:ARM64: Enable TR::TreeEvaluator::tableEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::ARM64::TreeEvaluator::unImpOpEvaluator(node, cg);
+	// TODO:RV: Enable TR::TreeEvaluator::tableEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
+	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
 	}
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::NULLCHKEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::NULLCHKEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	// TODO:ARM64: Enable TR::TreeEvaluator::NULLCHKEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::ARM64::TreeEvaluator::unImpOpEvaluator(node, cg);
+	// TODO:RV: Enable TR::TreeEvaluator::NULLCHKEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
+	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
 	}
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::ZEROCHKEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::ZEROCHKEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	// TODO:ARM64: Enable TR::TreeEvaluator::ZEROCHKEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::ARM64::TreeEvaluator::unImpOpEvaluator(node, cg);
+	// TODO:RV: Enable TR::TreeEvaluator::ZEROCHKEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
+	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
 	}
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::ResolveAndNULLCHKEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::ResolveAndNULLCHKEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	// TODO:ARM64: Enable TR::TreeEvaluator::ResolveAndNULLCHKEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::ARM64::TreeEvaluator::unImpOpEvaluator(node, cg);
+	// TODO:RV: Enable TR::TreeEvaluator::ResolveAndNULLCHKEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
+	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
 	}
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::DIVCHKEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::DIVCHKEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	// TODO:ARM64: Enable TR::TreeEvaluator::DIVCHKEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::ARM64::TreeEvaluator::unImpOpEvaluator(node, cg);
+	// TODO:RV: Enable TR::TreeEvaluator::DIVCHKEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
+	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
 	}
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::BNDCHKEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::BNDCHKEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	// TODO:ARM64: Enable TR::TreeEvaluator::BNDCHKEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::ARM64::TreeEvaluator::unImpOpEvaluator(node, cg);
+	// TODO:RV: Enable TR::TreeEvaluator::BNDCHKEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
+	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
 	}
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::ArrayCopyBNDCHKEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::ArrayCopyBNDCHKEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	// TODO:ARM64: Enable TR::TreeEvaluator::ArrayCopyBNDCHKEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::ARM64::TreeEvaluator::unImpOpEvaluator(node, cg);
+	// TODO:RV: Enable TR::TreeEvaluator::ArrayCopyBNDCHKEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
+	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
 	}
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::ArrayStoreCHKEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::ArrayStoreCHKEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	// TODO:ARM64: Enable TR::TreeEvaluator::ArrayStoreCHKEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::ARM64::TreeEvaluator::unImpOpEvaluator(node, cg);
+	// TODO:RV: Enable TR::TreeEvaluator::ArrayStoreCHKEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
+	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
 	}
 
 TR::Register *
-OMR::ARM64::TreeEvaluator::ArrayCHKEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::RV::TreeEvaluator::ArrayCHKEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	// TODO:ARM64: Enable TR::TreeEvaluator::ArrayCHKEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
-	return OMR::ARM64::TreeEvaluator::unImpOpEvaluator(node, cg);
+	// TODO:RV: Enable TR::TreeEvaluator::ArrayCHKEvaluator in compiler/aarch64/codegen/TreeEvaluatorTable.hpp when Implemented.
+	return OMR::RV::TreeEvaluator::unImpOpEvaluator(node, cg);
 	}

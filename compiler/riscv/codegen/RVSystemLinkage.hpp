@@ -19,8 +19,8 @@
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
 
-#ifndef OMR_ARM64_SYSTEMLINKAGE_INCL
-#define OMR_ARM64_SYSTEMLINKAGE_INCL
+#ifndef OMR_RV_SYSTEMLINKAGE_INCL
+#define OMR_RV_SYSTEMLINKAGE_INCL
 
 #include "codegen/Linkage.hpp"
 
@@ -38,11 +38,11 @@ template <class T> class List;
 
 namespace TR {
 
-class ARM64SystemLinkage : public TR::Linkage
+class RVSystemLinkage : public TR::Linkage
    {
    protected:
 
-   TR::ARM64LinkageProperties _properties;
+   TR::RVLinkageProperties _properties;
 
    public:
 
@@ -50,13 +50,13 @@ class ARM64SystemLinkage : public TR::Linkage
     * @brief Constructor
     * @param[in] cg : CodeGenerator
     */
-   ARM64SystemLinkage(TR::CodeGenerator *cg);
+   RVSystemLinkage(TR::CodeGenerator *cg);
 
    /**
     * @brief Gets linkage properties
     * @return Linkage properties
     */
-   virtual const TR::ARM64LinkageProperties& getProperties();
+   virtual const TR::RVLinkageProperties& getProperties();
 
    /**
     * @brief Gets the RightToLeft flag
@@ -75,9 +75,9 @@ class ARM64SystemLinkage : public TR::Linkage
     */
    virtual void mapSingleAutomatic(TR::AutomaticSymbol *p, uint32_t &stackIndex);
    /**
-    * @brief Initializes ARM64 RealRegister linkage
+    * @brief Initializes RV RealRegister linkage
     */
-   virtual void initARM64RealRegisterLinkage();
+   virtual void initRVRealRegisterLinkage();
 
    /**
     * @brief Creates method prologue

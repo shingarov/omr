@@ -19,18 +19,18 @@
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
 
-#ifndef OMR_ARM64_INSTRUCTION_INCL
-#define OMR_ARM64_INSTRUCTION_INCL
+#ifndef OMR_RV_INSTRUCTION_INCL
+#define OMR_RV_INSTRUCTION_INCL
 
 /*
  * The following #define and typedef must appear before any #includes in this file
  */
 #ifndef OMR_INSTRUCTION_CONNECTOR
 #define OMR_INSTRUCTION_CONNECTOR
-namespace OMR { namespace ARM64 { class Instruction; } }
-namespace OMR { typedef OMR::ARM64::Instruction InstructionConnector; }
+namespace OMR { namespace RV { class Instruction; } }
+namespace OMR { typedef OMR::RV::Instruction InstructionConnector; }
 #else
-#error OMR::ARM64::Instruction expected to be a primary connector, but an OMR connector is already defined
+#error OMR::RV::Instruction expected to be a primary connector, but an OMR connector is already defined
 #endif
 
 #include "compiler/codegen/OMRInstruction.hpp"
@@ -48,7 +48,7 @@ namespace TR { class RegisterDependencyConditions; }
 namespace OMR
 {
 
-namespace ARM64
+namespace RV
 {
 
 class OMR_EXTENSIBLE Instruction : public OMR::Instruction
@@ -93,7 +93,7 @@ class OMR_EXTENSIBLE Instruction : public OMR::Instruction
     * @brief Instruction description string
     * @return description string
     */
-   virtual char *description() { return "ARM64"; }
+   virtual char *description() { return "RV"; }
    /**
     * @brief Gets instruction kind
     * @return instruction kind
@@ -181,7 +181,7 @@ class OMR_EXTENSIBLE Instruction : public OMR::Instruction
     * @param[in] cg : CodeGenerator
     * @param[in] mask : GCMap mask
     */
-   void ARM64NeedsGCMap(TR::CodeGenerator *cg, uint32_t mask);
+   void RVNeedsGCMap(TR::CodeGenerator *cg, uint32_t mask);
 
    /**
     * @brief Gets the memory data register
@@ -224,7 +224,7 @@ class OMR_EXTENSIBLE Instruction : public OMR::Instruction
    virtual bool dependencyRefsRegister(TR::Register *reg);
 
    /*
-    * Maps to TIndex in Instruction. Here we set values specific to ARM64 CodeGen.
+    * Maps to TIndex in Instruction. Here we set values specific to RV CodeGen.
     *
     * A 32-bit field where the lower 24-bits contain an integer that represents an
     * approximate ordering of instructions.
@@ -254,7 +254,7 @@ class OMR_EXTENSIBLE Instruction : public OMR::Instruction
       TR::RegisterDependencyConditions *_conditions;
    };
 
-} // ARM64
+} // RV
 
 } // OMR
 

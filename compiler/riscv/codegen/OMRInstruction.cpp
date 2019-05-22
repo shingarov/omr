@@ -30,7 +30,7 @@
 
 namespace TR { class Register; }
 
-OMR::ARM64::Instruction::Instruction(TR::CodeGenerator *cg, TR::InstOpCode::Mnemonic op, TR::Node *node)
+OMR::RV::Instruction::Instruction(TR::CodeGenerator *cg, TR::InstOpCode::Mnemonic op, TR::Node *node)
    : OMR::Instruction(cg, op, node),
      _conditions(NULL)
    {
@@ -38,7 +38,7 @@ OMR::ARM64::Instruction::Instruction(TR::CodeGenerator *cg, TR::InstOpCode::Mnem
    }
 
 
-OMR::ARM64::Instruction::Instruction(TR::CodeGenerator *cg, TR::Instruction *precedingInstruction, TR::InstOpCode::Mnemonic op, TR::Node *node)
+OMR::RV::Instruction::Instruction(TR::CodeGenerator *cg, TR::Instruction *precedingInstruction, TR::InstOpCode::Mnemonic op, TR::Node *node)
    : OMR::Instruction(cg, precedingInstruction, op, node),
      _conditions(NULL)
    {
@@ -46,7 +46,7 @@ OMR::ARM64::Instruction::Instruction(TR::CodeGenerator *cg, TR::Instruction *pre
    }
 
 
-OMR::ARM64::Instruction::Instruction(TR::CodeGenerator *cg, TR::InstOpCode::Mnemonic op, TR::RegisterDependencyConditions *cond, TR::Node *node)
+OMR::RV::Instruction::Instruction(TR::CodeGenerator *cg, TR::InstOpCode::Mnemonic op, TR::RegisterDependencyConditions *cond, TR::Node *node)
    : OMR::Instruction(cg, op, node),
      _conditions(cond)
    {
@@ -56,7 +56,7 @@ OMR::ARM64::Instruction::Instruction(TR::CodeGenerator *cg, TR::InstOpCode::Mnem
    }
 
 
-OMR::ARM64::Instruction::Instruction(TR::CodeGenerator *cg, TR::Instruction *precedingInstruction, TR::InstOpCode::Mnemonic op, TR::RegisterDependencyConditions *cond, TR::Node *node)
+OMR::RV::Instruction::Instruction(TR::CodeGenerator *cg, TR::Instruction *precedingInstruction, TR::InstOpCode::Mnemonic op, TR::RegisterDependencyConditions *cond, TR::Node *node)
    : OMR::Instruction(cg, precedingInstruction, op, node),
      _conditions(cond)
    {
@@ -67,14 +67,14 @@ OMR::ARM64::Instruction::Instruction(TR::CodeGenerator *cg, TR::Instruction *pre
 
 
 void
-OMR::ARM64::Instruction::remove()
+OMR::RV::Instruction::remove()
    {
    self()->getPrev()->setNext(self()->getNext());
    self()->getNext()->setPrev(self()->getPrev());
    }
 
 
-void OMR::ARM64::Instruction::ARM64NeedsGCMap(TR::CodeGenerator *cg, uint32_t mask)
+void OMR::RV::Instruction::RVNeedsGCMap(TR::CodeGenerator *cg, uint32_t mask)
    {
    if (cg->comp()->useRegisterMaps())
       self()->setNeedsGCMap(mask);
@@ -82,48 +82,48 @@ void OMR::ARM64::Instruction::ARM64NeedsGCMap(TR::CodeGenerator *cg, uint32_t ma
 
 
 TR::Register *
-OMR::ARM64::Instruction::getMemoryDataRegister()
+OMR::RV::Instruction::getMemoryDataRegister()
    {
    return NULL;
    }
 
 
 bool
-OMR::ARM64::Instruction::refsRegister(TR::Register * reg)
+OMR::RV::Instruction::refsRegister(TR::Register * reg)
    {
-   TR::RegisterDependencyConditions *cond = OMR::ARM64::Instruction::getDependencyConditions();
+   TR::RegisterDependencyConditions *cond = OMR::RV::Instruction::getDependencyConditions();
    return cond && cond->refsRegister(reg);
    }
 
 
 bool
-OMR::ARM64::Instruction::defsRegister(TR::Register * reg)
+OMR::RV::Instruction::defsRegister(TR::Register * reg)
    {
-   TR::RegisterDependencyConditions *cond = OMR::ARM64::Instruction::getDependencyConditions();
+   TR::RegisterDependencyConditions *cond = OMR::RV::Instruction::getDependencyConditions();
    return cond && cond->defsRegister(reg);
    }
 
 
 bool
-OMR::ARM64::Instruction::usesRegister(TR::Register * reg)
+OMR::RV::Instruction::usesRegister(TR::Register * reg)
    {
-   TR::RegisterDependencyConditions *cond = OMR::ARM64::Instruction::getDependencyConditions();
+   TR::RegisterDependencyConditions *cond = OMR::RV::Instruction::getDependencyConditions();
    return cond && cond->usesRegister(reg);
    }
 
 
 bool
-OMR::ARM64::Instruction::dependencyRefsRegister(TR::Register * reg)
+OMR::RV::Instruction::dependencyRefsRegister(TR::Register * reg)
    {
-   TR::RegisterDependencyConditions *cond = OMR::ARM64::Instruction::getDependencyConditions();
+   TR::RegisterDependencyConditions *cond = OMR::RV::Instruction::getDependencyConditions();
    return cond && cond->refsRegister(reg);
    }
 
 
 void
-OMR::ARM64::Instruction::assignRegisters(TR_RegisterKinds kindToBeAssigned)
+OMR::RV::Instruction::assignRegisters(TR_RegisterKinds kindToBeAssigned)
    {
-   TR::RegisterDependencyConditions *cond = OMR::ARM64::Instruction::getDependencyConditions();
+   TR::RegisterDependencyConditions *cond = OMR::RV::Instruction::getDependencyConditions();
    if (cond)
       {
       cond->assignPostConditionRegisters(self(), kindToBeAssigned, self()->cg());
@@ -131,13 +131,13 @@ OMR::ARM64::Instruction::assignRegisters(TR_RegisterKinds kindToBeAssigned)
       }
    }
 
-uint8_t *OMR::ARM64::Instruction::generateBinaryEncoding()
+uint8_t *OMR::RV::Instruction::generateBinaryEncoding()
    {
    TR_ASSERT(false, "generateBinaryEncoding() must be overloaded in subclasses");
    return NULL;
    }
 
-int32_t OMR::ARM64::Instruction::estimateBinaryLength(int32_t currentEstimate)
+int32_t OMR::RV::Instruction::estimateBinaryLength(int32_t currentEstimate)
    {
    setEstimatedBinaryLength(RISCV_INSTRUCTION_LENGTH);
    return currentEstimate + self()->getEstimatedBinaryLength();

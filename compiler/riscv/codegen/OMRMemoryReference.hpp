@@ -19,18 +19,18 @@
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
 
-#ifndef OMR_ARM64_MEMORY_REFERENCE_INCL
-#define OMR_ARM64_MEMORY_REFERENCE_INCL
+#ifndef OMR_RV_MEMORY_REFERENCE_INCL
+#define OMR_RV_MEMORY_REFERENCE_INCL
 
 /*
  * The following #define and typedef must appear before any #includes in this file
  */
 #ifndef OMR_MEMREF_CONNECTOR
 #define OMR_MEMREF_CONNECTOR
-namespace OMR { namespace ARM64 { class MemoryReference; } }
-namespace OMR { typedef OMR::ARM64::MemoryReference MemoryReferenceConnector; }
+namespace OMR { namespace RV { class MemoryReference; } }
+namespace OMR { typedef OMR::RV::MemoryReference MemoryReferenceConnector; }
 #else
-#error OMR::ARM64::MemoryReference expected to be a primary connector, but a OMR connector is already defined
+#error OMR::RV::MemoryReference expected to be a primary connector, but a OMR connector is already defined
 #endif
 
 #include "compiler/codegen/OMRMemoryReference.hpp"
@@ -50,7 +50,7 @@ namespace TR { class UnresolvedDataSnippet; }
 namespace OMR
 {
 
-namespace ARM64
+namespace RV
 {
 
 class OMR_EXTENSIBLE MemoryReference : public OMR::MemoryReference
@@ -72,9 +72,9 @@ class OMR_EXTENSIBLE MemoryReference : public OMR::MemoryReference
 
    typedef enum
       {
-      TR_ARM64MemoryReferenceControl_Base_Modifiable  = 0x01,
+      TR_RVMemoryReferenceControl_Base_Modifiable  = 0x01,
       /* To be added more if necessary */
-      } TR_ARM64MemoryReferenceControl;
+      } TR_RVMemoryReferenceControl;
 
    /**
     * @brief Constructor
@@ -242,16 +242,16 @@ class OMR_EXTENSIBLE MemoryReference : public OMR::MemoryReference
     */
    bool isBaseModifiable()
       {
-      return ((_flag & TR_ARM64MemoryReferenceControl_Base_Modifiable) != 0);
+      return ((_flag & TR_RVMemoryReferenceControl_Base_Modifiable) != 0);
       }
    /**
     * @brief Sets the BaseModifiable flag
     */
-   void setBaseModifiable() {_flag |= TR_ARM64MemoryReferenceControl_Base_Modifiable;}
+   void setBaseModifiable() {_flag |= TR_RVMemoryReferenceControl_Base_Modifiable;}
    /**
     * @brief Clears the BaseModifiable flag
     */
-   void clearBaseModifiable() {_flag &= ~TR_ARM64MemoryReferenceControl_Base_Modifiable;}
+   void clearBaseModifiable() {_flag &= ~TR_RVMemoryReferenceControl_Base_Modifiable;}
 
    /**
     * @brief Gets the unresolved data snippet
@@ -325,7 +325,7 @@ class OMR_EXTENSIBLE MemoryReference : public OMR::MemoryReference
 
    };
 
-} // ARM64
+} // RV
 } // OMR
 
 #endif

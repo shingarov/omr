@@ -19,18 +19,18 @@
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
 
-#ifndef OMR_ARM64_CODEGENERATOR_INCL
-#define OMR_ARM64_CODEGENERATOR_INCL
+#ifndef OMR_RV_CODEGENERATOR_INCL
+#define OMR_RV_CODEGENERATOR_INCL
 
 /*
  * The following #define and typedef must appear before any #includes in this file
  */
 #ifndef OMR_CODEGENERATOR_CONNECTOR
 #define OMR_CODEGENERATOR_CONNECTOR
-namespace OMR { namespace ARM64 { class CodeGenerator; } }
-namespace OMR { typedef OMR::ARM64::CodeGenerator CodeGeneratorConnector; }
+namespace OMR { namespace RV { class CodeGenerator; } }
+namespace OMR { typedef OMR::RV::CodeGenerator CodeGeneratorConnector; }
 #else
-#error OMR::ARM64::CodeGenerator expected to be a primary connector, but an OMR connector is already defined
+#error OMR::RV::CodeGenerator expected to be a primary connector, but an OMR connector is already defined
 #endif
 
 #include "compiler/codegen/OMRCodeGenerator.hpp"
@@ -38,8 +38,8 @@ namespace OMR { typedef OMR::ARM64::CodeGenerator CodeGeneratorConnector; }
 #include "codegen/RegisterConstants.hpp"
 #include "infra/Annotations.hpp"
 
-class TR_ARM64OutOfLineCodeSection;
-namespace TR { class ARM64LinkageProperties; }
+class TR_RVOutOfLineCodeSection;
+namespace TR { class RVLinkageProperties; }
 namespace TR { class ConstantDataSnippet; }
 
 /**
@@ -64,7 +64,7 @@ extern TR::Instruction *loadConstant64(TR::CodeGenerator *cg, TR::Node *node, in
 namespace OMR
 {
 
-namespace ARM64
+namespace RV
 {
 
 class OMR_EXTENSIBLE CodeGenerator : public OMR::CodeGenerator
@@ -148,7 +148,7 @@ class OMR_EXTENSIBLE CodeGenerator : public OMR::CodeGenerator
     * @brief Returns the linkage properties
     * @return Linkage properties
     */
-   const TR::ARM64LinkageProperties &getProperties() { return *_linkageProperties; }
+   const TR::RVLinkageProperties &getProperties() { return *_linkageProperties; }
 
    /**
     * @brief Returns the stack pointer register
@@ -319,12 +319,12 @@ class OMR_EXTENSIBLE CodeGenerator : public OMR::CodeGenerator
    TR::RealRegister *_methodMetaDataRegister;
    TR::Instruction *_returnTypeInfoInstruction;
    TR::ConstantDataSnippet *_constantData;
-   const TR::ARM64LinkageProperties *_linkageProperties;
-   TR::list<TR_ARM64OutOfLineCodeSection*> _outOfLineCodeSectionList;
+   const TR::RVLinkageProperties *_linkageProperties;
+   TR::list<TR_RVOutOfLineCodeSection*> _outOfLineCodeSectionList;
 
    };
 
-} // ARM64
+} // RV
 
 } // TR
 

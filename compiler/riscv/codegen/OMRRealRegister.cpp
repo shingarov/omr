@@ -21,7 +21,7 @@
 
 #include "codegen/RealRegister.hpp"
 
-const uint8_t OMR::ARM64::RealRegister::fullRegBinaryEncodings[TR::RealRegister::NumRegisters] =
+const uint8_t OMR::RV::RealRegister::fullRegBinaryEncodings[TR::RealRegister::NumRegisters] =
    {
       0x00, // NoReg
 #define DECLARE_GPR(regname, abiname, encoding) encoding,

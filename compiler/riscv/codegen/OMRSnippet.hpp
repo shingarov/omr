@@ -19,18 +19,18 @@
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
 
-#ifndef OMR_ARM64_SNIPPET_INCL
-#define OMR_ARM64_SNIPPET_INCL
+#ifndef OMR_RV_SNIPPET_INCL
+#define OMR_RV_SNIPPET_INCL
 
 /*
  * The following #define and typedef must appear before any #includes in this file
  */
 #ifndef OMR_SNIPPET_CONNECTOR
 #define OMR_SNIPPET_CONNECTOR
-namespace OMR { namespace ARM64 { class Snippet; } }
-namespace OMR { typedef OMR::ARM64::Snippet SnippetConnector; }
+namespace OMR { namespace RV { class Snippet; } }
+namespace OMR { typedef OMR::RV::Snippet SnippetConnector; }
 #else
-#error OMR::ARM64::Snippet expected to be a primary connector, but an OMR connector is already defined
+#error OMR::RV::Snippet expected to be a primary connector, but an OMR connector is already defined
 #endif
 
 #include "compiler/codegen/OMRSnippet.hpp"
@@ -42,7 +42,7 @@ namespace TR { class Node; }
 namespace OMR
 {
 
-namespace ARM64
+namespace RV
 {
 
 class OMR_EXTENSIBLE Snippet : public OMR::Snippet
@@ -86,7 +86,7 @@ class OMR_EXTENSIBLE Snippet : public OMR::Snippet
    virtual Kind getKind() { return IsUnknown; }
    };
 
-} // ARM64
+} // RV
 } // OMR
 
 #endif

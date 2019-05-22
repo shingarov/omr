@@ -91,6 +91,6 @@ class OMR_EXTENSIBLE Instruction : public OMR::InstructionConnector
  * @param[in] i : instruction cursor
  * @return instruction cursor
  */
-inline uint32_t *toARM64Cursor(uint8_t *i) { return (uint32_t *)i; }
+inline uint32_t *toRVCursor(uint8_t *i) { return (uint32_t *)i; }
 
 #endif

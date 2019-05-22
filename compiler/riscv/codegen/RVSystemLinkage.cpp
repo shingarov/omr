@@ -58,20 +58,20 @@
       { block; }                                                                 \
    )
 
-TR::ARM64SystemLinkage::ARM64SystemLinkage(TR::CodeGenerator *cg)
+TR::RVSystemLinkage::RVSystemLinkage(TR::CodeGenerator *cg)
    : TR::Linkage(cg)
    {
    int i;
 
    _properties._properties = IntegersInRegisters|FloatsInRegisters|RightToLeft;
 
-   _properties._registerFlags[TR::RealRegister::zero] = Preserved|ARM64_Reserved; // zero
-   _properties._registerFlags[TR::RealRegister::ra]   = Preserved|ARM64_Reserved; // return address
-   _properties._registerFlags[TR::RealRegister::sp]   = Preserved|ARM64_Reserved; // sp
-   _properties._registerFlags[TR::RealRegister::gp]   = Preserved|ARM64_Reserved; // gp
-   _properties._registerFlags[TR::RealRegister::tp]   = Preserved|ARM64_Reserved; // tp
+   _properties._registerFlags[TR::RealRegister::zero] = Preserved|RV_Reserved; // zero
+   _properties._registerFlags[TR::RealRegister::ra]   = Preserved|RV_Reserved; // return address
+   _properties._registerFlags[TR::RealRegister::sp]   = Preserved|RV_Reserved; // sp
+   _properties._registerFlags[TR::RealRegister::gp]   = Preserved|RV_Reserved; // gp
+   _properties._registerFlags[TR::RealRegister::tp]   = Preserved|RV_Reserved; // tp
 
-   _properties._registerFlags[TR::RealRegister::t0]   = Preserved|ARM64_Reserved; // fp
+   _properties._registerFlags[TR::RealRegister::t0]   = Preserved|RV_Reserved; // fp
    _properties._registerFlags[TR::RealRegister::t1]   = 0;
    _properties._registerFlags[TR::RealRegister::t2]   = 0;
 
@@ -185,15 +185,15 @@ TR::ARM64SystemLinkage::ARM64SystemLinkage(TR::CodeGenerator *cg)
    }
 
 
-const TR::ARM64LinkageProperties&
-TR::ARM64SystemLinkage::getProperties()
+const TR::RVLinkageProperties&
+TR::RVSystemLinkage::getProperties()
    {
    return _properties;
    }
 
 
 void
-TR::ARM64SystemLinkage::initARM64RealRegisterLinkage()
+TR::RVSystemLinkage::initRVRealRegisterLinkage()
    {
    TR::Machine *machine = cg()->machine();
    TR::RealRegister *reg;
@@ -232,7 +232,7 @@ TR::ARM64SystemLinkage::initARM64RealRegisterLinkage()
    }
 
 uint32_t
-TR::ARM64SystemLinkage::getRightToLeft()
+TR::RVSystemLinkage::getRightToLeft()
    {
    return getProperties().getRightToLeft();
    }
@@ -258,7 +258,7 @@ static void mapSingleParameter(TR::ParameterSymbol *parameter, uint32_t &stackIn
 
 
 void
-TR::ARM64SystemLinkage::mapStack(TR::ResolvedMethodSymbol *method)
+TR::RVSystemLinkage::mapStack(TR::ResolvedMethodSymbol *method)
    {
    TR::Machine *machine = cg()->machine();
    uint32_t stackIndex = 0;
@@ -401,7 +401,7 @@ TR::ARM64SystemLinkage::mapStack(TR::ResolvedMethodSymbol *method)
 
 
 void
-TR::ARM64SystemLinkage::mapSingleAutomatic(TR::AutomaticSymbol *p, uint32_t &stackIndex)
+TR::RVSystemLinkage::mapSingleAutomatic(TR::AutomaticSymbol *p, uint32_t &stackIndex)
    {
    int32_t roundedSize = (p->getSize() + 3) & (~3);
    if (roundedSize == 0)
@@ -412,19 +412,19 @@ TR::ARM64SystemLinkage::mapSingleAutomatic(TR::AutomaticSymbol *p, uint32_t &sta
 
 
 void
-TR::ARM64SystemLinkage::createPrologue(TR::Instruction *cursor)
+TR::RVSystemLinkage::createPrologue(TR::Instruction *cursor)
    {
    createPrologue(cursor, comp()->getJittedMethodSymbol()->getParameterList());
    }
 
 
 void
-TR::ARM64SystemLinkage::createPrologue(TR::Instruction *cursor, List<TR::ParameterSymbol> &parmList)
+TR::RVSystemLinkage::createPrologue(TR::Instruction *cursor, List<TR::ParameterSymbol> &parmList)
    {
    TR::CodeGenerator *codeGen = cg();
    TR::Machine *machine = codeGen->machine();
    TR::ResolvedMethodSymbol *bodySymbol = comp()->getJittedMethodSymbol();
-   const TR::ARM64LinkageProperties& properties = getProperties();
+   const TR::RVLinkageProperties& properties = getProperties();
    TR::RealRegister *sp = machine->getRealRegister(properties.getStackPointerRegister());
    TR::RealRegister *ra = machine->getRealRegister(TR::RealRegister::ra);
    TR::Node *firstNode = comp()->getStartTree()->getNode();
@@ -507,10 +507,10 @@ TR::ARM64SystemLinkage::createPrologue(TR::Instruction *cursor, List<TR::Paramet
 
 
 void
-TR::ARM64SystemLinkage::createEpilogue(TR::Instruction *cursor)
+TR::RVSystemLinkage::createEpilogue(TR::Instruction *cursor)
    {
    TR::CodeGenerator *codeGen = cg();
-   const TR::ARM64LinkageProperties& properties = getProperties();
+   const TR::RVLinkageProperties& properties = getProperties();
    TR::Machine *machine = codeGen->machine();
    TR::Node *lastNode = cursor->getNode();
    TR::ResolvedMethodSymbol *bodySymbol = comp()->getJittedMethodSymbol();
@@ -548,12 +548,12 @@ TR::ARM64SystemLinkage::createEpilogue(TR::Instruction *cursor)
    }
 
 
-int32_t TR::ARM64SystemLinkage::buildArgs(TR::Node *callNode,
+int32_t TR::RVSystemLinkage::buildArgs(TR::Node *callNode,
                                        TR::RegisterDependencyConditions *dependencies)
 
    {
-   const TR::ARM64LinkageProperties &properties = getProperties();
-   TR::ARM64MemoryArgument *pushToMemory = NULL;
+   const TR::RVLinkageProperties &properties = getProperties();
+   TR::RVMemoryArgument *pushToMemory = NULL;
    TR::Register *argMemReg;
    TR::Register *tempReg;
    int32_t argIndex = 0;
@@ -605,7 +605,7 @@ int32_t TR::ARM64SystemLinkage::buildArgs(TR::Node *callNode,
    /* End result of Step 1 - determined number of memory arguments! */
    if (numMemArgs > 0)
       {
-      pushToMemory = new (trStackMemory()) TR::ARM64MemoryArgument[numMemArgs];
+      pushToMemory = new (trStackMemory()) TR::RVMemoryArgument[numMemArgs];
 
       argMemReg = cg()->allocateRegister();
       }
@@ -782,11 +782,11 @@ int32_t TR::ARM64SystemLinkage::buildArgs(TR::Node *callNode,
    }
 
 
-TR::Register *TR::ARM64SystemLinkage::buildDirectDispatch(TR::Node *callNode)
+TR::Register *TR::RVSystemLinkage::buildDirectDispatch(TR::Node *callNode)
    {
    TR::SymbolReference *callSymRef = callNode->getSymbolReference();
 
-   const TR::ARM64LinkageProperties &pp = getProperties();
+   const TR::RVLinkageProperties &pp = getProperties();
    TR::RealRegister *sp = cg()->machine()->getRealRegister(pp.getStackPointerRegister());
    TR::RealRegister *ra = cg()->machine()->getRealRegister(TR::RealRegister::ra);
 
@@ -859,7 +859,7 @@ TR::Register *TR::ARM64SystemLinkage::buildDirectDispatch(TR::Node *callNode)
    }
 
 
-TR::Register *TR::ARM64SystemLinkage::buildIndirectDispatch(TR::Node *callNode)
+TR::Register *TR::RVSystemLinkage::buildIndirectDispatch(TR::Node *callNode)
    {
    TR_ASSERT(false, "Not implemented yet.");
 

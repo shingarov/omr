@@ -19,18 +19,18 @@
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
 
-#ifndef OMR_ARM64_ENVIRONMENT_INCL
-#define OMR_ARM64_ENVIRONMENT_INCL
+#ifndef OMR_RV_ENVIRONMENT_INCL
+#define OMR_RV_ENVIRONMENT_INCL
 
 /*
  * The following #define and typedef must appear before any #includes in this file
  */
 #ifndef OMR_ENVIRONMENT_CONNECTOR
 #define OMR_ENVIRONMENT_CONNECTOR
-namespace OMR { namespace ARM64 { class Environment; } }
-namespace OMR { typedef OMR::ARM64::Environment EnvironmentConnector; }
+namespace OMR { namespace RV { class Environment; } }
+namespace OMR { typedef OMR::RV::Environment EnvironmentConnector; }
 #else
-#error OMR::ARM64::Environment expected to be a primary connector, but an OMR connector is already defined
+#error OMR::RV::Environment expected to be a primary connector, but an OMR connector is already defined
 #endif
 
 #include "compiler/env/OMREnvironment.hpp"
@@ -39,7 +39,7 @@ namespace OMR { typedef OMR::ARM64::Environment EnvironmentConnector; }
 namespace OMR
 {
 
-namespace ARM64
+namespace RV
 {
 
 class Environment : public OMR::Environment
@@ -59,4 +59,4 @@ public:
 }
 
 }
-#endif //OMR_ARM64_ENVIRONMENT_INCL
+#endif //OMR_RV_ENVIRONMENT_INCL

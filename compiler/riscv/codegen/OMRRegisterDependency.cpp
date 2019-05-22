@@ -33,7 +33,7 @@
 // Replace this by #include "codegen/Instruction.hpp" when available for aarch64
 namespace TR { class Instruction; }
 
-OMR::ARM64::RegisterDependencyConditions::RegisterDependencyConditions(
+OMR::RV::RegisterDependencyConditions::RegisterDependencyConditions(
                                        TR::CodeGenerator *cg,
                                        TR::Node          *node,
                                        uint32_t          extranum,
@@ -42,12 +42,12 @@ OMR::ARM64::RegisterDependencyConditions::RegisterDependencyConditions(
    TR_ASSERT(false, "Not implemented yet.");
    }
 
-void OMR::ARM64::RegisterDependencyConditions::unionNoRegPostCondition(TR::Register *reg, TR::CodeGenerator *cg)
+void OMR::RV::RegisterDependencyConditions::unionNoRegPostCondition(TR::Register *reg, TR::CodeGenerator *cg)
    {
    addPostCondition(reg, TR::RealRegister::NoReg);
    }
 
-bool OMR::ARM64::RegisterDependencyConditions::refsRegister(TR::Register *r)
+bool OMR::RV::RegisterDependencyConditions::refsRegister(TR::Register *r)
    {
    for (uint16_t i = 0; i < _addCursorForPre; i++)
       {
@@ -68,7 +68,7 @@ bool OMR::ARM64::RegisterDependencyConditions::refsRegister(TR::Register *r)
    return false;
    }
 
-bool OMR::ARM64::RegisterDependencyConditions::defsRegister(TR::Register *r)
+bool OMR::RV::RegisterDependencyConditions::defsRegister(TR::Register *r)
    {
    for (uint16_t i = 0; i < _addCursorForPre; i++)
       {
@@ -89,7 +89,7 @@ bool OMR::ARM64::RegisterDependencyConditions::defsRegister(TR::Register *r)
    return false;
    }
 
-bool OMR::ARM64::RegisterDependencyConditions::defsRealRegister(TR::Register *r)
+bool OMR::RV::RegisterDependencyConditions::defsRealRegister(TR::Register *r)
    {
    for (uint16_t i = 0; i < _addCursorForPre; i++)
       {
@@ -110,7 +110,7 @@ bool OMR::ARM64::RegisterDependencyConditions::defsRealRegister(TR::Register *r)
    return false;
    }
 
-bool OMR::ARM64::RegisterDependencyConditions::usesRegister(TR::Register *r)
+bool OMR::RV::RegisterDependencyConditions::usesRegister(TR::Register *r)
    {
    for (uint16_t i = 0; i < _addCursorForPre; i++)
       {
@@ -131,7 +131,7 @@ bool OMR::ARM64::RegisterDependencyConditions::usesRegister(TR::Register *r)
    return false;
    }
 
-void OMR::ARM64::RegisterDependencyConditions::incRegisterTotalUseCounts(TR::CodeGenerator *cg)
+void OMR::RV::RegisterDependencyConditions::incRegisterTotalUseCounts(TR::CodeGenerator *cg)
    {
    for (int i = 0; i < _addCursorForPre; i++)
       {
@@ -144,7 +144,7 @@ void OMR::ARM64::RegisterDependencyConditions::incRegisterTotalUseCounts(TR::Cod
    }
 
 TR::RegisterDependencyConditions *
-OMR::ARM64::RegisterDependencyConditions::clone(
+OMR::RV::RegisterDependencyConditions::clone(
    TR::CodeGenerator *cg,
    TR::RegisterDependencyConditions *added)
    {
@@ -153,7 +153,7 @@ OMR::ARM64::RegisterDependencyConditions::clone(
    return NULL;
    }
 
-void TR_ARM64RegisterDependencyGroup::assignRegisters(
+void TR_RVRegisterDependencyGroup::assignRegisters(
                         TR::Instruction *currentInstruction,
                         TR_RegisterKinds kindToBeAssigned,
                         uint32_t numberOfRegisters,

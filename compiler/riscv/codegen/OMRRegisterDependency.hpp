@@ -19,18 +19,18 @@
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
 
-#ifndef OMR_ARM64_REGISTER_DEPENDENCY_INCL
-#define OMR_ARM64_REGISTER_DEPENDENCY_INCL
+#ifndef OMR_RV_REGISTER_DEPENDENCY_INCL
+#define OMR_RV_REGISTER_DEPENDENCY_INCL
 
 /*
  * The following #define and typedef must appear before any #includes in this file
  */
 #ifndef OMR_REGISTER_DEPENDENCY_CONNECTOR
 #define OMR_REGISTER_DEPENDENCY_CONNECTOR
-namespace OMR { namespace ARM64 { class RegisterDependencyConditions; } }
-namespace OMR { typedef OMR::ARM64::RegisterDependencyConditions RegisterDependencyConditionsConnector; }
+namespace OMR { namespace RV { class RegisterDependencyConditions; } }
+namespace OMR { typedef OMR::RV::RegisterDependencyConditions RegisterDependencyConditionsConnector; }
 #else
-#error OMR::ARM64::RegisterDependencyConditions expected to be a primary connector, but a OMR connector is already defined
+#error OMR::RV::RegisterDependencyConditions expected to be a primary connector, but a OMR connector is already defined
 #endif
 
 #include "compiler/codegen/OMRRegisterDependency.hpp"
@@ -48,7 +48,7 @@ namespace TR { class RegisterDependencyConditions; }
 
 #define NUM_DEFAULT_DEPENDENCIES 1
 
-class TR_ARM64RegisterDependencyGroup
+class TR_RVRegisterDependencyGroup
    {
    TR::RegisterDependency _dependencies[NUM_DEFAULT_DEPENDENCIES];
 
@@ -59,7 +59,7 @@ class TR_ARM64RegisterDependencyGroup
    /**
     * @brief Constructor
     */
-   TR_ARM64RegisterDependencyGroup() {}
+   TR_RVRegisterDependencyGroup() {}
 
    /**
     * @brief new operator
@@ -74,7 +74,7 @@ class TR_ARM64RegisterDependencyGroup
     * @param[in] numberDependencies : # of dependencies
     * @param[in] m : memory
     */
-   // Use TR_ARM64RegisterDependencyGroup::create to allocate an object of this type
+   // Use TR_RVRegisterDependencyGroup::create to allocate an object of this type
    void * operator new(size_t s, int32_t numDependencies, TR_Memory * m)
       {
       TR_ASSERT(numDependencies > 0, "operator new called with numDependencies == 0");
@@ -90,9 +90,9 @@ class TR_ARM64RegisterDependencyGroup
     * @param[in] numberDependencies : # of dependencies
     * @param[in] m : memory
     */
-   static TR_ARM64RegisterDependencyGroup * create(int32_t numDependencies, TR_Memory * m)
+   static TR_RVRegisterDependencyGroup * create(int32_t numDependencies, TR_Memory * m)
       {
-      return numDependencies ? new (numDependencies, m) TR_ARM64RegisterDependencyGroup : 0;
+      return numDependencies ? new (numDependencies, m) TR_RVRegisterDependencyGroup : 0;
       }
 
    /**
@@ -176,12 +176,12 @@ class TR_ARM64RegisterDependencyGroup
 
 namespace OMR
 {
-namespace ARM64
+namespace RV
 {
 class RegisterDependencyConditions: public OMR::RegisterDependencyConditions
    {
-   TR_ARM64RegisterDependencyGroup *_preConditions;
-   TR_ARM64RegisterDependencyGroup *_postConditions;
+   TR_RVRegisterDependencyGroup *_preConditions;
+   TR_RVRegisterDependencyGroup *_postConditions;
    uint16_t _numPreConditions;
    uint16_t _addCursorForPre;
    uint16_t _numPostConditions;
@@ -210,8 +210,8 @@ class RegisterDependencyConditions: public OMR::RegisterDependencyConditions
     * @param[in] m : memory
     */
    RegisterDependencyConditions(uint16_t numPreConds, uint16_t numPostConds, TR_Memory * m)
-      : _preConditions(TR_ARM64RegisterDependencyGroup::create(numPreConds, m)),
-        _postConditions(TR_ARM64RegisterDependencyGroup::create(numPostConds, m)),
+      : _preConditions(TR_RVRegisterDependencyGroup::create(numPreConds, m)),
+        _postConditions(TR_RVRegisterDependencyGroup::create(numPostConds, m)),
         _numPreConditions(numPreConds),
         _addCursorForPre(0),
         _numPostConditions(numPostConds),
@@ -258,7 +258,7 @@ class RegisterDependencyConditions: public OMR::RegisterDependencyConditions
       {
       if (_preConditions == NULL)
          {
-         _preConditions = TR_ARM64RegisterDependencyGroup::create(n, m);
+         _preConditions = TR_RVRegisterDependencyGroup::create(n, m);
          }
       if (_addCursorForPre > n)
          {
@@ -283,7 +283,7 @@ class RegisterDependencyConditions: public OMR::RegisterDependencyConditions
       {
       if (_postConditions == NULL)
          {
-         _postConditions = TR_ARM64RegisterDependencyGroup::create(n, m);
+         _postConditions = TR_RVRegisterDependencyGroup::create(n, m);
          }
       if (_addCursorForPost > n)
          {
@@ -320,7 +320,7 @@ class RegisterDependencyConditions: public OMR::RegisterDependencyConditions
     * @brief Gets pre-conditions
     * @return pre-conditions
     */
-   TR_ARM64RegisterDependencyGroup *getPreConditions()  {return _preConditions;}
+   TR_RVRegisterDependencyGroup *getPreConditions()  {return _preConditions;}
 
    /**
     * @brief Adds to pre-conditions
@@ -340,7 +340,7 @@ class RegisterDependencyConditions: public OMR::RegisterDependencyConditions
     * @brief Gets post-conditions
     * @return post-conditions
     */
-   TR_ARM64RegisterDependencyGroup *getPostConditions() {return _postConditions;}
+   TR_RVRegisterDependencyGroup *getPostConditions() {return _postConditions;}
 
    /**
     * @brief Adds to post-conditions
@@ -440,7 +440,7 @@ class RegisterDependencyConditions: public OMR::RegisterDependencyConditions
    void incRegisterTotalUseCounts(TR::CodeGenerator *cg);
    };
 
-} // ARM64
+} // RV
 } // OMR
 
 #endif

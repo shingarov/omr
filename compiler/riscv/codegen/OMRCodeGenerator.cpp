@@ -34,10 +34,10 @@
 #include "il/Node.hpp"
 #include "il/Node_inlines.hpp"
 
-OMR::ARM64::CodeGenerator::CodeGenerator() :
+OMR::RV::CodeGenerator::CodeGenerator() :
       OMR::CodeGenerator(),
       _constantData(NULL),
-      _outOfLineCodeSectionList(getTypedAllocator<TR_ARM64OutOfLineCodeSection*>(self()->comp()->allocator()))
+      _outOfLineCodeSectionList(getTypedAllocator<TR_RVOutOfLineCodeSection*>(self()->comp()->allocator()))
    {
    // Initialize Linkage for Code Generator
    self()->initializeLinkage();
@@ -60,7 +60,7 @@ OMR::ARM64::CodeGenerator::CodeGenerator() :
    self()->setLastGlobalGPR(TR::Machine::getLastGlobalGPRRegisterNumber());
    self()->setLastGlobalFPR(TR::Machine::getLastGlobalFPRRegisterNumber());
 
-   self()->getLinkage()->initARM64RealRegisterLinkage();
+   self()->getLinkage()->initRVRealRegisterLinkage();
 
    _numberBytesReadInaccessible = 0;
    _numberBytesWriteInaccessible = 0;
@@ -106,7 +106,7 @@ OMR::ARM64::CodeGenerator::CodeGenerator() :
      }
 
    // Initialize linkage reg arrays
-   TR::ARM64LinkageProperties linkageProperties = self()->getProperties();
+   TR::RVLinkageProperties linkageProperties = self()->getProperties();
    for (i = 0; i < linkageProperties.getNumIntArgRegs(); i++)
      _gprLinkageGlobalRegisterNumbers[i] = globalRegNumbers[linkageProperties.getIntegerArgumentRegister(i)];
    for (i = 0; i < linkageProperties.getNumFloatArgRegs(); i++)
@@ -120,7 +120,7 @@ OMR::ARM64::CodeGenerator::CodeGenerator() :
    }
 
 void
-OMR::ARM64::CodeGenerator::beginInstructionSelection()
+OMR::RV::CodeGenerator::beginInstructionSelection()
    {
    TR::Compilation *comp = self()->comp();
    TR::Node *startNode = comp->getStartTree()->getNode();
@@ -128,7 +128,7 @@ OMR::ARM64::CodeGenerator::beginInstructionSelection()
       {
       TR_ASSERT(false, "Not implemented yet.");
 
-      //_returnTypeInfoInstruction = new (self()->trHeapMemory()) TR::ARM64ImmInstruction(TR::InstOpCode::dd, startNode, 0, self());
+      //_returnTypeInfoInstruction = new (self()->trHeapMemory()) TR::RVImmInstruction(TR::InstOpCode::dd, startNode, 0, self());
       }
    else
       {
@@ -139,7 +139,7 @@ OMR::ARM64::CodeGenerator::beginInstructionSelection()
    }
 
 void
-OMR::ARM64::CodeGenerator::endInstructionSelection()
+OMR::RV::CodeGenerator::endInstructionSelection()
    {
    if (_returnTypeInfoInstruction != NULL)
       {
@@ -150,7 +150,7 @@ OMR::ARM64::CodeGenerator::endInstructionSelection()
    }
 
 void
-OMR::ARM64::CodeGenerator::doRegisterAssignment(TR_RegisterKinds kindsToAssign)
+OMR::RV::CodeGenerator::doRegisterAssignment(TR_RegisterKinds kindsToAssign)
    {
    // Registers are assigned in backward direction
 
@@ -211,7 +211,7 @@ OMR::ARM64::CodeGenerator::doRegisterAssignment(TR_RegisterKinds kindsToAssign)
    }
 
 void
-OMR::ARM64::CodeGenerator::doBinaryEncoding()
+OMR::RV::CodeGenerator::doBinaryEncoding()
    {
    TR::Compilation *comp = self()->comp();
    int32_t estimate = 0;
@@ -259,23 +259,23 @@ OMR::ARM64::CodeGenerator::doBinaryEncoding()
       }
    }
 
-TR::Linkage *OMR::ARM64::CodeGenerator::createLinkage(TR_LinkageConventions lc)
+TR::Linkage *OMR::RV::CodeGenerator::createLinkage(TR_LinkageConventions lc)
    {
    TR::Linkage *linkage;
    switch (lc)
       {
       case TR_System:
-         linkage = new (self()->trHeapMemory()) TR::ARM64SystemLinkage(self());
+         linkage = new (self()->trHeapMemory()) TR::RVSystemLinkage(self());
          break;
       default:
          TR_ASSERT(false, "using system linkage for unrecognized convention %d\n", lc);
-         linkage = new (self()->trHeapMemory()) TR::ARM64SystemLinkage(self());
+         linkage = new (self()->trHeapMemory()) TR::RVSystemLinkage(self());
       }
    self()->setLinkage(lc, linkage);
    return linkage;
    }
 
-void OMR::ARM64::CodeGenerator::emitDataSnippets()
+void OMR::RV::CodeGenerator::emitDataSnippets()
    {
    TR_ASSERT(false, "Not implemented yet.");
    /*
@@ -284,12 +284,12 @@ void OMR::ARM64::CodeGenerator::emitDataSnippets()
     */
    }
 
-bool OMR::ARM64::CodeGenerator::hasDataSnippets()
+bool OMR::RV::CodeGenerator::hasDataSnippets()
    {
    return (_constantData == NULL) ? false : true;
    }
 
-int32_t OMR::ARM64::CodeGenerator::setEstimatedLocationsForDataSnippetLabels(int32_t estimatedSnippetStart)
+int32_t OMR::RV::CodeGenerator::setEstimatedLocationsForDataSnippetLabels(int32_t estimatedSnippetStart)
    {
    TR_ASSERT(false, "Not implemented yet.");
    return 0;
@@ -301,7 +301,7 @@ int32_t OMR::ARM64::CodeGenerator::setEstimatedLocationsForDataSnippetLabels(int
 
 
 #ifdef DEBUG
-void OMR::ARM64::CodeGenerator::dumpDataSnippets(TR::FILE *outFile)
+void OMR::RV::CodeGenerator::dumpDataSnippets(TR::FILE *outFile)
    {
    if (outFile == NULL)
       return;
@@ -315,7 +315,7 @@ void OMR::ARM64::CodeGenerator::dumpDataSnippets(TR::FILE *outFile)
 #endif
 
 
-TR::Instruction *OMR::ARM64::CodeGenerator::generateSwitchToInterpreterPrePrologue(TR::Instruction *cursor, TR::Node *node)
+TR::Instruction *OMR::RV::CodeGenerator::generateSwitchToInterpreterPrePrologue(TR::Instruction *cursor, TR::Node *node)
    {
    TR_ASSERT(false, "Not implemented yet.");
 
@@ -324,7 +324,7 @@ TR::Instruction *OMR::ARM64::CodeGenerator::generateSwitchToInterpreterPreProlog
 
 
 // different from evaluate in that it returns a clobberable register
-TR::Register *OMR::ARM64::CodeGenerator::gprClobberEvaluate(TR::Node *node)
+TR::Register *OMR::RV::CodeGenerator::gprClobberEvaluate(TR::Node *node)
    {
    if (node->getReferenceCount() > 1)
       {
@@ -339,13 +339,13 @@ TR::Register *OMR::ARM64::CodeGenerator::gprClobberEvaluate(TR::Node *node)
    }
 
 
-void OMR::ARM64::CodeGenerator::buildRegisterMapForInstruction(TR_GCStackMap *map)
+void OMR::RV::CodeGenerator::buildRegisterMapForInstruction(TR_GCStackMap *map)
    {
    TR_ASSERT(false, "Not implemented yet.");
    }
 
 
-TR_GlobalRegisterNumber OMR::ARM64::CodeGenerator::pickRegister(TR_RegisterCandidate *regCan,
+TR_GlobalRegisterNumber OMR::RV::CodeGenerator::pickRegister(TR_RegisterCandidate *regCan,
                                                           TR::Block **barr,
                                                           TR_BitVector &availRegs,
                                                           TR_GlobalRegisterNumber &highRegisterNumber,
@@ -354,50 +354,50 @@ TR_GlobalRegisterNumber OMR::ARM64::CodeGenerator::pickRegister(TR_RegisterCandi
    return OMR::CodeGenerator::pickRegister(regCan, barr, availRegs, highRegisterNumber, candidates);
    }
 
-bool OMR::ARM64::CodeGenerator::allowGlobalRegisterAcrossBranch(TR_RegisterCandidate *regCan, TR::Node *branchNode)
+bool OMR::RV::CodeGenerator::allowGlobalRegisterAcrossBranch(TR_RegisterCandidate *regCan, TR::Node *branchNode)
    {
    // If return false, processLiveOnEntryBlocks has to dis-qualify any candidates which are referenced
    // within any CASE of a SWITCH statement.
    return true;
    }
 
-int32_t OMR::ARM64::CodeGenerator::getMaximumNumberOfGPRsAllowedAcrossEdge(TR::Node *node)
+int32_t OMR::RV::CodeGenerator::getMaximumNumberOfGPRsAllowedAcrossEdge(TR::Node *node)
    {
    TR_ASSERT(false, "Not implemented yet.");
 
    return 0;
    }
 
-int32_t OMR::ARM64::CodeGenerator::getMaximumNumberOfFPRsAllowedAcrossEdge(TR::Node *node)
+int32_t OMR::RV::CodeGenerator::getMaximumNumberOfFPRsAllowedAcrossEdge(TR::Node *node)
    {
    TR_ASSERT(false, "Not implemented yet.");
 
    return 0;
    }
 
-int32_t OMR::ARM64::CodeGenerator::getMaximumNumbersOfAssignableGPRs()
+int32_t OMR::RV::CodeGenerator::getMaximumNumbersOfAssignableGPRs()
    {
    return TR::RealRegister::LastGPR - TR::RealRegister::FirstGPR + 1;
    }
 
-int32_t OMR::ARM64::CodeGenerator::getMaximumNumbersOfAssignableFPRs()
+int32_t OMR::RV::CodeGenerator::getMaximumNumbersOfAssignableFPRs()
    {
    return TR::RealRegister::LastFPR - TR::RealRegister::FirstFPR + 1;
    }
 
-bool OMR::ARM64::CodeGenerator::isGlobalRegisterAvailable(TR_GlobalRegisterNumber i, TR::DataType dt)
+bool OMR::RV::CodeGenerator::isGlobalRegisterAvailable(TR_GlobalRegisterNumber i, TR::DataType dt)
    {
    return self()->machine()->getRealRegister((TR::RealRegister::RegNum)self()->getGlobalRegister(i))->getState() == TR::RealRegister::Free;
    }
 
-TR_GlobalRegisterNumber OMR::ARM64::CodeGenerator::getLinkageGlobalRegisterNumber(int8_t linkageRegisterIndex, TR::DataType type)
+TR_GlobalRegisterNumber OMR::RV::CodeGenerator::getLinkageGlobalRegisterNumber(int8_t linkageRegisterIndex, TR::DataType type)
    {
    TR_ASSERT(false, "Not implemented yet.");
 
    return 0;
    }
 
-void OMR::ARM64::CodeGenerator::apply16BitLabelRelativeRelocation(int32_t *cursor, TR::LabelSymbol *label)
+void OMR::RV::CodeGenerator::apply16BitLabelRelativeRelocation(int32_t *cursor, TR::LabelSymbol *label)
    {
    // for "b.cond" instruction
    TR_ASSERT(label->getCodeLocation(), "Attempt to relocate to a NULL label address!");
@@ -408,17 +408,17 @@ void OMR::ARM64::CodeGenerator::apply16BitLabelRelativeRelocation(int32_t *curso
    *cursor |= ENCODE_SBTYPE_IMM(distance);
    }
 
-void OMR::ARM64::CodeGenerator::apply16BitLabelRelativeRelocation(int32_t *cursor, TR::LabelSymbol *label, int8_t d, bool isInstrOffset) 
+void OMR::RV::CodeGenerator::apply16BitLabelRelativeRelocation(int32_t *cursor, TR::LabelSymbol *label, int8_t d, bool isInstrOffset) 
    {
    apply16BitLabelRelativeRelocation(cursor, label);
    }
 
-void OMR::ARM64::CodeGenerator::apply24BitLabelRelativeRelocation(int32_t *cursor, TR::LabelSymbol *label)
+void OMR::RV::CodeGenerator::apply24BitLabelRelativeRelocation(int32_t *cursor, TR::LabelSymbol *label)
    {
    TR_ASSERT(false, "Unsupported relocation");
    }
 
-void OMR::ARM64::CodeGenerator::apply32BitLabelRelativeRelocation(int32_t *cursor, TR::LabelSymbol *label)
+void OMR::RV::CodeGenerator::apply32BitLabelRelativeRelocation(int32_t *cursor, TR::LabelSymbol *label)
    {
    // for "b.cond" instruction
    TR_ASSERT(label->getCodeLocation(), "Attempt to relocate to a NULL label address!");
@@ -429,13 +429,13 @@ void OMR::ARM64::CodeGenerator::apply32BitLabelRelativeRelocation(int32_t *curso
    *cursor |= ENCODE_UJTYPE_IMM(distance);
    }
 
-int64_t OMR::ARM64::CodeGenerator::getLargestNegConstThatMustBeMaterialized()
+int64_t OMR::RV::CodeGenerator::getLargestNegConstThatMustBeMaterialized()
    { 
    TR_ASSERT(0, "Not Implemented on AArch64"); 
    return 0; 
    }
 
-int64_t OMR::ARM64::CodeGenerator::getSmallestPosConstThatMustBeMaterialized()
+int64_t OMR::RV::CodeGenerator::getSmallestPosConstThatMustBeMaterialized()
    { 
    TR_ASSERT(0, "Not Implemented on AArch64"); 
    return 0; 

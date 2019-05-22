@@ -21,7 +21,7 @@
 
 #include "env/DebugEnv.hpp"
 
-OMR::ARM64::DebugEnv::DebugEnv() :
+OMR::RV::DebugEnv::DebugEnv() :
       OMR::DebugEnv()
    {
    _hexAddressWidthInChars = 16;

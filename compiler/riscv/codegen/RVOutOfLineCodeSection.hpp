@@ -19,8 +19,8 @@
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
 
-#ifndef ARM64OUTOFLINECODESECTION_INCL
-#define ARM64OUTOFLINECODESECTION_INCL
+#ifndef RVOUTOFLINECODESECTION_INCL
+#define RVOUTOFLINECODESECTION_INCL
 
 #include "codegen/InstOpCode.hpp"
 #include "codegen/OutOfLineCodeSection.hpp"
@@ -28,7 +28,7 @@
 namespace TR { class CodeGenerator; }
 namespace TR { class LabelSymbol; }
 
-class TR_ARM64OutOfLineCodeSection : public TR_OutOfLineCodeSection
+class TR_RVOutOfLineCodeSection : public TR_OutOfLineCodeSection
    {
 
 public:
@@ -37,7 +37,7 @@ public:
     * @param[in] entryLabel : entry label
     * @param[in] cg : code generator
     */
-   TR_ARM64OutOfLineCodeSection(TR::LabelSymbol *entryLabel, TR::CodeGenerator *cg)
+   TR_RVOutOfLineCodeSection(TR::LabelSymbol *entryLabel, TR::CodeGenerator *cg)
       : TR_OutOfLineCodeSection(entryLabel, cg)
       {}
 
@@ -47,7 +47,7 @@ public:
     * @param[in] restartLabel : restart label
     * @param[in] cg : code generator
     */
-   TR_ARM64OutOfLineCodeSection(TR::LabelSymbol *entryLabel, TR::LabelSymbol *restartLabel, TR::CodeGenerator *cg)
+   TR_RVOutOfLineCodeSection(TR::LabelSymbol *entryLabel, TR::LabelSymbol *restartLabel, TR::CodeGenerator *cg)
       : TR_OutOfLineCodeSection(entryLabel, restartLabel, cg)
       {}
 
@@ -62,7 +62,7 @@ public:
     * @param[in] restartLabel : restart label
     * @param[in] cg : code generator
     */
-   TR_ARM64OutOfLineCodeSection(TR::Node *callNode, TR::ILOpCodes callOp, TR::Register *targetReg, TR::LabelSymbol *entryLabel, TR::LabelSymbol *restartLabel, TR::CodeGenerator *cg);
+   TR_RVOutOfLineCodeSection(TR::Node *callNode, TR::ILOpCodes callOp, TR::Register *targetReg, TR::LabelSymbol *entryLabel, TR::LabelSymbol *restartLabel, TR::CodeGenerator *cg);
 
    /**
     * @brief Assigns registers
@@ -72,6 +72,6 @@ public:
    /**
     * @brief Generates out-of-line code section dispatch
     */
-   void generateARM64OutOfLineCodeSectionDispatch();
+   void generateRVOutOfLineCodeSectionDispatch();
    };
 #endif

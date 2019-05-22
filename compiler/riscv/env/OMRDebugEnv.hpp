@@ -19,18 +19,18 @@
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
 
-#ifndef OMR_ARM64_DEBUG_ENV_INCL
-#define OMR_ARM64_DEBUG_ENV_INCL
+#ifndef OMR_RV_DEBUG_ENV_INCL
+#define OMR_RV_DEBUG_ENV_INCL
 
 /*
  * The following #define and typedef must appear before any #includes in this file
  */
 #ifndef OMR_DEBUG_ENV_CONNECTOR
 #define OMR_DEBUG_ENV_CONNECTOR
-namespace OMR { namespace ARM64 { class DebugEnv; } }
-namespace OMR { typedef OMR::ARM64::DebugEnv DebugEnvConnector; }
+namespace OMR { namespace RV { class DebugEnv; } }
+namespace OMR { typedef OMR::RV::DebugEnv DebugEnvConnector; }
 #else
-#error OMR::ARM64::DebugEnv expected to be a primary connector, but an OMR connector is already defined
+#error OMR::RV::DebugEnv expected to be a primary connector, but an OMR connector is already defined
 #endif
 
 #include "compiler/env/OMRDebugEnv.hpp"
@@ -39,7 +39,7 @@ namespace OMR { typedef OMR::ARM64::DebugEnv DebugEnvConnector; }
 namespace OMR
 {
 
-namespace ARM64
+namespace RV
 {
 
 class OMR_EXTENSIBLE DebugEnv : public OMR::DebugEnv
@@ -54,4 +54,4 @@ public:
 
 }
 
-#endif //OMR_ARM64_DEBUG_ENV_INCL
+#endif //OMR_RV_DEBUG_ENV_INCL

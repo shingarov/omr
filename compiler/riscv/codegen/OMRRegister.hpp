@@ -19,18 +19,18 @@
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
 
-#ifndef OMR_ARM64_REGISTER_INCL
-#define OMR_ARM64_REGISTER_INCL
+#ifndef OMR_RV_REGISTER_INCL
+#define OMR_RV_REGISTER_INCL
 
 /*
  * The following #define and typedef must appear before any #includes in this file
  */
 #ifndef OMR_REGISTER_CONNECTOR
 #define OMR_REGISTER_CONNECTOR
-   namespace OMR { namespace ARM64 { class Register; } }
-   namespace OMR { typedef OMR::ARM64::Register RegisterConnector; }
+   namespace OMR { namespace RV { class Register; } }
+   namespace OMR { typedef OMR::RV::Register RegisterConnector; }
 #else
-   #error OMR::ARM64::Register expected to be a primary connector, but a OMR connector is already defined
+   #error OMR::RV::Register expected to be a primary connector, but a OMR connector is already defined
 #endif
 
 
@@ -41,7 +41,7 @@ class TR_LiveRegisterInfo;
 namespace OMR
 {
 
-namespace ARM64
+namespace RV
 {
 
 class OMR_EXTENSIBLE Register: public OMR::Register
@@ -79,4 +79,4 @@ class OMR_EXTENSIBLE Register: public OMR::Register
 }
 
 
-#endif /* OMR_ARM64_REGISTER_INCL */
+#endif /* OMR_RV_REGISTER_INCL */

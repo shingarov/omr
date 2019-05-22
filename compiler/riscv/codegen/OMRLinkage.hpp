@@ -19,16 +19,16 @@
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
 
-#ifndef OMR_ARM64_LINKAGE_INCL
-#define OMR_ARM64_LINKAGE_INCL
+#ifndef OMR_RV_LINKAGE_INCL
+#define OMR_RV_LINKAGE_INCL
 
 /*
  * The following #define and typedef must appear before any #includes in this file
  */
 #ifndef OMR_LINKAGE_CONNECTOR
 #define OMR_LINKAGE_CONNECTOR
-namespace OMR { namespace ARM64 { class Linkage; } }
-namespace OMR { typedef OMR::ARM64::Linkage LinkageConnector; }
+namespace OMR { namespace RV { class Linkage; } }
+namespace OMR { typedef OMR::RV::Linkage LinkageConnector; }
 #endif
 
 #include "compiler/codegen/OMRLinkage.hpp"
@@ -73,10 +73,10 @@ addDependency(
 
 namespace TR {
 
-class ARM64MemoryArgument
+class RVMemoryArgument
    {
    public:
-   // @@ TR_ALLOC(TR_Memory::ARM64MemoryArgument)
+   // @@ TR_ALLOC(TR_Memory::RVMemoryArgument)
 
    TR::Register *argRegister;
    TR::MemoryReference *argMemory;
@@ -97,9 +97,9 @@ class ARM64MemoryArgument
 #define FloatReturn                 0x08
 #define FloatArgument               0x10
 #define CallerAllocatesBackingStore 0x20
-#define ARM64_Reserved              0x40
+#define RV_Reserved              0x40
 
-struct ARM64LinkageProperties
+struct RVLinkageProperties
    {
    uint32_t _properties;
    uint32_t _registerFlags[TR::RealRegister::NumRegisters];
@@ -266,7 +266,7 @@ struct ARM64LinkageProperties
 
 namespace OMR
 {
-namespace ARM64
+namespace RV
 {
 class OMR_EXTENSIBLE Linkage : public OMR::Linkage
    {
@@ -300,9 +300,9 @@ class OMR_EXTENSIBLE Linkage : public OMR::Linkage
     */
    virtual void mapSingleAutomatic(TR::AutomaticSymbol *p, uint32_t &stackIndex);
    /**
-    * @brief Initializes ARM64 RealRegister linkage
+    * @brief Initializes RV RealRegister linkage
     */
-   virtual void initARM64RealRegisterLinkage();
+   virtual void initRVRealRegisterLinkage();
 
    /**
     * @brief Returns a MemoryReference for an outgoing argument
@@ -312,7 +312,7 @@ class OMR_EXTENSIBLE Linkage : public OMR::Linkage
     * @param[out] memArg : struct holding memory argument information
     * @return MemoryReference for the argument
     */
-   virtual TR::MemoryReference *getOutgoingArgumentMemRef(TR::Register *argMemReg, TR::Register *argReg, TR::InstOpCode::Mnemonic opCode, TR::ARM64MemoryArgument &memArg);
+   virtual TR::MemoryReference *getOutgoingArgumentMemRef(TR::Register *argMemReg, TR::Register *argReg, TR::InstOpCode::Mnemonic opCode, TR::RVMemoryArgument &memArg);
 
    /**
     * @brief Saves arguments
@@ -362,10 +362,10 @@ class OMR_EXTENSIBLE Linkage : public OMR::Linkage
    TR::Register *pushDoubleArg(TR::Node *child);
 
    /**
-    * @brief Gets ARM64 linkage properties
+    * @brief Gets RV linkage properties
     * @return Linkage properties
     */
-   virtual const TR::ARM64LinkageProperties& getProperties() = 0;
+   virtual const TR::RVLinkageProperties& getProperties() = 0;
 
    /**
     * @brief Gets the number of argument registers
@@ -430,7 +430,7 @@ class OMR_EXTENSIBLE Linkage : public OMR::Linkage
 
    TR::CodeGenerator*_cg;
    };
-} // ARM64
+} // RV
 } // TR
 
 #endif

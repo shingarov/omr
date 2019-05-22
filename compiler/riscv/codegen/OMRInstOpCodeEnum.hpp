@@ -38,5 +38,5 @@
 		retn,  // Return
 		dd,    // Define word
 		label, // Destination of a jump
-		ARM64LastOp = label,
-		ARM64NumOpCodes = ARM64LastOp+1,
+		RVLastOp = label,
+		RVNumOpCodes = RVLastOp+1,

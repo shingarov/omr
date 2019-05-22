@@ -19,18 +19,18 @@
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
 
-#ifndef OMR_ARM64_MACHINE_INCL
-#define OMR_ARM64_MACHINE_INCL
+#ifndef OMR_RV_MACHINE_INCL
+#define OMR_RV_MACHINE_INCL
 
 /*
  * The following #define and typedef must appear before any #includes in this file
  */
 #ifndef OMR_MACHINE_CONNECTOR
 #define OMR_MACHINE_CONNECTOR
-namespace OMR { namespace ARM64 { class Machine; } }
-namespace OMR { typedef OMR::ARM64::Machine MachineConnector; }
+namespace OMR { namespace RV { class Machine; } }
+namespace OMR { typedef OMR::RV::Machine MachineConnector; }
 #else
-#error OMR::ARM64::Machine expected to be a primary connector, but an OMR connector is already defined
+#error OMR::RV::Machine expected to be a primary connector, but an OMR connector is already defined
 #endif
 
 #include "compiler/codegen/OMRMachine.hpp"
@@ -42,17 +42,17 @@ namespace TR { class CodeGenerator; }
 namespace TR { class Instruction; }
 namespace TR { class Register; }
 
-#define NUM_ARM64_GPR 32
-#define MAX_ARM64_GLOBAL_GPRS 27 // excluding IP0, IP1, FP, LR, and SP
-#define NUM_ARM64_FPR 32
-#define MAX_ARM64_GLOBAL_FPRS 32
+#define NUM_RV_GPR 32
+#define MAX_RV_GLOBAL_GPRS 27 // excluding IP0, IP1, FP, LR, and SP
+#define NUM_RV_FPR 32
+#define MAX_RV_GLOBAL_FPRS 32
 
-#define NUM_ARM64_MAXR 32
+#define NUM_RV_MAXR 32
 
 namespace OMR
 {
 
-namespace ARM64
+namespace RV
 {
 
 class OMR_EXTENSIBLE Machine : public OMR::Machine
@@ -156,13 +156,13 @@ public:
     * @return global register number
     */
    static TR_GlobalRegisterNumber getLastGlobalGPRRegisterNumber()
-      { return MAX_ARM64_GLOBAL_GPRS - 1; }
+      { return MAX_RV_GLOBAL_GPRS - 1; }
    /**
     * @brief Answers global register number of last FPR
     * @return global register number
     */
    static TR_GlobalRegisterNumber getLastGlobalFPRRegisterNumber()
-      { return MAX_ARM64_GLOBAL_GPRS + MAX_ARM64_GLOBAL_FPRS - 1; }
+      { return MAX_RV_GLOBAL_GPRS + MAX_RV_GLOBAL_FPRS - 1; }
 
 private:
 
@@ -174,7 +174,7 @@ private:
    void initializeRegisterFile();
 
    // Tactical GRA
-   static uint32_t _globalRegisterNumberToRealRegisterMap[MAX_ARM64_GLOBAL_GPRS + MAX_ARM64_GLOBAL_FPRS];
+   static uint32_t _globalRegisterNumberToRealRegisterMap[MAX_RV_GLOBAL_GPRS + MAX_RV_GLOBAL_FPRS];
 
    };
 }

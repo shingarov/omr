@@ -18,18 +18,18 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
-#ifndef OMR_ARM64_TREE_EVALUATOR_INCL
-#define OMR_ARM64_TREE_EVALUATOR_INCL
+#ifndef OMR_RV_TREE_EVALUATOR_INCL
+#define OMR_RV_TREE_EVALUATOR_INCL
 
 /*
  * The following #define and typedef must appear before any #includes in this file
  */
 #ifndef OMR_TREE_EVALUATOR_CONNECTOR
 #define OMR_TREE_EVALUATOR_CONNECTOR
-namespace OMR { namespace ARM64 { class TreeEvaluator; } }
-namespace OMR { typedef OMR::ARM64::TreeEvaluator TreeEvaluatorConnector; }
+namespace OMR { namespace RV { class TreeEvaluator; } }
+namespace OMR { typedef OMR::RV::TreeEvaluator TreeEvaluatorConnector; }
 #else
-#error OMR::ARM64::TreeEvaluator expected to be a primary connector, but a OMR connector is already defined
+#error OMR::RV::TreeEvaluator expected to be a primary connector, but a OMR connector is already defined
 #endif
 
 #include "compiler/codegen/OMRTreeEvaluator.hpp"
@@ -70,7 +70,7 @@ TR::Register *commonStoreEvaluator(TR::Node *node, TR::InstOpCode::Mnemonic op, 
 namespace OMR
 {
 
-namespace ARM64
+namespace RV
 {
 
 class OMR_EXTENSIBLE TreeEvaluator: public OMR::TreeEvaluator
@@ -806,4 +806,4 @@ public:
 
 }
 }
-#endif //OMR_ARM64_TREE_EVALUATOR_INCL
+#endif //OMR_RV_TREE_EVALUATOR_INCL

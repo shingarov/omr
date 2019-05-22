@@ -31,7 +31,7 @@
 #include "il/Node_inlines.hpp"
 
 
-OMR::ARM64::MemoryReference::MemoryReference(
+OMR::RV::MemoryReference::MemoryReference(
       TR::CodeGenerator *cg) :
    _baseRegister(NULL),
    _baseNode(NULL),
@@ -45,7 +45,7 @@ OMR::ARM64::MemoryReference::MemoryReference(
    }
 
 
-OMR::ARM64::MemoryReference::MemoryReference(
+OMR::RV::MemoryReference::MemoryReference(
       TR::Register *br,
       TR::CodeGenerator *cg) :
    _baseRegister(br),
@@ -60,7 +60,7 @@ OMR::ARM64::MemoryReference::MemoryReference(
    }
 
 
-OMR::ARM64::MemoryReference::MemoryReference(
+OMR::RV::MemoryReference::MemoryReference(
       TR::Register *br,
       int32_t disp,
       TR::CodeGenerator *cg) :
@@ -76,7 +76,7 @@ OMR::ARM64::MemoryReference::MemoryReference(
    }
 
 
-OMR::ARM64::MemoryReference::MemoryReference(
+OMR::RV::MemoryReference::MemoryReference(
       TR::Node *rootLoadOrStore,
       uint32_t len,
       TR::CodeGenerator *cg) :
@@ -129,7 +129,7 @@ OMR::ARM64::MemoryReference::MemoryReference(
    }
 
 
-OMR::ARM64::MemoryReference::MemoryReference(
+OMR::RV::MemoryReference::MemoryReference(
       TR::Node *node,
       TR::SymbolReference *symRef,
       uint32_t len,
@@ -147,7 +147,7 @@ OMR::ARM64::MemoryReference::MemoryReference(
    }
 
 
-bool OMR::ARM64::MemoryReference::useIndexedForm()
+bool OMR::RV::MemoryReference::useIndexedForm()
    {
    TR_ASSERT(false, "Not implemented yet.");
 
@@ -155,7 +155,7 @@ bool OMR::ARM64::MemoryReference::useIndexedForm()
    }
 
 
-void OMR::ARM64::MemoryReference::setSymbol(TR::Symbol *symbol, TR::CodeGenerator *cg)
+void OMR::RV::MemoryReference::setSymbol(TR::Symbol *symbol, TR::CodeGenerator *cg)
    {
    TR_ASSERT(_symbolReference->getSymbol()==NULL || _symbolReference->getSymbol()==symbol, "should not write to existing symbolReference");
    _symbolReference->setSymbol(symbol);
@@ -168,7 +168,7 @@ void OMR::ARM64::MemoryReference::setSymbol(TR::Symbol *symbol, TR::CodeGenerato
    }
 
 
-void OMR::ARM64::MemoryReference::addToOffset(TR::Node *node, intptrj_t amount, TR::CodeGenerator *cg)
+void OMR::RV::MemoryReference::addToOffset(TR::Node *node, intptrj_t amount, TR::CodeGenerator *cg)
    {
    if (self()->getUnresolvedSnippet() != NULL)
       {
@@ -249,7 +249,7 @@ void OMR::ARM64::MemoryReference::addToOffset(TR::Node *node, intptrj_t amount, 
    }
 
 
-void OMR::ARM64::MemoryReference::decNodeReferenceCounts(TR::CodeGenerator *cg)
+void OMR::RV::MemoryReference::decNodeReferenceCounts(TR::CodeGenerator *cg)
    {
    if (_baseRegister != NULL)
       {
@@ -261,7 +261,7 @@ void OMR::ARM64::MemoryReference::decNodeReferenceCounts(TR::CodeGenerator *cg)
    }
 
 
-void OMR::ARM64::MemoryReference::populateMemoryReference(TR::Node *subTree, TR::CodeGenerator *cg)
+void OMR::RV::MemoryReference::populateMemoryReference(TR::Node *subTree, TR::CodeGenerator *cg)
    {
    if (subTree->getReferenceCount() > 1 || subTree->getRegister() != NULL)
       {
@@ -378,7 +378,7 @@ void OMR::ARM64::MemoryReference::populateMemoryReference(TR::Node *subTree, TR:
    }
 
 
-void OMR::ARM64::MemoryReference::consolidateRegisters(TR::Register *srcReg, TR::Node *srcTree, bool srcModifiable, TR::CodeGenerator *cg)
+void OMR::RV::MemoryReference::consolidateRegisters(TR::Register *srcReg, TR::Node *srcTree, bool srcModifiable, TR::CodeGenerator *cg)
    {
    TR::Register *tempTargetRegister;
 
@@ -431,7 +431,7 @@ void OMR::ARM64::MemoryReference::consolidateRegisters(TR::Register *srcReg, TR:
    }
 
 
-void OMR::ARM64::MemoryReference::incRegisterTotalUseCounts(TR::CodeGenerator * cg)
+void OMR::RV::MemoryReference::incRegisterTotalUseCounts(TR::CodeGenerator * cg)
    {
    if (_baseRegister != NULL)
       {
@@ -440,7 +440,7 @@ void OMR::ARM64::MemoryReference::incRegisterTotalUseCounts(TR::CodeGenerator * 
    }
 
 
-void OMR::ARM64::MemoryReference::assignRegisters(TR::Instruction *currentInstruction, TR::CodeGenerator *cg)
+void OMR::RV::MemoryReference::assignRegisters(TR::Instruction *currentInstruction, TR::CodeGenerator *cg)
    {
    TR::Machine *machine = cg->machine();
    TR::RealRegister *assignedBaseRegister;
@@ -481,7 +481,7 @@ void OMR::ARM64::MemoryReference::assignRegisters(TR::Instruction *currentInstru
 
    if (self()->getUnresolvedSnippet() != NULL)
       {
-      currentInstruction->ARM64NeedsGCMap(cg, 0xFFFFFFFF);
+      currentInstruction->RVNeedsGCMap(cg, 0xFFFFFFFF);
       }
    }
 

@@ -28,3 +28,14 @@
    IsAdmin,
    IsLabel,
 
+   IsRTYPE,
+   IsITYPE,
+   IsSTYPE,
+     IsBTYPE,
+   IsUTYPE,
+     IsJTYPE,
+
+   IsLOAD,
+   IsSTORE,
+
+

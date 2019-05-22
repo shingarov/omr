@@ -31,13 +31,13 @@
 #include "codegen/RealRegister.hpp"
 #include "infra/Assert.hpp"
 
-OMR::ARM64::Machine::Machine(TR::CodeGenerator *cg) :
+OMR::RV::Machine::Machine(TR::CodeGenerator *cg) :
       OMR::Machine(cg)
    {
    self()->initializeRegisterFile();
    }
 
-TR::RealRegister *OMR::ARM64::Machine::findBestFreeRegister(TR_RegisterKinds rk,
+TR::RealRegister *OMR::RV::Machine::findBestFreeRegister(TR_RegisterKinds rk,
                                                             bool considerUnlatched)
    {
    int32_t first;
@@ -78,11 +78,11 @@ TR::RealRegister *OMR::ARM64::Machine::findBestFreeRegister(TR_RegisterKinds rk,
    return freeRegister;
    }
 
-TR::RealRegister *OMR::ARM64::Machine::freeBestRegister(TR::Instruction *currentInstruction,
+TR::RealRegister *OMR::RV::Machine::freeBestRegister(TR::Instruction *currentInstruction,
                                                         TR::Register *virtualRegister,
                                                         TR::RealRegister *forced)
    {
-   TR::Register *candidates[NUM_ARM64_MAXR];
+   TR::Register *candidates[NUM_RV_MAXR];
    TR::Compilation *comp = self()->cg()->comp();
    TR::MemoryReference *tmemref;
    TR_BackingStore *location;
@@ -259,7 +259,7 @@ TR::RealRegister *OMR::ARM64::Machine::freeBestRegister(TR::Instruction *current
    return best;
    }
 
-TR::RealRegister *OMR::ARM64::Machine::reverseSpillState(TR::Instruction *currentInstruction,
+TR::RealRegister *OMR::RV::Machine::reverseSpillState(TR::Instruction *currentInstruction,
                                                      TR::Register *spilledRegister,
                                                      TR::RealRegister *targetRegister)
    {
@@ -439,7 +439,7 @@ TR::RealRegister *OMR::ARM64::Machine::reverseSpillState(TR::Instruction *curren
    return targetRegister;
    }
 
-TR::RealRegister *OMR::ARM64::Machine::assignOneRegister(TR::Instruction *currentInstruction,
+TR::RealRegister *OMR::RV::Machine::assignOneRegister(TR::Instruction *currentInstruction,
                                                          TR::Register *virtualRegister)
    {
    TR_RegisterKinds rk = virtualRegister->getKind();
@@ -527,7 +527,7 @@ static void registerExchange(TR::Instruction *precedingInstruction,
       }
    }
 
-void OMR::ARM64::Machine::coerceRegisterAssignment(TR::Instruction *currentInstruction,
+void OMR::RV::Machine::coerceRegisterAssignment(TR::Instruction *currentInstruction,
                                                    TR::Register *virtualRegister,
                                                    TR::RealRegister::RegNum registerNumber)
    {
@@ -686,7 +686,7 @@ void OMR::ARM64::Machine::coerceRegisterAssignment(TR::Instruction *currentInstr
    self()->cg()->traceRegAssigned(virtualRegister, targetRegister);
    }
 
-void OMR::ARM64::Machine::initializeRegisterFile()
+void OMR::RV::Machine::initializeRegisterFile()
    {
    _registerFile[TR::RealRegister::NoReg] = NULL;
    _registerFile[TR::RealRegister::SpilledReg] = NULL;
@@ -707,7 +707,7 @@ void OMR::ARM64::Machine::initializeRegisterFile()
    }
 
 void
-OMR::ARM64::Machine::takeRegisterStateSnapShot()
+OMR::RV::Machine::takeRegisterStateSnapShot()
    {
    int32_t i;
    for (i = TR::RealRegister::FirstGPR; i < TR::RealRegister::NumRegisters - 1; i++)
@@ -719,7 +719,7 @@ OMR::ARM64::Machine::takeRegisterStateSnapShot()
    }
 
 void
-OMR::ARM64::Machine::restoreRegisterStateFromSnapShot()
+OMR::RV::Machine::restoreRegisterStateFromSnapShot()
    {
    int32_t i;
    for (i = TR::RealRegister::FirstGPR; i < TR::RealRegister::NumRegisters - 1; i++) // Skipping SpilledReg
@@ -751,7 +751,7 @@ OMR::ARM64::Machine::restoreRegisterStateFromSnapShot()
       }
    }
 
-uint32_t OMR::ARM64::Machine::_globalRegisterNumberToRealRegisterMap[] =
+uint32_t OMR::RV::Machine::_globalRegisterNumberToRealRegisterMap[] =
    {
    // GPRs
    TR::RealRegister::x15,

@@ -34,27 +34,27 @@ static TR::Register *commonConstEvaluator(TR::Node *node, int32_t value, TR::Cod
    return node->setRegister(tempReg);
    }
 
-TR::Register *OMR::ARM64::TreeEvaluator::iconstEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+TR::Register *OMR::RV::TreeEvaluator::iconstEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return commonConstEvaluator(node, node->getInt(), cg);
    }
 
-TR::Register *OMR::ARM64::TreeEvaluator::sconstEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+TR::Register *OMR::RV::TreeEvaluator::sconstEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return commonConstEvaluator(node, node->getShortInt(), cg);
    }
 
-TR::Register *OMR::ARM64::TreeEvaluator::bconstEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+TR::Register *OMR::RV::TreeEvaluator::bconstEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return commonConstEvaluator(node, node->getByte(), cg);
    }
 
-TR::Register *OMR::ARM64::TreeEvaluator::cconstEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+TR::Register *OMR::RV::TreeEvaluator::cconstEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return commonConstEvaluator(node, node->getConst<uint16_t>(), cg);
    }
 
-TR::Register *OMR::ARM64::TreeEvaluator::aconstEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+TR::Register *OMR::RV::TreeEvaluator::aconstEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    TR::Register *tempReg = cg->allocateRegister();
    intptrj_t address = node->getLongInt();
@@ -62,7 +62,7 @@ TR::Register *OMR::ARM64::TreeEvaluator::aconstEvaluator(TR::Node *node, TR::Cod
    return node->setRegister(tempReg);
    }
 
-TR::Register *OMR::ARM64::TreeEvaluator::lconstEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+TR::Register *OMR::RV::TreeEvaluator::lconstEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    TR::Register *tempReg = cg->allocateRegister();
    loadConstant64(cg, node, node->getLongInt(), tempReg);
@@ -70,7 +70,7 @@ TR::Register *OMR::ARM64::TreeEvaluator::lconstEvaluator(TR::Node *node, TR::Cod
    }
 
 // also handles lneg
-TR::Register *OMR::ARM64::TreeEvaluator::inegEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+TR::Register *OMR::RV::TreeEvaluator::inegEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    TR::Node *firstChild = node->getFirstChild();
    TR::Register *reg = cg->gprClobberEvaluate(firstChild);
@@ -99,18 +99,18 @@ static TR::Register *commonIntegerAbsEvaluator(TR::Node *node, TR::CodeGenerator
    return reg;
    }
 
-TR::Register *OMR::ARM64::TreeEvaluator::iabsEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+TR::Register *OMR::RV::TreeEvaluator::iabsEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return commonIntegerAbsEvaluator(node, cg);
    }
 
-TR::Register *OMR::ARM64::TreeEvaluator::labsEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+TR::Register *OMR::RV::TreeEvaluator::labsEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return commonIntegerAbsEvaluator(node, cg);
    }
 
 // also handles i2b, i2s, l2b, l2s
-TR::Register *OMR::ARM64::TreeEvaluator::l2iEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+TR::Register *OMR::RV::TreeEvaluator::l2iEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    TR::Node *child = node->getFirstChild();
    TR::Register *trgReg = cg->gprClobberEvaluate(child);
@@ -129,52 +129,52 @@ static TR::Register *extendToIntOrLongHelper(TR::Node *node, uint32_t imms, TR::
    return trgReg;
    }
 
-TR::Register *OMR::ARM64::TreeEvaluator::b2iEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+TR::Register *OMR::RV::TreeEvaluator::b2iEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return extendToIntOrLongHelper(node, 7, cg);
    }
 
-TR::Register *OMR::ARM64::TreeEvaluator::s2iEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+TR::Register *OMR::RV::TreeEvaluator::s2iEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return extendToIntOrLongHelper(node, 15, cg);
    }
 
-TR::Register *OMR::ARM64::TreeEvaluator::b2lEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+TR::Register *OMR::RV::TreeEvaluator::b2lEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return extendToIntOrLongHelper(node, 7, cg);
    }
 
-TR::Register *OMR::ARM64::TreeEvaluator::s2lEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+TR::Register *OMR::RV::TreeEvaluator::s2lEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return extendToIntOrLongHelper(node, 15, cg);
    }
 
-TR::Register *OMR::ARM64::TreeEvaluator::i2lEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+TR::Register *OMR::RV::TreeEvaluator::i2lEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return extendToIntOrLongHelper(node, 31, cg);
    }
 
-TR::Register *OMR::ARM64::TreeEvaluator::bu2iEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+TR::Register *OMR::RV::TreeEvaluator::bu2iEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return extendToIntOrLongHelper(node, 7, cg);
    }
 
-TR::Register *OMR::ARM64::TreeEvaluator::su2iEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+TR::Register *OMR::RV::TreeEvaluator::su2iEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return extendToIntOrLongHelper(node, 15, cg);
    }
 
-TR::Register *OMR::ARM64::TreeEvaluator::bu2lEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+TR::Register *OMR::RV::TreeEvaluator::bu2lEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return extendToIntOrLongHelper(node, 7, cg);
    }
 
-TR::Register *OMR::ARM64::TreeEvaluator::su2lEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+TR::Register *OMR::RV::TreeEvaluator::su2lEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return extendToIntOrLongHelper(node, 15, cg);
    }
 
-TR::Register *OMR::ARM64::TreeEvaluator::iu2lEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+TR::Register *OMR::RV::TreeEvaluator::iu2lEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return extendToIntOrLongHelper(node, 31, cg);
    }

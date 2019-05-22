@@ -176,7 +176,7 @@ TR_Debug::print(TR::FILE *pOutFile, TR::AdminInstruction *instr)
 
 /*
 void
-TR_Debug::print(TR::FILE *pOutFile, TR::ARM64Trg1Instruction *instr)
+TR_Debug::print(TR::FILE *pOutFile, TR::RVTrg1Instruction *instr)
    {
    printPrefix(pOutFile, instr);
    trfprintf(pOutFile, "%s \t", getOpCodeName(&instr->getOpCode()));
@@ -191,7 +191,7 @@ TR_Debug::print(TR::FILE *pOutFile, TR::RegisterDependency *dep)
    trfprintf(pOutFile,"[");
    print(pOutFile, dep->getRegister(), TR_WordReg);
    trfprintf(pOutFile," : ");
-   trfprintf(pOutFile,"%s] ", getARM64RegisterName(dep->getRealRegister()));
+   trfprintf(pOutFile,"%s] ", getRVRegisterName(dep->getRealRegister()));
    trfflush(_comp->getOutFile());
    }
 
@@ -232,7 +232,7 @@ TR_Debug::print(TR::FILE *pOutFile, TR::MemoryReference *mr)
    }
 
 void
-TR_Debug::printARM64GCRegisterMap(TR::FILE *pOutFile, TR::GCRegisterMap *map)
+TR_Debug::printRVGCRegisterMap(TR::FILE *pOutFile, TR::GCRegisterMap *map)
    {
    TR_ASSERT(false, "Not implemented yet.");
    }
@@ -266,12 +266,12 @@ TR_Debug::getName(TR::RealRegister *reg, TR_RegisterSizes size)
    }
 
 const char *
-TR_Debug::getARM64RegisterName(uint32_t regNum, bool is64bit)
+TR_Debug::getRVRegisterName(uint32_t regNum, bool is64bit)
    {
    return getRegisterName((TR::RealRegister::RegNum)regNum, is64bit);
    }
 
-void TR_Debug::printARM64OOLSequences(TR::FILE *pOutFile)
+void TR_Debug::printRVOOLSequences(TR::FILE *pOutFile)
    {
    TR_ASSERT(false, "Not implemented yet.");
    }

@@ -21,7 +21,7 @@
 
 #include "codegen/InstOpCode.hpp"
 
-const OMR::ARM64::InstOpCode::OpCodeBinaryEntry OMR::ARM64::InstOpCode::binaryEncodings[ARM64NumOpCodes] =
+const OMR::RV::InstOpCode::OpCodeBinaryEntry OMR::RV::InstOpCode::binaryEncodings[RVNumOpCodes] =
 {
 //		BINARY			Opcode    	Opcode		comments
 /* UNALLOCATED */

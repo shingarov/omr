@@ -19,8 +19,8 @@
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
 
-#ifndef TR_ARM64_INSTOPCODE_INCL
-#define TR_ARM64_INSTOPCODE_INCL
+#ifndef TR_RV_INSTOPCODE_INCL
+#define TR_RV_INSTOPCODE_INCL
 
 #include "codegen/OMRInstOpCode.hpp"
 #include "infra/Assert.hpp"
@@ -42,7 +42,7 @@ class InstOpCode: public OMR::InstOpCodeConnector
     */
    InstOpCode(TR::InstOpCode::Mnemonic m) : OMR::InstOpCodeConnector(m)
       {
-#ifdef TR_RISCV_ARM64_SOURCE_COMPAT
+#ifdef TR_RISCV_RV_SOURCE_COMPAT
       TR_ASSERT((uint32_t)m < (uint32_t)TR::InstOpCode::cbzw || (uint32_t)m >= (uint32_t)TR::InstOpCode::proc,
                "Invalid RISC-V opcode (AArch64 opcode, perhaps?)");
 #endif
