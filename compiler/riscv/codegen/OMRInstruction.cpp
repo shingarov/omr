@@ -26,6 +26,8 @@
 #include "codegen/Instruction.hpp"
 #include "codegen/RegisterDependency.hpp"
 
+#define RISCV_INSTRUCTION_LENGTH 4
+
 namespace TR { class Register; }
 
 OMR::ARM64::Instruction::Instruction(TR::CodeGenerator *cg, TR::InstOpCode::Mnemonic op, TR::Node *node)
@@ -127,4 +129,16 @@ OMR::ARM64::Instruction::assignRegisters(TR_RegisterKinds kindToBeAssigned)
       cond->assignPostConditionRegisters(self(), kindToBeAssigned, self()->cg());
       cond->assignPreConditionRegisters(self()->getPrev(), kindToBeAssigned, self()->cg());
       }
+   }
+
+uint8_t *OMR::ARM64::Instruction::generateBinaryEncoding()
+   {
+   TR_ASSERT(false, "generateBinaryEncoding() must be overloaded in subclasses");
+   return NULL;
+   }
+
+int32_t OMR::ARM64::Instruction::estimateBinaryLength(int32_t currentEstimate)
+   {
+   setEstimatedBinaryLength(RISCV_INSTRUCTION_LENGTH);
+   return currentEstimate + self()->getEstimatedBinaryLength();
    }
