@@ -21,10 +21,10 @@
 
 compiler_library(riscv
 # Target files
-	${CMAKE_CURRENT_LIST_DIR}/codegen/ARM64Debug.cpp
+	${CMAKE_CURRENT_LIST_DIR}/codegen/RVDebug.cpp
 	${CMAKE_CURRENT_LIST_DIR}/codegen/RVInstruction.cpp
-	${CMAKE_CURRENT_LIST_DIR}/codegen/ARM64OutOfLineCodeSection.cpp
-	${CMAKE_CURRENT_LIST_DIR}/codegen/ARM64SystemLinkage.cpp
+	${CMAKE_CURRENT_LIST_DIR}/codegen/RVOutOfLineCodeSection.cpp
+	${CMAKE_CURRENT_LIST_DIR}/codegen/RVSystemLinkage.cpp
 	${CMAKE_CURRENT_LIST_DIR}/codegen/BinaryEvaluator.cpp
 	${CMAKE_CURRENT_LIST_DIR}/codegen/ControlFlowEvaluator.cpp
 	${CMAKE_CURRENT_LIST_DIR}/codegen/FPTreeEvaluator.cpp

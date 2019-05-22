@@ -23,7 +23,7 @@
 #include <riscv.h>
 
 #include "codegen/RVInstruction.hpp"
-#include "codegen/ARM64SystemLinkage.hpp"
+#include "codegen/RVSystemLinkage.hpp"
 #include "codegen/CodeGenerator.hpp"
 #include "codegen/CodeGenerator_inlines.hpp"
 #include "codegen/GCStackMap.hpp"

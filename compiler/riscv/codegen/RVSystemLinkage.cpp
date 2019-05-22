@@ -20,7 +20,7 @@
  *******************************************************************************/
 
 #include <riscv.h>
-#include "codegen/ARM64SystemLinkage.hpp"
+#include "codegen/RVSystemLinkage.hpp"
 #include "codegen/RVInstruction.hpp"
 #include "codegen/GenerateInstructions.hpp"
 #include "codegen/MemoryReference.hpp"
