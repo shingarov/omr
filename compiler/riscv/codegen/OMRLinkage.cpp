@@ -24,6 +24,7 @@
 
 #include "codegen/CodeGenerator.hpp"
 #include "codegen/Linkage.hpp"
+#include "codegen/Linkage_inlines.hpp"
 #include "codegen/MemoryReference.hpp"
 #include "il/Node.hpp"
 #include "il/Node_inlines.hpp"
@@ -160,16 +161,4 @@ OMR::RV::Linkage::numArgumentRegisters(TR_RegisterKinds kind)
       default:
          return 0;
       }
-   }
-
-TR_HeapMemory
-OMR::RV::Linkage::trHeapMemory()
-   {
-   return self()->trMemory();
-   }
-
-TR_StackMemory
-OMR::RV::Linkage::trStackMemory()
-   {
-   return self()->trMemory();
    }

@@ -274,13 +274,9 @@ class OMR_EXTENSIBLE Linkage : public OMR::Linkage
 
    /**
     * @brief Constructor
-    */
-   Linkage () : OMR::Linkage() {}
-   /**
-    * @brief Constructor
     * @param[in] cg : CodeGenerator
     */
-   Linkage (TR::CodeGenerator *cg) : _cg(cg) {}
+   Linkage (TR::CodeGenerator *cg) : OMR::Linkage(cg) {}
 
    /**
     * @brief Parameter has to be on stack or not
@@ -394,43 +390,8 @@ class OMR_EXTENSIBLE Linkage : public OMR::Linkage
     */
    virtual TR::Register *buildIndirectDispatch(TR::Node *callNode) = 0;
 
-   /**
-    * @brief Gets the CodeGenerator
-    * @return CodeGenerator
-    */
-   TR::CodeGenerator *cg() {return _cg;}
-   /**
-    * @brief Gets the Compilation
-    * @return Compilation
-    */
-   TR::Compilation *comp() {return _cg->comp();}
-   /**
-    * @brief Gets the FrontEnd
-    * @return FrontEnd
-    */
-   TR_FrontEnd *fe() {return _cg->fe();}
-
-   /**
-    * @brief Gets the TR_Memory
-    * @return TR_Memory
-    */
-   TR_Memory *trMemory() {return _cg->trMemory();}
-   /**
-    * @brief Gets the Heap Memory
-    * @return Heap Memory
-    */
-   TR_HeapMemory trHeapMemory();
-   /**
-    * @brief Gets the Stack Memory
-    * @return Stack Memory
-    */
-   TR_StackMemory trStackMemory();
-
-   protected:
-
-   TR::CodeGenerator*_cg;
    };
 } // RV
-} // TR
+} // OMR
 
 #endif
