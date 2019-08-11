@@ -111,7 +111,7 @@ TR::Instruction *loadConstant64(TR::CodeGenerator *cg, TR::Node *node, int64_t v
 TR::Register *
 OMR::RV::TreeEvaluator::unImpOpEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 	{
-	TR_ASSERT_FATAL(false, "Opcode %s is not implemented\n", node->getOpCode().getName());
+	TR_ASSERT(false, "Opcode %s is not implemented\n", node->getOpCode().getName());
 	return NULL;
 	}
 
