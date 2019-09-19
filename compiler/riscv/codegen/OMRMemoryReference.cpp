@@ -699,6 +699,7 @@ uint8_t *OMR::ARM64::MemoryReference::generateBinaryEncoding(TR::Instruction *cu
 
 uint32_t OMR::ARM64::MemoryReference::estimateBinaryLength(TR::InstOpCode op)
    {
+   TR_ASSERT(false, "Should not be called anymore");
    if (self()->getUnresolvedSnippet() != NULL)
       {
       TR_ASSERT(false, "Not implemented yet.");

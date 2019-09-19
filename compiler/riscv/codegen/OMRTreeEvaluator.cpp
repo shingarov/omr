@@ -177,7 +177,7 @@ TR::Register *commonLoadEvaluator(TR::Node *node, TR::InstOpCode::Mnemonic op, i
       }
    node->setRegister(tempReg);
    TR::MemoryReference *tempMR = new (cg->trHeapMemory()) TR::MemoryReference(node, memSize, cg);
-   generateTrg1MemInstruction(cg, op, node, tempReg, tempMR);
+   generateLOAD(op, node, tempReg, tempMR, cg);
 
    /*
     * Enable this part when dmb instruction becomes available
@@ -195,7 +195,7 @@ TR::Register *commonLoadEvaluator(TR::Node *node, TR::InstOpCode::Mnemonic op, i
 TR::Register *
 OMR::ARM64::TreeEvaluator::iloadEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return commonLoadEvaluator(node, TR::InstOpCode::ldrimmw, 4, cg);
+   return commonLoadEvaluator(node, TR::InstOpCode::_lw, 4, cg);
    }
 
 // also handles aloadi
@@ -241,28 +241,28 @@ OMR::ARM64::TreeEvaluator::aloadEvaluator(TR::Node *node, TR::CodeGenerator *cg)
 TR::Register *
 OMR::ARM64::TreeEvaluator::lloadEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return commonLoadEvaluator(node, TR::InstOpCode::ldrimmx, 8, cg);
+   return commonLoadEvaluator(node, TR::InstOpCode::_ld, 8, cg);
    }
 
 // also handles bloadi
 TR::Register *
 OMR::ARM64::TreeEvaluator::bloadEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return commonLoadEvaluator(node, TR::InstOpCode::ldrsbimmx, 1, cg);
+   return commonLoadEvaluator(node, TR::InstOpCode::_lb, 1, cg);
    }
 
 // also handles sloadi
 TR::Register *
 OMR::ARM64::TreeEvaluator::sloadEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return commonLoadEvaluator(node, TR::InstOpCode::ldrshimmx, 2, cg);
+   return commonLoadEvaluator(node, TR::InstOpCode::_lh, 2, cg);
    }
 
 // also handles cloadi
 TR::Register *
 OMR::ARM64::TreeEvaluator::cloadEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return commonLoadEvaluator(node, TR::InstOpCode::ldrhimm, 2, cg);
+   return commonLoadEvaluator(node, TR::InstOpCode::_lhu, 2, cg);
    }
 
 TR::Register *
@@ -294,7 +294,7 @@ TR::Register *commonStoreEvaluator(TR::Node *node, TR::InstOpCode::Mnemonic op, 
       generateInstruction(cg, TR::InstOpCode::dmb, node);
       }
     */
-   generateMemSrc1Instruction(cg, op, node, tempMR, cg->evaluate(valueChild));
+   generateSTORE(op, node, tempMR, cg->evaluate(valueChild), cg);
    /*
     * Enable this part when dmb instruction becomes available
    if (needSync)
@@ -313,28 +313,28 @@ TR::Register *commonStoreEvaluator(TR::Node *node, TR::InstOpCode::Mnemonic op, 
 TR::Register *
 OMR::ARM64::TreeEvaluator::lstoreEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return commonStoreEvaluator(node, TR::InstOpCode::strimmx, 8, cg);
+   return commonStoreEvaluator(node, TR::InstOpCode::_sd, 8, cg);
    }
 
 // also handles bstorei
 TR::Register *
 OMR::ARM64::TreeEvaluator::bstoreEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return commonStoreEvaluator(node, TR::InstOpCode::strbimm, 1, cg);
+   return commonStoreEvaluator(node, TR::InstOpCode::_sb, 1, cg);
    }
 
 // also handles sstorei, cstore, cstorei
 TR::Register *
 OMR::ARM64::TreeEvaluator::sstoreEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return commonStoreEvaluator(node, TR::InstOpCode::strhimm, 2, cg);
+   return commonStoreEvaluator(node, TR::InstOpCode::_sh, 2, cg);
    }
 
 // also handles istorei
 TR::Register *
 OMR::ARM64::TreeEvaluator::istoreEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   return commonStoreEvaluator(node, TR::InstOpCode::strimmw, 4, cg);
+   return commonStoreEvaluator(node, TR::InstOpCode::_sw, 4, cg);
    }
 
 TR::Register *

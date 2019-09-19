@@ -67,6 +67,103 @@ class ItypeInstruction : public ARM64Trg1Src1Instruction
 
    };
 
+
+class LoadInstruction : public ARM64Trg1MemInstruction
+   {
+   public:
+
+   LoadInstruction(TR::InstOpCode::Mnemonic op,
+         TR::Node          *n,
+         TR::Register      *treg,
+         TR::MemoryReference *mr,
+         TR::CodeGenerator *codeGen)
+      : ARM64Trg1MemInstruction(op, n, treg, mr, codeGen)
+      {
+      }
+
+
+   LoadInstruction(TR::InstOpCode::Mnemonic op,
+         TR::Node          *n,
+         TR::Register      *treg,
+         TR::MemoryReference *mr,
+         TR::Instruction   *precedingInstruction,
+         TR::CodeGenerator *codeGen)
+      : ARM64Trg1MemInstruction(op, n, treg, mr, precedingInstruction, codeGen)
+      {
+      }
+
+   virtual uint8_t *generateBinaryEncoding();
+
+   virtual int32_t estimateBinaryLength(int32_t currentEstimate);
+   };
+
+
+class StypeInstruction : public ARM64Src2Instruction
+   {
+
+   uint32_t _imm;
+
+   public:
+
+   StypeInstruction(TR::InstOpCode::Mnemonic op,
+         TR::Node          *n,
+         TR::Register      *s1reg,
+         TR::Register      *s2reg,
+         uint32_t          imm,
+         TR::CodeGenerator *codeGen)
+
+      : ARM64Src2Instruction(op, n, s1reg, s2reg, codeGen),
+        _imm(imm)
+      {
+      }
+
+   StypeInstruction(TR::InstOpCode::Mnemonic op,
+         TR::Node          *n,
+         TR::Register      *s1reg,
+         TR::Register      *s2reg,
+         uint32_t          imm,
+         TR::Instruction   *precedingInstruction,
+         TR::CodeGenerator *codeGen)
+      : ARM64Src2Instruction(op, n, s1reg, s2reg, precedingInstruction, codeGen),
+        _imm(imm)
+      {
+      }
+
+   uint32_t getSourceImmediate()            {return _imm;}
+   uint32_t setSourceImmediate(uint32_t si) {return (_imm = si);}
+
+   virtual uint8_t *generateBinaryEncoding();
+
+   };
+
+class StoreInstruction : public ARM64MemSrc1Instruction
+   {
+   public:
+
+   StoreInstruction(TR::InstOpCode::Mnemonic op,
+         TR::Node          *n,
+         TR::MemoryReference *mr,
+         TR::Register      *sreg,
+         TR::CodeGenerator *codeGen)
+      : ARM64MemSrc1Instruction(op, n, mr, sreg, codeGen)
+      {
+      }
+
+   StoreInstruction(TR::InstOpCode::Mnemonic op,
+         TR::Node          *n,
+         TR::MemoryReference *mr,
+         TR::Register      *sreg,
+         TR::Instruction   *precedingInstruction,
+         TR::CodeGenerator *codeGen)
+      : ARM64MemSrc1Instruction(op, n, mr, sreg, precedingInstruction, codeGen)
+      {
+      }
+
+   virtual uint8_t *generateBinaryEncoding();
+
+   virtual int32_t estimateBinaryLength(int32_t currentEstimate);
+   };
+
 class BtypeInstruction : public ARM64LabelInstruction
    {
    protected:
@@ -185,6 +282,28 @@ TR::Instruction *generateITYPE( TR::InstOpCode::Mnemonic op,
                                 TR::Register      *treg,
                                 TR::Register      *sreg,
                                 uint32_t          imm,
+                                TR::CodeGenerator *cg,
+                                TR::Instruction   *previous = NULL);
+
+TR::Instruction *generateLOAD(  TR::InstOpCode::Mnemonic op,
+                                TR::Node          *n,
+                                TR::Register      *trgReg,
+                                TR::MemoryReference *memRef,
+                                TR::CodeGenerator *cg,
+                                TR::Instruction   *previous = NULL);
+
+TR::Instruction *generateSTYPE( TR::InstOpCode::Mnemonic op,
+                                TR::Node          *n,
+                                TR::Register      *s1reg,
+                                TR::Register      *s2reg,
+                                uint32_t          imm,
+                                TR::CodeGenerator *cg,
+                                TR::Instruction   *previous = NULL);
+
+TR::Instruction *generateSTORE( TR::InstOpCode::Mnemonic op,
+                                TR::Node          *n,
+                                TR::MemoryReference *memRef,
+                                TR::Register      *srcReg,
                                 TR::CodeGenerator *cg,
                                 TR::Instruction   *previous = NULL);
 

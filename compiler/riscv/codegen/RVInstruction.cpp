@@ -80,6 +80,73 @@ uint8_t *TR::ItypeInstruction::generateBinaryEncoding() {
    return cursor;
 }
 
+uint8_t *TR::LoadInstruction::generateBinaryEncoding() {
+   uint8_t        *instructionStart = cg()->getBinaryBufferCursor();
+   uint8_t        *cursor           = instructionStart;
+   uint32_t *iPtr = (uint32_t*)instructionStart;
+
+   TR_ASSERT(getMemoryIndex() == nullptr, "Unsupported addressing mode");
+
+   *iPtr = TR_RISCV_ITYPE ((uint32_t)(getOpCode().getOpCodeBinaryEncoding()),
+                         toRealRegister(getTargetRegister())->binaryRegCode(),
+                         toRealRegister(getMemoryBase())->binaryRegCode(),
+                         getMemoryReference()->getOffset(true));
+
+   cursor += RISCV_INSTRUCTION_LENGTH;
+   setBinaryLength(RISCV_INSTRUCTION_LENGTH);
+   setBinaryEncoding(instructionStart);
+   return cursor;
+}
+
+
+int32_t TR::LoadInstruction::estimateBinaryLength(int32_t currentEstimate)
+   {
+   setEstimatedBinaryLength(RISCV_INSTRUCTION_LENGTH);
+   return currentEstimate + self()->getEstimatedBinaryLength();
+   }
+
+uint8_t *TR::StypeInstruction::generateBinaryEncoding() {
+   uint8_t        *instructionStart = cg()->getBinaryBufferCursor();
+   uint8_t        *cursor           = instructionStart;
+   uint32_t *iPtr = (uint32_t*)instructionStart;
+
+   *iPtr = TR_RISCV_STYPE ((uint32_t)(getOpCode().getOpCodeBinaryEncoding()),
+                         toRealRegister(getSource1Register())->binaryRegCode(),
+                         toRealRegister(getSource2Register())->binaryRegCode(),
+                         getSourceImmediate());
+
+   cursor += RISCV_INSTRUCTION_LENGTH;
+   setBinaryLength(RISCV_INSTRUCTION_LENGTH);
+   setBinaryEncoding(instructionStart);
+   return cursor;
+}
+
+uint8_t *TR::StoreInstruction::generateBinaryEncoding() {
+   uint8_t        *instructionStart = cg()->getBinaryBufferCursor();
+   uint8_t        *cursor           = instructionStart;
+   uint32_t *iPtr = (uint32_t*)instructionStart;
+
+   TR_ASSERT(getMemoryIndex() == nullptr, "Unsupported addressing mode");
+
+   *iPtr = TR_RISCV_STYPE ((uint32_t)(getOpCode().getOpCodeBinaryEncoding()),
+                         toRealRegister(getMemoryBase())->binaryRegCode(),
+                         toRealRegister(getSource1Register())->binaryRegCode(),
+                         getMemoryReference()->getOffset(true));
+
+   cursor += RISCV_INSTRUCTION_LENGTH;
+   setBinaryLength(RISCV_INSTRUCTION_LENGTH);
+   setBinaryEncoding(instructionStart);
+   return cursor;
+}
+
+
+int32_t TR::StoreInstruction::estimateBinaryLength(int32_t currentEstimate)
+   {
+   setEstimatedBinaryLength(RISCV_INSTRUCTION_LENGTH);
+   return currentEstimate + self()->getEstimatedBinaryLength();
+   }
+
+
 
 uint8_t *TR::BtypeInstruction::generateBinaryEncoding()
    {
@@ -172,6 +239,46 @@ TR::Instruction *generateITYPE( TR::InstOpCode::Mnemonic op,
       return new (cg->trHeapMemory()) TR::ItypeInstruction(op, n, treg, sreg, imm, previous, cg);
    else
       return new (cg->trHeapMemory()) TR::ItypeInstruction(op, n, treg, sreg, imm, cg);
+   }
+
+TR::Instruction *generateLOAD(  TR::InstOpCode::Mnemonic op,
+                                TR::Node          *n,
+                                TR::Register      *trgReg,
+                                TR::MemoryReference *memRef,
+                                TR::CodeGenerator *cg,
+                                TR::Instruction   *previous)
+   {
+   if (previous)
+      return new (cg->trHeapMemory()) TR::LoadInstruction(op, n, trgReg, memRef, previous, cg);
+   else
+      return new (cg->trHeapMemory()) TR::LoadInstruction(op, n, trgReg, memRef, cg);
+   }
+
+TR::Instruction *generateSTYPE( TR::InstOpCode::Mnemonic op,
+                                TR::Node          *n,
+                                TR::Register      *s1reg,
+                                TR::Register      *s2reg,
+                                uint32_t          imm,
+                                TR::CodeGenerator *cg,
+                                TR::Instruction   *previous)
+   {
+   if (previous)
+      return new (cg->trHeapMemory()) TR::StypeInstruction(op, n, s1reg, s2reg, imm, previous, cg);
+   else
+      return new (cg->trHeapMemory()) TR::StypeInstruction(op, n, s1reg, s2reg, imm, cg);
+   }
+
+TR::Instruction *generateSTORE( TR::InstOpCode::Mnemonic op,
+                                TR::Node          *n,
+                                TR::MemoryReference *memRef,
+                                TR::Register      *srcReg,
+                                TR::CodeGenerator *cg,
+                                TR::Instruction   *previous)
+   {
+   if (previous)
+      return new (cg->trHeapMemory()) TR::StoreInstruction(op, n, memRef, srcReg, previous, cg);
+   else
+      return new (cg->trHeapMemory()) TR::StoreInstruction(op, n, memRef, srcReg, cg);
    }
 
 TR::Instruction *generateBTYPE( TR::InstOpCode::Mnemonic op,

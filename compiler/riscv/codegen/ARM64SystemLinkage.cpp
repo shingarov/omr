@@ -416,6 +416,7 @@ TR::ARM64SystemLinkage::createPrologue(TR::Instruction *cursor, List<TR::Paramet
    TR::ResolvedMethodSymbol *bodySymbol = comp()->getJittedMethodSymbol();
    const TR::ARM64LinkageProperties& properties = getProperties();
    TR::RealRegister *sp = machine->getRealRegister(properties.getStackPointerRegister());
+   TR::RealRegister *ra = machine->getRealRegister(TR::RealRegister::ra);
    TR::Node *firstNode = comp()->getStartTree()->getNode();
 
    // allocate stack space
@@ -429,11 +430,11 @@ TR::ARM64SystemLinkage::createPrologue(TR::Instruction *cursor, List<TR::Paramet
       TR_ASSERT(false, "Not implemented yet.");
       }
 
-   // save link register (x30)
+   // save link register (ra)
    if (machine->getLinkRegisterKilled())
       {
       TR::MemoryReference *stackSlot = new (trHeapMemory()) TR::MemoryReference(sp, 0, codeGen);
-      cursor = generateMemSrc1Instruction(cg(), TR::InstOpCode::strimmx, firstNode, stackSlot, machine->getRealRegister(TR::RealRegister::x30), cursor);
+      cursor = generateSTORE(TR::InstOpCode::_sd, firstNode, stackSlot, ra, codeGen, cursor);
       }
 
    // spill argument registers
@@ -456,8 +457,8 @@ TR::ARM64SystemLinkage::createPrologue(TR::Instruction *cursor, List<TR::Paramet
          case TR::Address:
             if (nextIntArgReg < getProperties().getNumIntArgRegs())
                {
-               op = (parameter->getSize() == 8) ? TR::InstOpCode::strimmx : TR::InstOpCode::strimmw;
-               cursor = generateMemSrc1Instruction(cg(), op, firstNode, stackSlot, machine->getRealRegister((TR::RealRegister::RegNum)(TR::RealRegister::x0 + nextIntArgReg)), cursor);
+               op = (parameter->getSize() == 8) ? TR::InstOpCode::_sd : TR::InstOpCode::_sw;
+               cursor = generateSTORE(op, firstNode, stackSlot, machine->getRealRegister((TR::RealRegister::RegNum)(TR::RealRegister::a0 + nextIntArgReg)), codeGen, cursor);
                nextIntArgReg++;
                }
             else
@@ -470,7 +471,7 @@ TR::ARM64SystemLinkage::createPrologue(TR::Instruction *cursor, List<TR::Paramet
             if (nextFltArgReg < getProperties().getNumFloatArgRegs())
                {
                op = (parameter->getSize() == 8) ? TR::InstOpCode::vstrimmd : TR::InstOpCode::vstrimms;
-               cursor = generateMemSrc1Instruction(cg(), op, firstNode, stackSlot, machine->getRealRegister((TR::RealRegister::RegNum)(TR::RealRegister::v0 + nextFltArgReg)), cursor);
+               cursor = generateMemSrc1Instruction(cg(), op, firstNode, stackSlot, machine->getRealRegister((TR::RealRegister::RegNum)(TR::RealRegister::fa0 + nextFltArgReg)), cursor);
                nextFltArgReg++;
                }
             else
