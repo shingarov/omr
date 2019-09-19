@@ -21,6 +21,7 @@
 
 #include "codegen/ARM64ConditionCode.hpp"
 #include "codegen/ARM64Instruction.hpp"
+#include "codegen/RVInstruction.hpp"
 #include "codegen/CodeGenerator.hpp"
 #include "codegen/GenerateInstructions.hpp"
 #include "codegen/Linkage.hpp"
@@ -86,34 +87,21 @@ TR::Register *OMR::ARM64::TreeEvaluator::gotoEvaluator(TR::Node *node, TR::CodeG
    return NULL;
    }
 
-static TR::Instruction *ificmpHelper(TR::Node *node, TR::ARM64ConditionCode cc, bool is64bit, TR::CodeGenerator *cg)
+static TR::Instruction *ificmpHelper(TR::InstOpCode::Mnemonic op, TR::Node *node, bool reverse, TR::CodeGenerator *cg)
    {
    TR::Node *firstChild = node->getFirstChild();
    TR::Node *secondChild = node->getSecondChild();
    TR::Node *thirdChild = NULL;
+
    TR::Register *src1Reg = cg->evaluate(firstChild);
-   bool useRegCompare = true;
-
-   if (secondChild->getOpCode().isLoadConst() && secondChild->getRegister() == NULL)
-      {
-      int64_t value = is64bit ? secondChild->getLongInt() : secondChild->getInt();
-      if (constantIsUnsignedImm12(value))
-         {
-         generateCompareImmInstruction(cg, node, src1Reg, value, is64bit);
-         useRegCompare = false;
-         }
-      }
-
-   if (useRegCompare)
-      {
-      TR::Register *src2Reg = cg->evaluate(secondChild);
-      generateCompareInstruction(cg, node, src1Reg, src2Reg, is64bit);
-      }
+   TR::Register *src2Reg = cg->evaluate(secondChild);
 
    TR::LabelSymbol *dstLabel = node->getBranchDestination()->getNode()->getLabel();
    TR::Instruction *result;
    if (node->getNumChildren() == 3)
       {
+      TR_ASSERT(false, "Not yet Implemented");
+#if 0
       thirdChild = node->getChild(2);
       TR_ASSERT(thirdChild->getOpCodeValue() == TR::GlRegDeps, "The third child of a compare must be a TR::GlRegDeps");
 
@@ -121,10 +109,14 @@ static TR::Instruction *ificmpHelper(TR::Node *node, TR::ARM64ConditionCode cc, 
 
       TR::RegisterDependencyConditions *deps = generateRegisterDependencyConditions(cg, thirdChild, 0);
       result = generateConditionalBranchInstruction(cg, TR::InstOpCode::b_cond, node, dstLabel, cc, deps);
+#endif
       }
    else
       {
-      result = generateConditionalBranchInstruction(cg, TR::InstOpCode::b_cond, node, dstLabel, cc);
+      if (reverse)
+         result = generateBTYPE(op, node, dstLabel, src2Reg, src1Reg, cg);
+      else
+         result = generateBTYPE(op, node, dstLabel, src1Reg, src2Reg, cg);
       }
 
    firstChild->decReferenceCount();
@@ -140,7 +132,7 @@ static TR::Instruction *ificmpHelper(TR::Node *node, TR::ARM64ConditionCode cc, 
 TR::Register *
 OMR::ARM64::TreeEvaluator::ificmpeqEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   ificmpHelper(node, TR::CC_EQ, false, cg);
+   ificmpHelper(TR::InstOpCode::_beq, node, false, cg);
    return NULL;
    }
 
@@ -148,63 +140,63 @@ OMR::ARM64::TreeEvaluator::ificmpeqEvaluator(TR::Node *node, TR::CodeGenerator *
 TR::Register *
 OMR::ARM64::TreeEvaluator::ificmpneEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   ificmpHelper(node, TR::CC_NE, false, cg);
+   ificmpHelper(TR::InstOpCode::_bne, node, false, cg);
    return NULL;
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::ificmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   ificmpHelper(node, TR::CC_LT, false, cg);
+   ificmpHelper(TR::InstOpCode::_blt, node, false, cg);
    return NULL;
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::ificmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   ificmpHelper(node, TR::CC_GE, false, cg);
+   ificmpHelper(TR::InstOpCode::_bge, node, false, cg);
    return NULL;
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::ificmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   ificmpHelper(node, TR::CC_GT, false, cg);
+   ificmpHelper(TR::InstOpCode::_blt, node, true, cg);
    return NULL;
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::ificmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   ificmpHelper(node, TR::CC_LE, false, cg);
+   ificmpHelper(TR::InstOpCode::_bge, node, true, cg);
    return NULL;
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::ifiucmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   ificmpHelper(node, TR::CC_CC, false, cg);
+   ificmpHelper(TR::InstOpCode::_bltu, node, false, cg);
    return NULL;
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::ifiucmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   ificmpHelper(node, TR::CC_CS, false, cg);
+   ificmpHelper(TR::InstOpCode::_bgeu, node, false, cg);
    return NULL;
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::ifiucmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   ificmpHelper(node, TR::CC_HI, false, cg);
+   ificmpHelper(TR::InstOpCode::_bltu, node, true, cg);
    return NULL;
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::ifiucmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   ificmpHelper(node, TR::CC_LS, false, cg);
+   ificmpHelper(TR::InstOpCode::_bgeu, node, true, cg);
    return NULL;
    }
 
@@ -212,7 +204,7 @@ OMR::ARM64::TreeEvaluator::ifiucmpleEvaluator(TR::Node *node, TR::CodeGenerator 
 TR::Register *
 OMR::ARM64::TreeEvaluator::iflcmpeqEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   ificmpHelper(node, TR::CC_EQ, true, cg);
+   ificmpHelper(TR::InstOpCode::_beq, node, false, cg);
    return NULL;
    }
 
@@ -220,21 +212,21 @@ OMR::ARM64::TreeEvaluator::iflcmpeqEvaluator(TR::Node *node, TR::CodeGenerator *
 TR::Register *
 OMR::ARM64::TreeEvaluator::iflcmpneEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   ificmpHelper(node, TR::CC_NE, true, cg);
+   ificmpHelper(TR::InstOpCode::_bne, node, false, cg);
    return NULL;
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::iflcmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   ificmpHelper(node, TR::CC_LT, true, cg);
+   ificmpHelper(TR::InstOpCode::_blt, node, false, cg);
    return NULL;
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::iflcmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   ificmpHelper(node, TR::CC_GE, true, cg);
+   ificmpHelper(TR::InstOpCode::_blt, node, true, cg);
    return NULL;
    }
 
@@ -242,7 +234,7 @@ OMR::ARM64::TreeEvaluator::iflcmpgeEvaluator(TR::Node *node, TR::CodeGenerator *
 TR::Register *
 OMR::ARM64::TreeEvaluator::iflucmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   ificmpHelper(node, TR::CC_CC, true, cg);
+   ificmpHelper(TR::InstOpCode::_bltu, node, false, cg);
    return NULL;
    }
 
@@ -250,21 +242,21 @@ OMR::ARM64::TreeEvaluator::iflucmpltEvaluator(TR::Node *node, TR::CodeGenerator 
 TR::Register *
 OMR::ARM64::TreeEvaluator::iflucmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   ificmpHelper(node, TR::CC_CS, true, cg);
+   ificmpHelper(TR::InstOpCode::_bgeu, node, false, cg);
    return NULL;
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::iflcmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   ificmpHelper(node, TR::CC_GT, true, cg);
+   ificmpHelper(TR::InstOpCode::_blt, node, true, cg);
    return NULL;
    }
 
 TR::Register *
 OMR::ARM64::TreeEvaluator::iflcmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   ificmpHelper(node, TR::CC_LE, true, cg);
+   ificmpHelper(TR::InstOpCode::_bge, node, true, cg);
    return NULL;
    }
 
@@ -272,7 +264,7 @@ OMR::ARM64::TreeEvaluator::iflcmpleEvaluator(TR::Node *node, TR::CodeGenerator *
 TR::Register *
 OMR::ARM64::TreeEvaluator::iflucmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   ificmpHelper(node, TR::CC_HI, true, cg);
+   ificmpHelper(TR::InstOpCode::_bltu, node, true, cg);
    return NULL;
    }
 
@@ -280,7 +272,7 @@ OMR::ARM64::TreeEvaluator::iflucmpgtEvaluator(TR::Node *node, TR::CodeGenerator 
 TR::Register *
 OMR::ARM64::TreeEvaluator::iflucmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
-   ificmpHelper(node, TR::CC_LS, true, cg);
+   ificmpHelper(TR::InstOpCode::_bgeu, node, true, cg);
    return NULL;
    }
 
