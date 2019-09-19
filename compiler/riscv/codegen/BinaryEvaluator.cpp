@@ -19,7 +19,9 @@
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
 
+#include <riscv.h>
 #include "codegen/ARM64Instruction.hpp"
+#include "codegen/RVInstruction.hpp"
 #include "codegen/ARM64ShiftCode.hpp"
 #include "codegen/CodeGenerator.hpp"
 #include "codegen/GenerateInstructions.hpp"
@@ -41,22 +43,22 @@ static TR::Register *addOrSubInteger(TR::Node *node, TR::CodeGenerator *cg)
    if (secondChild->getOpCode().isLoadConst() && secondChild->getRegister() == NULL)
       {
       int32_t value = secondChild->getInt();
-      if (constantIsUnsignedImm12(value))
+      if (VALID_ITYPE_IMM(value))
          {
-         generateTrg1Src1ImmInstruction(cg, isAdd ? TR::InstOpCode::addimmw : TR::InstOpCode::subimmw, node, trgReg, src1Reg, value);
+         generateITYPE(TR::InstOpCode::_addi, node, trgReg, src1Reg, isAdd ? value : - value, cg);
          }
       else
          {
          TR::Register *tmpReg = cg->allocateRegister();
          loadConstant32(cg, node, value, tmpReg);
-         generateTrg1Src2Instruction(cg, isAdd ? TR::InstOpCode::addw : TR::InstOpCode::subw, node, trgReg, src1Reg, tmpReg);
+         generateRTYPE(isAdd ? TR::InstOpCode::_add : TR::InstOpCode::_sub, node, trgReg, src1Reg, tmpReg, cg);
          cg->stopUsingRegister(tmpReg);
          }
       }
    else
       {
       TR::Register *src2Reg = cg->evaluate(secondChild);
-      generateTrg1Src2Instruction(cg, isAdd ? TR::InstOpCode::addw : TR::InstOpCode::subw, node, trgReg, src1Reg, src2Reg);
+      generateRTYPE(isAdd ? TR::InstOpCode::_add : TR::InstOpCode::_sub, node, trgReg, src1Reg, src2Reg, cg);
       }
 
    node->setRegister(trgReg);
