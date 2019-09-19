@@ -19,6 +19,8 @@
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
 
+#include <riscv.h>
+#include "codegen/RVInstruction.hpp"
 #include "codegen/ARM64ShiftCode.hpp"
 #include "codegen/CodeGenerator.hpp"
 #include "codegen/GenerateInstructions.hpp"
@@ -32,47 +34,20 @@
 #include "il/symbol/LabelSymbol.hpp"
 #include "il/symbol/ParameterSymbol.hpp"
 
+
 TR::Instruction *loadConstant32(TR::CodeGenerator *cg, TR::Node *node, int32_t value, TR::Register *trgReg, TR::Instruction *cursor)
    {
    TR::Instruction *insertingInstructions = cursor;
    if (cursor == NULL)
       cursor = cg->getAppendInstruction();
 
-   TR::InstOpCode::Mnemonic op = TR::InstOpCode::bad;
-   uint32_t imm;
-
-   if (value >= 0 && value <= 65535)
+   if (VALID_ITYPE_IMM(value))
       {
-      op = TR::InstOpCode::movzw;
-      imm = value & 0xFFFF;
-      }
-   else if (value >= -65535 && value < 0)
-      {
-      op = TR::InstOpCode::movnw;
-      imm = ~value & 0xFFFF;
-      }
-   else if ((value & 0xFFFF) == 0)
-      {
-      op = TR::InstOpCode::movzw;
-      imm = ((value >> 16) & 0xFFFF) | TR::MOV_LSL16;
-      }
-   else if ((value & 0xFFFF) == 0xFFFF)
-      {
-      op = TR::InstOpCode::movnw;
-      imm = ((~value >> 16) & 0xFFFF) | TR::MOV_LSL16;
-      }
-
-   if (op != TR::InstOpCode::bad)
-      {
-      cursor = generateTrg1ImmInstruction(cg, op, node, trgReg, imm, cursor);
+      cursor = generateITYPE(TR::InstOpCode::_addiw, node, trgReg, cg->machine()->getRealRegister(TR::RealRegister::zero), value, cg);
       }
    else
       {
-      // need two instructions
-      cursor = generateTrg1ImmInstruction(cg, TR::InstOpCode::movzw, node, trgReg,
-                                          (value & 0xFFFF), cursor);
-      cursor = generateTrg1ImmInstruction(cg, TR::InstOpCode::movkw, node, trgReg,
-                                          (((value >> 16) & 0xFFFF) | TR::MOV_LSL16), cursor);
+      TR_ASSERT(false, "Not yet implemented");
       }
 
    if (!insertingInstructions)
