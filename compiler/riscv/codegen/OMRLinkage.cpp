@@ -69,21 +69,21 @@ TR::MemoryReference *OMR::RV::Linkage::getOutgoingArgumentMemRef(TR::Register *a
 
 TR::Instruction *OMR::RV::Linkage::saveArguments(TR::Instruction *cursor)
    {
-   TR_ASSERT(false, "Not implemented yet.");
+   TR_UNIMPLEMENTED();
 
    return cursor;
    }
 
 TR::Instruction *OMR::RV::Linkage::loadUpArguments(TR::Instruction *cursor)
    {
-   TR_ASSERT(false, "Not implemented yet.");
+   TR_UNIMPLEMENTED();
 
    return cursor;
    }
 
 TR::Instruction *OMR::RV::Linkage::flushArguments(TR::Instruction *cursor)
    {
-   TR_ASSERT(false, "Not implemented yet.");
+   TR_UNIMPLEMENTED();
 
    return cursor;
    }

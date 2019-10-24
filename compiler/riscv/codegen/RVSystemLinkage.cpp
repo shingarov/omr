@@ -439,7 +439,7 @@ TR::RVSystemLinkage::createPrologue(TR::Instruction *cursor, List<TR::ParameterS
       }
    else
       {
-      TR_ASSERT(false, "Not implemented yet.");
+      TR_UNIMPLEMENTED();
       }
 
    // save link register (ra)
@@ -542,7 +542,7 @@ TR::RVSystemLinkage::createEpilogue(TR::Instruction *cursor)
       }
    else
       {
-      TR_ASSERT(false, "Not implemented yet.");
+      TR_UNIMPLEMENTED();
       }
 
    // return
@@ -863,7 +863,7 @@ TR::Register *TR::RVSystemLinkage::buildDirectDispatch(TR::Node *callNode)
 
 TR::Register *TR::RVSystemLinkage::buildIndirectDispatch(TR::Node *callNode)
    {
-   TR_ASSERT(false, "Not implemented yet.");
+   TR_UNIMPLEMENTED();
 
    return NULL;
    }

@@ -99,7 +99,7 @@ OMR::RV::MemoryReference::MemoryReference(
       {
       if (ref->isUnresolved())
          {
-         TR_ASSERT(false, "Not implemented yet.");
+         TR_UNIMPLEMENTED();
          }
       self()->populateMemoryReference(rootLoadOrStore->getFirstChild(), cg);
       }
@@ -107,7 +107,7 @@ OMR::RV::MemoryReference::MemoryReference(
       {
       if (symbol->isStatic())
          {
-         TR_ASSERT(false, "Not implemented yet.");
+         TR_UNIMPLEMENTED();
          }
       else
          {
@@ -124,7 +124,7 @@ OMR::RV::MemoryReference::MemoryReference(
    self()->addToOffset(rootLoadOrStore, ref->getOffset(), cg);
    if (self()->getUnresolvedSnippet() != NULL)
       {
-      TR_ASSERT(false, "Not implemented yet.");
+      TR_UNIMPLEMENTED();
       }
    }
 
@@ -143,13 +143,13 @@ OMR::RV::MemoryReference::MemoryReference(
    _offset(0),
    _symbolReference(symRef)
    {
-   TR_ASSERT(false, "Not implemented yet.");
+   TR_UNIMPLEMENTED();
    }
 
 
 bool OMR::RV::MemoryReference::useIndexedForm()
    {
-   TR_ASSERT(false, "Not implemented yet.");
+   TR_UNIMPLEMENTED();
 
    return false;
    }
@@ -319,7 +319,7 @@ void OMR::RV::MemoryReference::populateMemoryReference(TR::Node *subTree, TR::Co
 
          if (symbol->isStatic())
             {
-            TR_ASSERT(false, "Not implemented yet.");
+            TR_UNIMPLEMENTED();
             }
          if (symbol->isRegisterMappedSymbol())
             {
@@ -386,7 +386,7 @@ void OMR::RV::MemoryReference::consolidateRegisters(TR::Register *srcReg, TR::No
 
    if (self()->getUnresolvedSnippet() != NULL)
       {
-      TR_ASSERT(false, "Not implemented yet.");
+      TR_UNIMPLEMENTED();
       }
    else
       {

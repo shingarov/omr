@@ -140,7 +140,7 @@ TR_Debug::print(TR::FILE *pOutFile, TR::LabelInstruction *instr)
       print(pOutFile, label);
       if (snippet)
          {
-         TR_ASSERT(false, "Not implemented yet.");
+         TR_UNIMPLEMENTED();
          }
       }
    printInstructionComment(pOutFile, 1, instr);
@@ -234,7 +234,7 @@ TR_Debug::print(TR::FILE *pOutFile, TR::MemoryReference *mr)
 void
 TR_Debug::printRVGCRegisterMap(TR::FILE *pOutFile, TR::GCRegisterMap *map)
    {
-   TR_ASSERT(false, "Not implemented yet.");
+   TR_UNIMPLEMENTED();
    }
 
 void
@@ -273,5 +273,5 @@ TR_Debug::getRVRegisterName(uint32_t regNum, bool is64bit)
 
 void TR_Debug::printRVOOLSequences(TR::FILE *pOutFile)
    {
-   TR_ASSERT(false, "Not implemented yet.");
+   TR_UNIMPLEMENTED();
    }

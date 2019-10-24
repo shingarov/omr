@@ -39,7 +39,7 @@ OMR::RV::RegisterDependencyConditions::RegisterDependencyConditions(
                                        uint32_t          extranum,
                                        TR::Instruction  **cursorPtr)
    {
-   TR_ASSERT(false, "Not implemented yet.");
+   TR_UNIMPLEMENTED();
    }
 
 void OMR::RV::RegisterDependencyConditions::unionNoRegPostCondition(TR::Register *reg, TR::CodeGenerator *cg)
@@ -148,7 +148,7 @@ OMR::RV::RegisterDependencyConditions::clone(
    TR::CodeGenerator *cg,
    TR::RegisterDependencyConditions *added)
    {
-   TR_ASSERT(false, "Not implemented yet.");
+   TR_UNIMPLEMENTED();
 
    return NULL;
    }

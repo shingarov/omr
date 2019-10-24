@@ -99,7 +99,7 @@ static TR::Instruction *ificmpHelper(TR::InstOpCode::Mnemonic op, TR::Node *node
    TR::Instruction *result;
    if (node->getNumChildren() == 3)
       {
-      TR_ASSERT(false, "Not yet Implemented");
+      TR_UNIMPLEMENTED();
 #if 0
       thirdChild = node->getChild(2);
       TR_ASSERT(thirdChild->getOpCodeValue() == TR::GlRegDeps, "The third child of a compare must be a TR::GlRegDeps");

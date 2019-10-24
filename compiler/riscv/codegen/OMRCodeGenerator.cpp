@@ -126,7 +126,7 @@ OMR::RV::CodeGenerator::beginInstructionSelection()
    TR::Node *startNode = comp->getStartTree()->getNode();
    if (comp->getMethodSymbol()->getLinkageConvention() == TR_Private)
       {
-      TR_ASSERT(false, "Not implemented yet.");
+      TR_UNIMPLEMENTED();
 
       //_returnTypeInfoInstruction = new (self()->trHeapMemory()) TR::RVImmInstruction(TR::InstOpCode::dd, startNode, 0, self());
       }
@@ -143,7 +143,7 @@ OMR::RV::CodeGenerator::endInstructionSelection()
    {
    if (_returnTypeInfoInstruction != NULL)
       {
-      TR_ASSERT(false, "Not implemented yet.");
+      TR_UNIMPLEMENTED();
 
       //_returnTypeInfoInstruction->setSourceImmediate(static_cast<uint32_t>(self()->comp()->getReturnInfo()));
       }
@@ -277,7 +277,7 @@ TR::Linkage *OMR::RV::CodeGenerator::createLinkage(TR_LinkageConventions lc)
 
 void OMR::RV::CodeGenerator::emitDataSnippets()
    {
-   TR_ASSERT(false, "Not implemented yet.");
+   TR_UNIMPLEMENTED();
    /*
     * Commented out until TR::ConstantDataSnippet is implemented
    self()->setBinaryBufferCursor(_constantData->emitSnippetBody());
@@ -291,7 +291,7 @@ bool OMR::RV::CodeGenerator::hasDataSnippets()
 
 int32_t OMR::RV::CodeGenerator::setEstimatedLocationsForDataSnippetLabels(int32_t estimatedSnippetStart)
    {
-   TR_ASSERT(false, "Not implemented yet.");
+   TR_UNIMPLEMENTED();
    return 0;
    /*
     * Commented out until TR::ConstantDataSnippet is implemented
@@ -306,7 +306,7 @@ void OMR::RV::CodeGenerator::dumpDataSnippets(TR::FILE *outFile)
    if (outFile == NULL)
       return;
 
-   TR_ASSERT(false, "Not implemented yet.");
+   TR_UNIMPLEMENTED();
    /*
     * Commented out until TR::ConstantDataSnippet is implemented
    _constantData->print(outFile);
@@ -317,7 +317,7 @@ void OMR::RV::CodeGenerator::dumpDataSnippets(TR::FILE *outFile)
 
 TR::Instruction *OMR::RV::CodeGenerator::generateSwitchToInterpreterPrePrologue(TR::Instruction *cursor, TR::Node *node)
    {
-   TR_ASSERT(false, "Not implemented yet.");
+   TR_UNIMPLEMENTED();
 
    return NULL;
    }
@@ -341,7 +341,7 @@ TR::Register *OMR::RV::CodeGenerator::gprClobberEvaluate(TR::Node *node)
 
 void OMR::RV::CodeGenerator::buildRegisterMapForInstruction(TR_GCStackMap *map)
    {
-   TR_ASSERT(false, "Not implemented yet.");
+   TR_UNIMPLEMENTED();
    }
 
 
@@ -363,14 +363,14 @@ bool OMR::RV::CodeGenerator::allowGlobalRegisterAcrossBranch(TR_RegisterCandidat
 
 int32_t OMR::RV::CodeGenerator::getMaximumNumberOfGPRsAllowedAcrossEdge(TR::Node *node)
    {
-   TR_ASSERT(false, "Not implemented yet.");
+   TR_UNIMPLEMENTED();
 
    return 0;
    }
 
 int32_t OMR::RV::CodeGenerator::getMaximumNumberOfFPRsAllowedAcrossEdge(TR::Node *node)
    {
-   TR_ASSERT(false, "Not implemented yet.");
+   TR_UNIMPLEMENTED();
 
    return 0;
    }
@@ -392,7 +392,7 @@ bool OMR::RV::CodeGenerator::isGlobalRegisterAvailable(TR_GlobalRegisterNumber i
 
 TR_GlobalRegisterNumber OMR::RV::CodeGenerator::getLinkageGlobalRegisterNumber(int8_t linkageRegisterIndex, TR::DataType type)
    {
-   TR_ASSERT(false, "Not implemented yet.");
+   TR_UNIMPLEMENTED();
 
    return 0;
    }

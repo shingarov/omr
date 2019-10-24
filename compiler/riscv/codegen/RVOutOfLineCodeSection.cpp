@@ -34,10 +34,10 @@ TR_RVOutOfLineCodeSection::TR_RVOutOfLineCodeSection(TR::Node *callNode,
 
 void TR_RVOutOfLineCodeSection::assignRegisters(TR_RegisterKinds kindsToBeAssigned)
    {
-   TR_ASSERT(false, "Not implemented yet.");
+   TR_UNIMPLEMENTED();
    }
 
 void TR_RVOutOfLineCodeSection::generateRVOutOfLineCodeSectionDispatch()
    {
-   TR_ASSERT(false, "Not implemented yet.");
+   TR_UNIMPLEMENTED();
    }
