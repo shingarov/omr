@@ -28,13 +28,13 @@
 #define DECLARE_GPR(regname, abiname, encoding) \
       abiname           = NoReg + 1 + encoding, \
       regname           = NoReg + 1 + encoding,
-#include <codegen/riscv-regs.h>
+#include "codegen/riscv-regs.h"
 #undef DECLARE_GPR
 
 #define DECLARE_FPR(regname, abiname, encoding) \
       abiname           = x31 + 1 + encoding, \
       regname           = x31 + 1 + encoding,
-#include <codegen/riscv-regs.h>
+#include "codegen/riscv-regs.h"
 #undef DECLARE_FPR
       FirstGPR          = x0,
       LastGPR           = x31,

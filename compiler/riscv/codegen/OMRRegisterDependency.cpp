@@ -30,9 +30,6 @@
 #include "codegen/RegisterDependency.hpp"
 #include "il/Node.hpp"
 
-// Replace this by #include "codegen/Instruction.hpp" when available for aarch64
-namespace TR { class Instruction; }
-
 OMR::RV::RegisterDependencyConditions::RegisterDependencyConditions(
                                        TR::CodeGenerator *cg,
                                        TR::Node          *node,

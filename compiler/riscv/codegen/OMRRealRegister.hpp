@@ -69,16 +69,6 @@ class OMR_EXTENSIBLE RealRegister : public OMR::RealRegister
 
    public:
 
-   typedef enum  {
-      pos_RD     = 0,
-      pos_RN     = 5,
-      pos_RM     = 16,
-      pos_RT     = 0,
-      pos_RT2    = 10,
-      pos_RS     = 16,
-      pos_RA     = 10
-   } RVOperandPosition;
-
    /**
     * @brief Return binary encoding of the register
     * @return: register binary encoding
@@ -86,69 +76,6 @@ class OMR_EXTENSIBLE RealRegister : public OMR::RealRegister
    uint32_t binaryRegCode()
       {
       return (uint32_t)fullRegBinaryEncodings[_registerNumber];
-      }
-
-   /**
-    * @brief Set the RealRegister in the Rd field of the specified instruction
-    * @param[in] instruction : target instruction
-    */
-   void setRegisterFieldRD(uint32_t *instruction)
-      {
-      TR_ASSERT(false, "Should not be called anymore!");
-      }
-
-   /**
-    * @brief Set the RealRegister in the Rn field of the specified instruction
-    * @param[in] instruction : target instruction
-    */
-   void setRegisterFieldRN(uint32_t *instruction)
-      {
-      TR_ASSERT(false, "Should not be called anymore!");
-      }
-
-   /**
-    * @brief Set the RealRegister in the Rm field of the specified instruction
-    * @param[in] instruction : target instruction
-    */
-   void setRegisterFieldRM(uint32_t *instruction)
-      {
-      TR_ASSERT(false, "Should not be called anymore!");
-      }
-
-   /**
-    * @brief Set the RealRegister in the Rt field of the specified instruction
-    * @param[in] instruction : target instruction
-    */
-   void setRegisterFieldRT(uint32_t *instruction)
-      {
-      TR_ASSERT(false, "Should not be called anymore!");
-      }
-
-   /**
-    * @brief Set the RealRegister in the Rt2 field of the specified instruction
-    * @param[in] instruction : target instruction
-    */
-   void setRegisterFieldRT2(uint32_t *instruction)
-      {
-      TR_ASSERT(false, "Should not be called anymore!");
-      }
-
-   /**
-    * @brief Set the RealRegister in the Rs field of the specified instruction
-    * @param[in] instruction : target instruction
-    */
-   void setRegisterFieldRS(uint32_t *instruction)
-      {
-      TR_ASSERT(false, "Should not be called anymore!");
-      }
-
-   /**
-    * @brief Set the RealRegister in the Ra field of the specified instruction
-    * @param[in] instruction : target instruction
-    */
-   void setRegisterFieldRA(uint32_t *instruction)
-      {
-      TR_ASSERT(false, "Should not be called anymore!");
       }
 
    private:
