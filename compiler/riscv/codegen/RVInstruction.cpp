@@ -357,24 +357,18 @@ void TR::StoreInstruction::assignRegisters(TR_RegisterKinds kindToBeAssigned)
    {
    TR::Machine *machine = cg()->machine();
    TR::MemoryReference *mref = getMemoryReference();
-   TR::Register *sourceVirtual = getSource1Register();
+   TR::Register *source1Virtual = getSource1Register();
 
    if (getDependencyConditions())
       getDependencyConditions()->assignPostConditionRegisters(this, kindToBeAssigned, cg());
 
-   sourceVirtual->block();
+   source1Virtual->block();
    mref->assignRegisters(this, cg());
-   sourceVirtual->unblock();
+   source1Virtual->unblock();
 
    mref->blockRegisters();
-   TR::RealRegister *assignedRegister = sourceVirtual->getAssignedRealRegister();
-   if (assignedRegister == NULL)
-      {
-      assignedRegister = machine->assignOneRegister(this, sourceVirtual);
-      }
+   setSource1Register(machine->assignOneRegister(this, source1Virtual));
    mref->unblockRegisters();
-
-   setSource1Register(assignedRegister);
 
    if (getDependencyConditions())
       getDependencyConditions()->assignPreConditionRegisters(this->getPrev(), kindToBeAssigned, cg());
