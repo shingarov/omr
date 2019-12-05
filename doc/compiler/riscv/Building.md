@@ -16,7 +16,7 @@ can get them using (the image created using [debian-riscv][1] contains them):
 ### Building
 
 ```
-git clone https://github.com/shingarov/omr -b riscv
+git clone https://github.com/eclipse/omr
 cd omr
 mkdir build
 cd build
