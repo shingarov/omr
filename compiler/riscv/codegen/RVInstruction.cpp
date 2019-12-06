@@ -45,7 +45,6 @@
 #include "il/DataTypes.hpp"                       // for CONSTANT64
 #include "il/ILOps.hpp"                           // for ILOpCode
 #include "il/Node.hpp"                            // for Node
-#include "il/symbol/LabelSymbol.hpp"              // for LabelSymbol
 #include "infra/Assert.hpp"                       // for TR_ASSERT
 #include "codegen/RVOutOfLineCodeSection.hpp"
 

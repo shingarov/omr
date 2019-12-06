@@ -29,9 +29,9 @@
 #include "codegen/TreeEvaluator.hpp"
 #include "il/Node.hpp"
 #include "il/Node_inlines.hpp"
-#include "il/symbol/AutomaticSymbol.hpp"
-#include "il/symbol/LabelSymbol.hpp"
-#include "il/symbol/ParameterSymbol.hpp"
+#include "il/AutomaticSymbol.hpp"
+#include "il/LabelSymbol.hpp"
+#include "il/ParameterSymbol.hpp"
 
 
 TR::Instruction *loadConstant32(TR::CodeGenerator *cg, TR::Node *node, int32_t value, TR::Register *trgReg, TR::Instruction *cursor)

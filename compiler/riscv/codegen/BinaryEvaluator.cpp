@@ -28,7 +28,8 @@
 #include "codegen/TreeEvaluator.hpp"
 #include "il/Node.hpp"
 #include "il/Node_inlines.hpp"
-#include "il/symbol/AutomaticSymbol.hpp"
+#include "il/AutomaticSymbol.hpp"
+#include "il/ParameterSymbol.hpp"
 #include "infra/Bit.hpp"
 
 /*

@@ -28,7 +28,8 @@
 #include "codegen/MemoryReference.hpp"
 #include "env/StackMemoryRegion.hpp"
 #include "il/Node_inlines.hpp"
-#include "il/symbol/AutomaticSymbol.hpp"
+#include "il/AutomaticSymbol.hpp"
+#include "il/ParameterSymbol.hpp"
 
 
 //getRegisterNumber
